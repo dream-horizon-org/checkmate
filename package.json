@@ -20,7 +20,7 @@
     "docker:setup": "./scripts/docker-start.sh --app-docker true --db-init true --seed-data true",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "NODE_ENV=production node server.mjs",
-    "unit:test": "NODE_ENV=test node --expose-gc --no-compilation-cache ./node_modules/jest/bin/jest --maxWorkers=70% --silent --watchAll=false --clearMocks",
+    "unit:test": "NODE_ENV=test node --expose-gc --no-compilation-cache ./node_modules/jest/bin/jest --maxWorkers=70% --silent --watchAll=false --clearMocks --logHeapUsage",
     "unit:test:coverage": "NODE_ENV=test node --expose-gc --no-compilation-cache ./node_modules/jest/bin/jest --maxWorkers=70% --silent --watchAll=false --clearMocks --coverage"
   },
   "dependencies": {
@@ -65,6 +65,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "7.52.1",
     "react-resizable-panels": "2.1.3",
+    "redis": "^4.6.0",
     "remix-auth": "^3.5.0",
     "remix-auth-google": "^2.0.0",
     "semantic-ui-css": "2.5.0",

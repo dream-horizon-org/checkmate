@@ -59,6 +59,7 @@ export enum API {
   RunUpdateTestStatus = 'api/v1/run/update-test-status',
   GetAllUser = 'api/v1/all-users',
   UpdateUserRole = 'api/v1/user/update-role',
+  CacheAdmin = 'api/v1/cache',
   AddSection = 'api/v1/project/add-section',
   EditSection = 'api/v1/project/edit-section',
   DeleteSection = 'api/v1/project/delete-section',

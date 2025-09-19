@@ -24,6 +24,23 @@ services:
       retries: 5
       start_period: 30s
 
+  checkmate-redis:
+    image: redis:7.2-alpine
+    container_name: checkmate-redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - checkmate-redis:/data
+    networks:
+      - checkmate-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   db_seeder:
     image: mysql:8.0
     container_name: db-seeder
@@ -50,10 +67,13 @@ services:
     depends_on:
       checkmate-db:
         condition: service_healthy
+      checkmate-redis:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       DB_URL: ${DOCKER_DB_URL}
+      REDIS_URL: redis://checkmate-redis:6379
       NODE_ENV: production
     ports:
       - 3000:3000
@@ -67,6 +87,8 @@ volumes:
     name: checkmate-db
   checkmate-app:
     name: checkmate-app
+  checkmate-redis:
+    name: checkmate-redis
 
 networks:
   checkmate-network:

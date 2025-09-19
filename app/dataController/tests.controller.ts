@@ -13,6 +13,7 @@ import SectionsController, {ICreateSectionResponse} from './sections.controller'
 import SquadsController from './squads.controller'
 import {addSectionHierarchy} from '@components/SectionList/utils'
 import {SectionWithHierarchy} from '@components/SectionList/interfaces'
+import {CacheService} from '~/services/redis/cache'
 
 export interface ITestStatus {
   projectId: number
@@ -89,22 +90,82 @@ export interface IBulkDeleteTests {
 
 const TestsController = {
   getTests: async (params: ITestsController) => {
-    const [testData, count] = await Promise.all([
-      TestsDao.getTests(params),
-      TestsDao.getTestsCount(params),
-    ])
-    return {testData, count}
+    const cacheKey = {
+      prefix: 'tests:list',
+      projectId: params.projectId,
+      additional: `page:${params.page}:size:${params.pageSize}:labels:${
+        params.labelIds?.join(',') || ''
+      }:squads:${params.squadIds?.join(',') || ''}:sections:${
+        params.sectionIds?.join(',') || ''
+      }:platforms:${params.platformIds?.join(',') || ''}:search:${
+        params.textSearch || ''
+      }:filter:${params.filterType || ''}:status:${params.status || ''}:sort:${
+        params.sortBy || ''
+      }:order:${params.sortOrder || ''}`,
+    }
+
+    return CacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const [testData, count] = await Promise.all([
+          TestsDao.getTests(params),
+          TestsDao.getTestsCount(params),
+        ])
+        return {testData, count}
+      },
+      {
+        ttl: 180, // 3 minutes (tests change frequently)
+        tags: [`project:${params.projectId}`, 'tests'],
+      },
+    )
   },
-  getTestsCount: (params: ITestsCountController) =>
-    TestsDao.getTestsCount(params),
+  getTestsCount: async (params: ITestsCountController) => {
+    const cacheKey = {
+      prefix: 'tests:count',
+      projectId: params.projectId,
+      additional: `labels:${params.labelIds?.join(',') || ''}:squads:${
+        params.squadIds?.join(',') || ''
+      }:sections:${params.sectionIds?.join(',') || ''}:platforms:${
+        params.platformIds?.join(',') || ''
+      }:search:${params.textSearch || ''}:filter:${
+        params.filterType || ''
+      }:status:${params.status || ''}:includeIds:${
+        params.includeTestIds || false
+      }`,
+    }
+
+    return CacheService.getOrSet(
+      cacheKey,
+      () => TestsDao.getTestsCount(params),
+      {
+        ttl: 300, // 5 minutes
+        tags: [`project:${params.projectId}`, 'tests'],
+      },
+    )
+  },
   createTest: async (params: ICreateTestController) => {
     const results = await handleNewSectionAndSquad(params)
     if (results?.newSection) params.sectionId = results.newSection.sectionId
     if (results?.newSquad) params.squadId = results.newSquad.squadId
 
-    return TestsDao.createTest(params)
+    const result = await TestsDao.createTest(params)
+
+    // Invalidate project-level test caches
+    await CacheService.invalidateByTag(`project:${params.projectId}`)
+    await CacheService.invalidateByTag('tests')
+
+    return result
   },
-  deleteTest: (params: IDeleteTestController) => TestsDao.deleteTest(params),
+  deleteTest: async (params: IDeleteTestController) => {
+    const result = await TestsDao.deleteTest(params)
+
+    // Invalidate caches for the deleted test
+    await CacheService.invalidateByTag(`project:${params.projectId}`)
+    await CacheService.invalidateByTag(`test:${params.testId}`)
+    await CacheService.invalidateByTag('tests')
+
+    return result
+  },
   updateTest: async (params: IUpdateTestController) => {
     const results = await handleNewSectionAndSquad({
       new_section: params.new_section,
@@ -115,11 +176,32 @@ const TestsController = {
     if (results?.newSection) params.sectionId = results.newSection.sectionId
     if (results?.newSquad) params.squadId = results.newSquad.squadId
 
-    return TestsDao.updateTest(params)
+    const result = await TestsDao.updateTest(params)
+
+    // Invalidate caches for the updated test
+    await CacheService.invalidateByTag(`project:${params.projectId}`)
+    await CacheService.invalidateByTag(`test:${params.testId}`)
+    await CacheService.invalidateByTag('tests')
+
+    return result
   },
   updateLabelTestMap: (params: IUpdateLabelTestMapController) =>
     TestsDao.updateLabelTestMap(params),
-  updateTests: (params: IUpdateTests) => TestsDao.updateTests(params),
+  updateTests: async (params: IUpdateTests) => {
+    const result = await TestsDao.updateTests(params)
+
+    // Invalidate caches for bulk test updates
+    if (params.projectId) {
+      await CacheService.invalidateByTag(`project:${params.projectId}`)
+    }
+    // Invalidate individual test caches if test IDs provided
+    for (const testId of params.testIds) {
+      await CacheService.invalidateByTag(`test:${testId}`)
+    }
+    await CacheService.invalidateByTag('tests')
+
+    return result
+  },
 
   bulkAddTests: async (param: IBulkAddTestsController) => {
     try {
@@ -317,8 +399,22 @@ const TestsController = {
 
   getTestStatus: (param: ITestStatus) => TestsDao.getTestStatus(param),
 
-  getTestDetails: (projectId: number, testId: number) =>
-    TestsDao.getTestDetails({projectId, testId}),
+  getTestDetails: async (projectId: number, testId: number) => {
+    const cacheKey = {
+      prefix: 'test:details',
+      projectId,
+      additional: `testId:${testId}`,
+    }
+
+    return CacheService.getOrSet(
+      cacheKey,
+      () => TestsDao.getTestDetails({projectId, testId}),
+      {
+        ttl: 600, // 10 minutes
+        tags: [`project:${projectId}`, `test:${testId}`, 'tests'],
+      },
+    )
+  },
 
   downloadTests: (params: ITestsController) => TestsDao.downloadTests(params),
   bulkDeleteTests: (params: IBulkDeleteTests) =>

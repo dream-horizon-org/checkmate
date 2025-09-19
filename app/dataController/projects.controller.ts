@@ -1,4 +1,5 @@
 import ProjectsDao from '~/db/dao/projects.dao'
+import {CacheService} from '~/services/redis/cache'
 
 export interface ICreateProject {
   projectName: string
@@ -30,16 +31,68 @@ export interface IArchiveProjects {
 }
 
 const ProjectsController = {
-  getAllProjects: (params: IGetAllProjects) => ProjectsDao.getAll(params),
-  getProjectInfo: (projectId: number) => ProjectsDao.getProjectInfo(projectId),
-  createProject: (params: ICreateProject) => ProjectsDao.createProject(params),
-  editProject: (params: IEditProject) => ProjectsDao.editProject(params),
+  getAllProjects: async (params: IGetAllProjects) => {
+    // Generate cache key based on parameters
+    const cacheKey = {
+      prefix: 'projects:all',
+      orgId: params.orgId,
+      additional: `page:${params.page}:size:${params.pageSize}:status:${
+        params.status || 'all'
+      }:search:${params.textSearch || ''}:desc:${
+        params.projectDescription || ''
+      }`,
+    }
+
+    return CacheService.getOrSet(cacheKey, () => ProjectsDao.getAll(params), {
+      ttl: 300, // 5 minutes
+      tags: [`org:${params.orgId}`, 'projects'],
+    })
+  },
+
+  getProjectInfo: async (projectId: number) => {
+    const cacheKey = {
+      prefix: 'project:info',
+      projectId,
+    }
+
+    return CacheService.getOrSet(
+      cacheKey,
+      () => ProjectsDao.getProjectInfo(projectId),
+      {
+        ttl: 600, // 10 minutes (project info changes less frequently)
+        tags: [`project:${projectId}`, 'projects'],
+      },
+    )
+  },
+
+  createProject: async (params: ICreateProject) => {
+    const result = await ProjectsDao.createProject(params)
+
+    // Invalidate related caches
+    await CacheService.invalidateByTag(`org:${params.orgId}`)
+    await CacheService.invalidateByTag('projects')
+
+    return result
+  },
+
+  editProject: async (params: IEditProject) => {
+    const result = await ProjectsDao.editProject(params)
+
+    // Invalidate specific project and org-level caches
+    await CacheService.invalidateByTag(`project:${params.projectId}`)
+    await CacheService.invalidateByTag('projects')
+
+    return result
+  },
   updateProjectStatus: async (params: IArchiveProjects) => {
     const {projectId, status} = params
+
     if (status === 'Archived') {
-      const projectInfo = await ProjectsDao.getProjectInfo(projectId)
+      // Use cached or fresh project info
+      const projectInfo = await ProjectsController.getProjectInfo(projectId)
       const project = projectInfo?.[0]
       const projectName = project?.projectName
+
       if (!project || !projectName) {
         return Promise.reject({
           data: null,
@@ -56,12 +109,25 @@ const ProjectsController = {
       }
       const timestamp = new Date().toISOString()
       const updatedName = `${projectName}_${timestamp}`
-      return ProjectsDao.updateProjectStatus({
+
+      const result = await ProjectsDao.updateProjectStatus({
         ...params,
         projectName: updatedName,
       })
+
+      // Invalidate caches after successful update
+      await CacheService.invalidateByTag(`project:${projectId}`)
+      await CacheService.invalidateByTag('projects')
+
+      return result
     } else {
-      return ProjectsDao.updateProjectStatus(params)
+      const result = await ProjectsDao.updateProjectStatus(params)
+
+      // Invalidate caches after successful update
+      await CacheService.invalidateByTag(`project:${projectId}`)
+      await CacheService.invalidateByTag('projects')
+
+      return result
     }
   },
 }

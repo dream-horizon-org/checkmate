@@ -7,6 +7,7 @@ import {installGlobals} from '@remix-run/node'
 import chalk from 'chalk'
 import express from 'express'
 import morgan from 'morgan'
+import {redisService} from './app/services/redis/client.ts'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -60,6 +61,24 @@ app.get('/healthcheck', (_, res) => {
 const port = parseInt(process.env.PORT || '', 10) || 3000
 
 httpServer.listen(port, async () => {
+  // Initialize Redis connection
+  try {
+    await redisService.connect()
+    console.log(
+      '  ',
+      chalk.greenBright.bold('➜'),
+      chalk.bold('Redis:'),
+      chalk.green('Connected'),
+    )
+  } catch (error) {
+    console.log(
+      '  ',
+      chalk.yellowBright.bold('⚠'),
+      chalk.bold('Redis:'),
+      chalk.yellow('Not connected - continuing without cache'),
+    )
+  }
+
   if (!isProd) {
     console.log(
       chalk.greenBright.bold('VITE'),
@@ -131,4 +150,17 @@ httpServer.listen(port, async () => {
       chalk.red('Disabled'),
     )
   }
+})
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n', chalk.yellow('Shutting down gracefully...'))
+  await redisService.disconnect()
+  process.exit(0)
+})
+
+process.on('SIGTERM', async () => {
+  console.log('\n', chalk.yellow('Shutting down gracefully...'))
+  await redisService.disconnect()
+  process.exit(0)
 })
