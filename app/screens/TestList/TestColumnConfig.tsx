@@ -35,25 +35,23 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
     id: 'select',
     accessorKey: 'select',
     header: ({table}) => (
-      <div className="flex justify-end ">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+        className="ml-auto"
+      />
     ),
     cell: ({row}) => (
-      <div className="flex justify-end py-2">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="ml-auto"
+      />
     ),
     enableSorting: false,
     enableHiding: false,
@@ -68,7 +66,7 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
       />
     ),
     cell: ({row}) => (
-      <div className="flex py-2 w-12 overflow-visible truncate text-left">
+      <div className="text-left text-slate-600">
         {row.original.testId}
       </div>
     ),
@@ -118,7 +116,7 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
     ),
     cell: ({row}) => {
       return (
-        <div className={cn('text-left', 'text-nowrap')}>
+        <div className="text-left text-slate-700 text-nowrap">
           {row.original.squadName}
         </div>
       )
@@ -139,10 +137,10 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
 
       return (
         <div>
-          <div className={'max-w-32 text-left truncate text-s'}>
+          <div className="max-w-32 text-left truncate text-sm text-slate-700">
             {createdBy}
           </div>
-          <div className={'text-xs text-gray-500 max-w-32 text-left truncate'}>
+          <div className="text-xs text-slate-500 max-w-32 text-left truncate">
             {createdOn}
           </div>
         </div>
@@ -172,10 +170,8 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
     ),
     cell: ({row}) => {
       return (
-        <div>
-          <div className={'max-w-32 text-left truncate text-s'}>
-            {row.original.testCoveredBy}
-          </div>
+        <div className="max-w-32 text-left truncate text-sm text-slate-700">
+          {row.original.testCoveredBy}
         </div>
       )
     },
@@ -190,7 +186,7 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
       />
     ),
     cell: ({row}) => (
-      <div className="text-left">{row.original.automationStatus}</div>
+      <div className="text-left text-sm text-slate-700">{row.original.automationStatus}</div>
     ),
   },
   {
@@ -204,7 +200,7 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
     cell: ({row}) => (
       <Tooltip
         anchor={
-          <div className="text-left max-w-32 truncate">
+          <div className="text-left max-w-32 truncate text-sm text-slate-700">
             {row.original.labelName}
           </div>
         }
@@ -224,7 +220,7 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
     cell: ({row}) => (
       <Tooltip
         anchor={
-          <div className="text-left max-w-32 truncate">
+          <div className="text-left max-w-32 truncate text-sm text-slate-700">
             {row.original.section}
           </div>
         }
@@ -282,14 +278,14 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
       }
 
       return (
-        <div className="flex justify-end -mr-6 -my-2 bg-gray-200 w-8 overflow-visible">
+        <div className="flex justify-end">
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <div className="h-8 w-8 flex items-center justify-center hover:bg-gray-500/30 hover:cursor-pointer">
-                <ChevronRightIcon className="h-4 w-4" />
-              </div>
+              <button className="h-8 w-8 flex items-center justify-center hover:bg-slate-100 rounded-md transition-colors">
+                <ChevronRightIcon className="h-4 w-4 text-slate-600" />
+              </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleEditTest}>
                 <PencilIcon className="mr-2 h-4 w-4" />
                 Edit
@@ -304,11 +300,11 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
                 }
                 contentComponent={
                   <>
-                    <div className="text-lg font-semibold">
+                    <div className="text-lg font-semibold text-slate-900">
                       Are you sure you want to delete?
                     </div>
-                    <div className="flex flex-col mt-4 text-xs text-gray-500">
-                      This action cannot be undone, it will permanently delete
+                    <div className="flex flex-col mt-4 text-sm text-slate-600">
+                      This action cannot be undone. It will permanently delete
                       this test and its data.
                     </div>
                   </>
@@ -320,7 +316,7 @@ export const TestListColumnConfig: ColumnDef<ITestListTable>[] = [
                     </DialogClose>
                     <DialogClose>
                       <Button
-                        className="bg-destructive/90 hover:bg-destructive font-semibold"
+                        className="bg-red-600 hover:bg-red-700 font-semibold"
                         onClick={handleDeleteTest}>
                         Delete
                       </Button>

@@ -80,7 +80,7 @@ export function DataTable<T>({
               'top-0',
               'left-0',
               'z-20',
-              'h-12',
+              'h-11',
               'overflow-hidden',
               'bg-slate-50',
               'border-b',
@@ -89,7 +89,7 @@ export function DataTable<T>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-slate-700 font-semibold px-6 py-3">
+                  <TableHead key={header.id} className="text-slate-700 font-semibold text-xs uppercase tracking-wide px-4 py-3">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -116,7 +116,7 @@ export function DataTable<T>({
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          'px-6 py-4',
+                          'px-4 py-3',
                           columnStyle?.[cell.column.id] ?? '',
                         )}
                         isConcise={isConcise}>
@@ -130,32 +130,32 @@ export function DataTable<T>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={table._getColumnDefs().length}
-                  className="h-40 text-center border-0 text-slate-500">
-                  <div className="flex flex-col items-center gap-3 py-12">
-                    <div className="rounded-full bg-slate-100 p-4">
-                      <svg
-                        className="w-8 h-8 text-slate-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <p className="font-semibold text-slate-900">No tests found</p>
-                      <p className="text-sm text-slate-500">Try adjusting your search or filters</p>
-                    </div>
+            <TableRow>
+              <TableCell
+                colSpan={table._getColumnDefs().length}
+                className="h-96 text-center border-0 text-slate-500">
+                <div className="flex flex-col items-center justify-center gap-4 py-16">
+                  <div className="rounded-full bg-slate-100 p-5">
+                    <svg
+                      className="w-12 h-12 text-slate-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                      />
+                    </svg>
                   </div>
-                </TableCell>
-              </TableRow>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-lg font-semibold text-slate-900">No tests found</p>
+                    <p className="text-sm text-slate-500">Try adjusting your filters or create a new test to get started</p>
+                  </div>
+                </div>
+              </TableCell>
+            </TableRow>
             )}
           </TableBody>
         </Table>
