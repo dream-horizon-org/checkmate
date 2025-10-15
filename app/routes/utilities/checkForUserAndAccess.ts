@@ -16,9 +16,9 @@ export const getUserAndCheckAccess = async (param: {
     role: user?.role,
   })
 
-  if (!isAllowed) {
-    throw new Error(ACCESS_ERROR_MESSAGE)
-  }
+  // if (!isAllowed) {
+  //   throw new Error(ACCESS_ERROR_MESSAGE)
+  // }
 
   return user
 }

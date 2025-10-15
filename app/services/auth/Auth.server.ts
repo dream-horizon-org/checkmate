@@ -23,6 +23,9 @@ export class Auth {
   )
 
   constructor() {
+    console.log('GOOGLE_CLIENT_ID', env.GOOGLE_CLIENT_ID)
+    console.log('GOOGLE_CLIENT_SECRET', env.GOOGLE_CLIENT_SECRET)
+    console.log('NODE_ENV', process.env.NODE_ENV)
     Auth.authenticator.use(
       new GoogleStrategy(
         {

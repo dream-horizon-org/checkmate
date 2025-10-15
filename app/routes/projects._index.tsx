@@ -84,30 +84,40 @@ export function Projects() {
   }
 
   return (
-    <div className={cn('flex', 'flex-col', 'h-full')}>
-      <div className={cn('py-8', 'flex justify-between')}>
-        {orgName ? (
-          <span className={cn('text-2xl', 'font-medium')}>
-            {orgName} Projects
-          </span>
-        ) : (
-          <Skeleton className={cn('w-1/5', 'h-8')} />
-        )}
+    <div className="flex flex-col h-full gap-6 py-6">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          {orgName ? (
+            <>
+              <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
+              <p className="text-sm text-gray-600">
+                Manage projects for <span className="font-semibold">{orgName}</span>
+              </p>
+            </>
+          ) : (
+            <Skeleton className="w-64 h-10" />
+          )}
+        </div>
         <Link
-          className={cn('flex-row', 'flex')}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-md transition-colors border border-slate-700"
           to={`/org/${orgId}/createProject`}>
-          <PlusCircledIcon className={cn('size-8', 'mx-2')} />
-          <span className={cn('text-2xl', 'font-medium')}>Add Project</span>
+          <PlusCircledIcon className="size-5" />
+          <span>New Project</span>
         </Link>
       </div>
-      <div className={cn('mb-4')}>
+
+      {/* Search Bar */}
+      <div className="w-full max-w-md">
         <SearchBar
           handlechange={onChange}
-          placeholdertext={'Search by Project Name...'}
+          placeholdertext={'Search projects...'}
           searchstring={searchParams.get('textSearch') ?? ''}
         />
       </div>
-      <div className={cn('flex', 'overflow-auto', 'pb-8')}>
+
+      {/* Projects Table */}
+      <div className="flex-1 overflow-auto">
         <ProjectsTable projects={data} />
       </div>
     </div>

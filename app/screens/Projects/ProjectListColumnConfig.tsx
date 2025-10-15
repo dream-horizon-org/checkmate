@@ -45,19 +45,22 @@ export const centered = (title: string) => {
 export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
   {
     header: () => (
-      <HeaderComponent position={'left'} heading="ID" className="ml-12" />
+      <HeaderComponent position={'left'} heading="ID" className="pl-2" />
     ),
     cell: ({row}) => {
       return (
-        <div className={cn('text-left', 'ml-8')}>{row.original.projectId}</div>
+        <div className="text-left font-semibold text-gray-700">
+          #{row.original.projectId}
+        </div>
       )
     },
     accessorKey: 'id',
+    size: 80,
   },
   {
     header: () => (
-      <div className="text-left text-sm font-extrabold text-black ml-28">
-        Name
+      <div className="text-left text-sm font-extrabold text-black">
+        Project Name
       </div>
     ),
     cell: ({row}) => {
@@ -67,7 +70,7 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
 
       const navigate = useCustomNavigate()
       return (
-        <div className={cn('text-left', 'ml-12', 'w-fit')}>
+        <div className="flex flex-col gap-1">
           <Tooltip
             anchor={
               <div
@@ -78,20 +81,22 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
                     e,
                   )
                 }}
-                className={cn(
-                  'px-12',
-                  'cursor-default',
-                  'cursor-pointer hover:underline hover:text-blue-700',
-                )}>
+                className="font-semibold text-slate-900 hover:text-slate-700 cursor-pointer hover:underline transition-colors">
                 {row.original.projectName}
               </div>
             }
-            content={<div className="text-center">{content}</div>}
+            content={<div className="text-center max-w-xs">{content}</div>}
           />
+          {row.original.projectDescription && (
+            <span className="text-xs text-gray-500 line-clamp-1">
+              {row.original.projectDescription}
+            </span>
+          )}
         </div>
       )
     },
     accessorKey: 'name',
+    size: 300,
   },
   {
     header: () => (
@@ -102,14 +107,16 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
     cell: ({row}) => {
       const createdOn = getDateDetail(new Date(row.original.createdOn))
       return (
-        <div className={cn('text-left', '-ml-4')}>
-          {row.original.createdByName}
-          <br />
-          <span className={'text-xs text-gray-500'}>{createdOn}</span>
+        <div className="flex flex-col gap-1">
+          <span className="font-medium text-gray-800">
+            {row.original.createdByName}
+          </span>
+          <span className="text-xs text-gray-500">{createdOn}</span>
         </div>
       )
     },
     accessorKey: 'createdBy',
+    size: 200,
   },
   {
     header: centered('Tests'),
@@ -124,24 +131,15 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
               e,
             )
           }}
-          className={cn(
-            'block',
-            'text-indigo-800',
-            'border-2',
-            'rounded-lg',
-            'bg-slate-800/10',
-            'hover:bg-slate-800/10',
-            'mx-auto',
-            'leading-none',
-            'flex',
-            'items-start',
-          )}
-          variant={'secondary'}>
-          Tests
+          size="sm"
+          className="w-full max-w-[100px] mx-auto"
+          variant="outline">
+          View Tests
         </Button>
       )
     },
     accessorKey: 'Tests',
+    size: 120,
   },
   {
     header: centered('Runs'),
@@ -156,28 +154,19 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
               event,
             )
           }}
-          className={cn(
-            'block',
-            'text-indigo-800',
-            'border-2',
-            'rounded-lg',
-            // 'hover:border-slate-950/10',
-            'bg-slate-800/10',
-            'hover:bg-slate-800/10',
-            'mx-auto',
-            'leading-none',
-            'flex',
-            'items-start',
-          )}
-          variant={'secondary'}>
-          Runs
+          size="sm"
+          className="w-full max-w-[100px] mx-auto"
+          variant="outline">
+          View Runs
         </Button>
       )
     },
     accessorKey: 'Runs',
+    size: 120,
   },
   {
     id: 'edit',
+    header: () => <div className="text-center text-sm font-extrabold">Actions</div>,
     cell: ({row}) => {
       const {toast} = useToast()
       const [projectData, setProjectData] = useState({
@@ -232,74 +221,11 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
         setProjectData((prevData) => ({...prevData, [id]: value}))
       }
 
-      return (
-        <CustomDialog
-          variant={'edit'}
-          anchorComponent={
-            <div className={cn('flex', 'h-8', 'w-8', 'ml-auto')}>
-              <Pencil
-                className={cn('h-5', 'w-5', 'cursor-pointer')}
-                onClick={handleEditClick}
-              />
-            </div>
-          }
-          headerComponent={
-            <>
-              <DialogTitle>Edit Project</DialogTitle>
-              <DialogDescription>
-                Make changes to your project here. Click save when you're done.
-              </DialogDescription>
-            </>
-          }
-          contentComponent={
-            <div className="grid gap-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Project
-                </Label>
-                <Input
-                  id="name"
-                  value={projectData.name}
-                  onChange={handleChange}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Description
-                </Label>
-                <Input
-                  id="description"
-                  value={projectData.description}
-                  onChange={handleChange}
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-          }
-          footerComponent={
-            <DialogClose asChild>
-              <Button
-                type="submit"
-                className="mt-2"
-                onClick={handleSaveChanges}>
-                Save changes
-              </Button>
-            </DialogClose>
-          }
-        />
-      )
-    },
-  },
-  {
-    id: 'delete',
-    cell: ({row}) => {
       const updateProjectStatus = useFetcher<any>()
 
       useEffect(() => {
         if (updateProjectStatus.data?.data) {
           const message = updateProjectStatus.data?.data?.message
-          console.log('message', message)
           toast({
             title: 'Success',
             description: message,
@@ -315,7 +241,7 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
         }
       }, [updateProjectStatus.data])
 
-      const handleConfirmDelete = async (event: React.MouseEvent) => {
+      const handleConfirmDelete = async () => {
         const projectId = row.original.projectId
         const status = 'Archived'
 
@@ -330,34 +256,93 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
       }
 
       return (
-        <CustomDialog
-          variant={'delete'}
-          anchorComponent={
-            <div className={cn('flex', 'h-8', 'w-8', 'ml-auto')}>
-              <TrashIcon size={24} />
-            </div>
-          }
-          headerComponent={
-            <>
-              <DialogTitle>Are you absolutely sure?</DialogTitle>
-              <DialogDescription>
-                This action will archive this project and it will no longer be
-                visible. You can undo this action within 30 days.
-              </DialogDescription>
-            </>
-          }
-          footerComponent={
-            <DialogClose className="mt-4" asChild>
+        <div className="flex items-center justify-center gap-2">
+          <CustomDialog
+            variant={'edit'}
+            anchorComponent={
               <Button
-                type="submit"
-                variant={'destructive'}
-                onClick={handleConfirmDelete}>
-                {'Yes, Delete'}
+                size="sm"
+                variant="ghost"
+                className="h-8 w-8 p-0"
+                onClick={handleEditClick}>
+                <Pencil className="h-4 w-4" />
               </Button>
-            </DialogClose>
-          }
-        />
+            }
+            headerComponent={
+              <>
+                <DialogTitle>Edit Project</DialogTitle>
+                <DialogDescription>
+                  Make changes to your project here. Click save when you're done.
+                </DialogDescription>
+              </>
+            }
+            contentComponent={
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Project
+                  </Label>
+                  <Input
+                    id="name"
+                    value={projectData.name}
+                    onChange={handleChange}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="description" className="text-right">
+                    Description
+                  </Label>
+                  <Input
+                    id="description"
+                    value={projectData.description}
+                    onChange={handleChange}
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+            }
+            footerComponent={
+              <DialogClose asChild>
+                <Button type="submit" onClick={handleSaveChanges}>
+                  Save changes
+                </Button>
+              </DialogClose>
+            }
+          />
+          <CustomDialog
+            variant={'delete'}
+            anchorComponent={
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-700">
+                <TrashIcon size={16} />
+              </Button>
+            }
+            headerComponent={
+              <>
+                <DialogTitle>Archive Project?</DialogTitle>
+                <DialogDescription>
+                  This will archive the project "{row.original.projectName}". It will no longer be
+                  visible in the projects list.
+                </DialogDescription>
+              </>
+            }
+            footerComponent={
+              <DialogClose asChild>
+                <Button
+                  type="submit"
+                  variant={'destructive'}
+                  onClick={handleConfirmDelete}>
+                  Yes, Archive
+                </Button>
+              </DialogClose>
+            }
+          />
+        </div>
       )
     },
+    size: 100,
   },
 ]

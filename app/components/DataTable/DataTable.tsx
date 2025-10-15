@@ -58,7 +58,7 @@ export function DataTable<T>({
     <div
       ref={containerRef}
       className={cn(
-        'max-h-full w-full border border-zinc-300 rounded-xl bg-slate-50 overflow-scroll',
+        'max-h-full w-full border border-slate-200 rounded-lg bg-white overflow-scroll shadow-sm',
       )}
       style={
         hideScrollBar
@@ -74,7 +74,7 @@ export function DataTable<T>({
           'w-auto',
           'min-w-full',
           'max-h-full',
-          'rounded-xl',
+          'rounded-lg',
         )}>
         <TableHeader
           className={cn(
@@ -82,15 +82,17 @@ export function DataTable<T>({
             'top-0',
             'left-0',
             'z-20',
-            'rounded-xl',
-            'h-11',
+            'rounded-lg',
+            'h-12',
             'overflow-hidden',
-            'bg-gray-200',
+            'bg-slate-50',
+            'border-b',
+            'border-slate-200',
           )}>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="border-0">
+            <TableRow key={headerGroup.id} className="border-0 hover:bg-slate-50">
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className={'text-black'}>
+                <TableHead key={header.id} className="text-slate-900 font-semibold">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -102,20 +104,22 @@ export function DataTable<T>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody className={'h-full overflow-y-scroll'}>
+        <TableBody className="h-full overflow-y-scroll">
           {rows ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
-                className={cn('hover:bg-primary/10', 'h-1', 'cursor-default')}
+                className={cn(
+                  'hover:bg-slate-50 transition-colors cursor-default border-b border-slate-100',
+                )}
                 onClick={(event) => handleRowClick(row, event)}>
                 {row.getVisibleCells().map((cell) => {
                   return (
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'px-6',
+                        'px-6 py-4',
                         columnStyle?.[cell.column.id] ?? '',
                       )}
                       isConcise={isConcise}>
@@ -132,8 +136,11 @@ export function DataTable<T>({
             <TableRow>
               <TableCell
                 colSpan={table._getColumnDefs().length}
-                className="p-6 text-center border-0 text-muted-foreground">
-                No Entry found
+                className="h-32 text-center border-0 text-slate-500">
+                <div className="flex flex-col items-center gap-2">
+                  <p className="font-medium">No projects found</p>
+                  <p className="text-sm text-slate-400">Try adjusting your search</p>
+                </div>
               </TableCell>
             </TableRow>
           )}
