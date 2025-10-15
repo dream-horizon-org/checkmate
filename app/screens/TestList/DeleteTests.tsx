@@ -73,9 +73,10 @@ export const DeleteTests = (props: DeleteTests) => {
         <AlertDialogTrigger asChild>
           <Button
             disabled={props.selectedRows.length > 0 ? false : true}
-            variant={'outline'}>
-            <TrashIcon size={16} className={'cursor-pointer mr-1'} />
-            Tests
+            variant={'outline'}
+            className="shadow-sm hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors">
+            <TrashIcon size={16} className={'mr-2'} />
+            Delete
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
@@ -84,14 +85,14 @@ export const DeleteTests = (props: DeleteTests) => {
               Are you sure you want to delete?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone, this will permanently delete
-              selected tests.
+              This action cannot be undone, this will permanently delete{' '}
+              {props.selectedRows.length} selected test{props.selectedRows.length !== 1 ? 's' : ''}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive/90 hover:bg-destructive"
+              className="bg-red-600 hover:bg-red-700"
               onClick={deleteSelectedTests}>
               Delete
             </AlertDialogAction>

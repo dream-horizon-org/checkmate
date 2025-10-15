@@ -462,12 +462,14 @@ export default function TestList() {
 
   return (
     <div className="flex flex-grow flex-col h-full">
-      <div className={cn('flex', 'gap-2', 'mb-4', 'flex-row')}>
-        <SearchBar
-          handlechange={handleSearchChanges}
-          placeholdertext={'Search by title or id...'}
-          searchstring={searchParams.get('textSearch') ?? ''}
-        />
+      <div className="flex items-center gap-2 mb-6">
+        <div className="flex-1">
+          <SearchBar
+            handlechange={handleSearchChanges}
+            placeholdertext={'Search by title or id...'}
+            searchstring={searchParams.get('textSearch') ?? ''}
+          />
+        </div>
 
         <AddProperty
           selectedRows={seletedTestIds}
@@ -482,7 +484,7 @@ export default function TestList() {
           onFilterApply={onFilterApply}
         />
 
-        <ToggleColumns table={table} containerClassName="ml-2" />
+        <ToggleColumns table={table} />
         <DeleteTests
           selectedRows={seletedTestIds}
           projectId={projectId}
