@@ -23,18 +23,20 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
     return false
   })
 
-  // Check if we're on the projects page
+  // Check if we're on pages without sidebar (projects or tests list)
   const isProjectsPage = location.pathname.includes('/projects')
+  const isTestsPage = location.pathname.match(/\/project\/\d+\/tests/)
+  const noSidebar = isProjectsPage || isTestsPage
   
   // Initialize CSS variable on mount and update on change
   useEffect(() => {
     if (typeof window !== 'undefined') {
       document.documentElement.style.setProperty(
         '--sidebar-width',
-        isProjectsPage ? '0rem' : isCollapsed ? '4rem' : '16rem',
+        noSidebar ? '0rem' : isCollapsed ? '4rem' : '16rem',
       )
     }
-  }, [isCollapsed, isProjectsPage])
+  }, [isCollapsed, noSidebar])
 
   return (
     <>
@@ -47,8 +49,8 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
         )}>
         {/* Left Section */}
         <div className="flex items-center gap-4">
-          {/* Menu Toggle Button - Only show if not on projects page */}
-          {!isProjectsPage && projectId && (
+          {/* Menu Toggle Button - Only show if not on projects/tests page */}
+          {!noSidebar && projectId && (
             <>
               <Button
                 variant="ghost"
@@ -125,8 +127,8 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
         </div>
       </header>
 
-      {/* Sidebar - Only show if not on projects page */}
-      {!isProjectsPage && projectId && (
+      {/* Sidebar - Only show if not on projects/tests page */}
+      {!noSidebar && projectId && (
         <SideDrawer isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       )}
     </>

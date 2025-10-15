@@ -1,42 +1,56 @@
-import {Tooltip} from '@components/Tooltip/Tooltip'
 import {useCustomNavigate} from '@hooks/useCustomNavigate'
 import {useParams} from '@remix-run/react'
-import {Separator} from '@ui/separator'
-import {Upload} from 'lucide-react'
+import {Upload, Download} from 'lucide-react'
 import {useSearchParams} from 'react-router-dom'
 import {API} from '~/routes/utilities/api'
-import {DownLoadTests} from '../RunTestList/DownLoadTests'
+import {Button} from '~/ui/button'
+import {useState} from 'react'
 
 export const UploadDownloadButton = ({projectName}: {projectName: string}) => {
   const projectId = useParams().projectId ? Number(useParams().projectId) : 0
   const navigate = useCustomNavigate()
   const [searchParams, _] = useSearchParams()
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  const handleDownload = async () => {
+    setIsDownloading(true)
+    try {
+      const response = await fetch(
+        `/${API.DownloadTests}?projectId=${projectId}&${searchParams}`,
+      )
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${projectName}-tests.csv`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Download failed:', error)
+    } finally {
+      setIsDownloading(false)
+    }
+  }
 
   return (
-    <div className="flex flex-row border border-input bg-background shadow-sm rounded-md	w-20	h-8 justify-between ml-4 mr-2 px-2">
-      <Tooltip
-        anchor={
-          <Upload
-            strokeWidth={1.5}
-            size={20}
-            className={'self-center cursor-pointer'}
-            onClick={(e) =>
-              navigate(`/project/${projectId}/uploadTests`, {}, e)
-            }
-          />
-        }
-        content={'Upload Test'}
-      />
-
-      <Separator orientation="vertical" className="my-2 h-5" />
-
-      <DownLoadTests
-        style={{size: 20, strokeWidth: 1.5}}
-        className={'self-center cursor-pointer'}
-        tooltipText={'Download Tests'}
-        fetchUrl={`/${API.DownloadTests}?projectId=${projectId}&${searchParams}`}
-        fileName={`${projectName}-project`}
-      />
-    </div>
+    <>
+      <Button
+        variant="outline"
+        onClick={(e) => navigate(`/project/${projectId}/uploadTests`, {}, e)}
+        className="shadow-sm">
+        <Upload className="w-4 h-4 mr-2" />
+        Upload
+      </Button>
+      <Button
+        variant="outline"
+        onClick={handleDownload}
+        disabled={isDownloading}
+        className="shadow-sm">
+        <Download className="w-4 h-4 mr-2" />
+        {isDownloading ? 'Downloading...' : 'Download'}
+      </Button>
+    </>
   )
 }

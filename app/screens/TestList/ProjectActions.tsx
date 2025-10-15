@@ -163,24 +163,21 @@ export const ProjectActions = () => {
     <div>
       <DropdownMenu open={actionDD} onOpenChange={setActionDD}>
         <DropdownMenuTrigger asChild>
-          <div className={cn('flex-row', 'flex', 'cursor-pointer')}>
-            <PlusCircledIcon
-              onClick={() => setActionDD(!actionDD)}
-              strokeWidth={1.5}
-              className={cn('size-8', 'mx-2')}
-            />
-          </div>
+          <Button variant="outline" className="shadow-sm">
+            <PlusCircledIcon className="w-4 h-4 mr-2" />
+            New
+          </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-fit">
+        <DropdownMenuContent className="w-fit" align="end">
           {ACTION_ITEMS.map((action) => (
             <DropdownMenuItem
               onSelect={(e: any) => handleActionClick(action.action, e)}
               key={action.id}
               className="capitalize">
               <Button
-                variant={'outline'}
+                variant={'ghost'}
                 size={'sm'}
-                className={'w-full text-sm font-semibold'}>
+                className={'w-full text-sm font-medium justify-start'}>
                 {action.action}
               </Button>
             </DropdownMenuItem>

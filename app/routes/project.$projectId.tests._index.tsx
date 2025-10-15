@@ -14,9 +14,9 @@ export const loader = testsApiLoader
 export default function TestsList() {
   const {state} = useNavigation()
   return (
-    <div className={'flex flex-row h-full mr-[-80px] -ml-12'}>
-      <ResizablePanelGroup direction={'horizontal'}>
-        <ResizablePanel order={1} className={'mr-4'} defaultSize={80}>
+    <div className="flex flex-row h-full pt-6">
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel order={1} className="mr-4" defaultSize={80}>
           <TestListPage />
         </ResizablePanel>
         <ResizableHandle withHandle />

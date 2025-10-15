@@ -173,24 +173,29 @@ export const SectionList = () => {
   }
 
   return (
-    <div className="flex flex-col flex-grow ml-4 h-full overflow-y-scroll bg-slate-200 p-4 pb-12 flex-nowrap">
+    <div className="flex flex-col flex-grow ml-4 h-full overflow-y-scroll bg-white border-l border-slate-200 p-5 pb-12 flex-nowrap">
       <div>
-        <h2 className="font-semibold flex flex-row mb-2 text-nowrap">
-          Section List
-          <SectionInfoBox />
-          {selectedSections?.length > 0 ? (
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+          <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            Section List
+            <SectionInfoBox />
+          </h2>
+          {selectedSections?.length > 0 && (
             <Tooltip
               anchor={
-                <ListRestart
-                  color="#ff3c00"
+                <button
                   onClick={resetSelections}
-                  className={'ml-4 text-blue-600 hover:cursor-pointer'}
-                />
+                  className="p-1.5 hover:bg-slate-100 rounded-md transition-colors">
+                  <ListRestart
+                    size={16}
+                    className="text-slate-500 hover:text-slate-700"
+                  />
+                </button>
               }
               content={'Reset sections'}
             />
-          ) : null}
-        </h2>
+          )}
+        </div>
         <RenderSections
           sections={sectionsData}
           addSubsectionClicked={addSubsectionClicked}
@@ -207,9 +212,9 @@ export const SectionList = () => {
             onClick={() => {
               addSubsectionClicked(null)
             }}
-            className="flex text-sm flex-row items-center gap-2 truncate ml-2 mt-2">
-            <CirclePlus color="green" size={16} />
-            <span>{`Add Section`}</span>
+            className="flex text-sm flex-row items-center gap-2 truncate ml-2 mt-4 text-slate-700 hover:text-slate-900 transition-colors">
+            <CirclePlus size={16} className="text-slate-500" />
+            <span>Add Section</span>
           </button>
         )}
       </div>
