@@ -30,15 +30,15 @@ export const DataTablePagination = <T,>({
   const {pageSize, pageIndex} = table.getState().pagination
 
   return (
-    <div className="flex items-center justify-between px-4 h-14 z-20 sticky bottom-0 bg-gray-100">
-      <div className="text-sm">
-        Showing {pageIndex * pageSize + 1} -{' '}
-        {Math.min((pageIndex + 1) * pageSize, table.getRowCount())} of{' '}
-        {table.getRowCount()} rows.
+    <div className="flex items-center justify-between px-6 h-16 z-20 sticky bottom-0 bg-white border-t border-slate-200">
+      <div className="text-sm text-slate-600 font-medium">
+        Showing <span className="text-slate-900 font-semibold">{pageIndex * pageSize + 1}</span> -{' '}
+        <span className="text-slate-900 font-semibold">{Math.min((pageIndex + 1) * pageSize, table.getRowCount())}</span> of{' '}
+        <span className="text-slate-900 font-semibold">{table.getRowCount()}</span> rows.
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+        <div className="flex items-center space-x-3">
+          <p className="text-sm font-medium text-slate-700">Rows per page</p>
           <Select
             value={`${pageSize}`}
             onValueChange={(value) => {
@@ -46,7 +46,7 @@ export const DataTablePagination = <T,>({
               table.setPageSize(Number(value))
               table.setPageIndex(0)
             }}>
-            <SelectTrigger className="h-8 w-[70px]">
+            <SelectTrigger className="h-9 w-[75px] border-slate-300 hover:border-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
@@ -58,13 +58,13 @@ export const DataTablePagination = <T,>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center justify-center text-sm font-medium">
-          Page {pageIndex + 1} of {table.getPageCount()}
+        <div className="flex items-center justify-center text-sm font-medium text-slate-700">
+          Page <span className="mx-1 text-slate-900 font-semibold">{pageIndex + 1}</span> of <span className="ml-1 text-slate-900 font-semibold">{table.getPageCount()}</span>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1">
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
+            className="hidden h-9 w-9 p-0 lg:flex hover:bg-slate-100 border-slate-300"
             onClick={() => {
               table.setPageIndex(0)
               onPageChange(1)
@@ -75,7 +75,7 @@ export const DataTablePagination = <T,>({
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0"
+            className="h-9 w-9 p-0 hover:bg-slate-100 border-slate-300"
             onClick={() => {
               onPageChange(table.getState().pagination.pageIndex)
               table.previousPage()
@@ -86,7 +86,7 @@ export const DataTablePagination = <T,>({
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0"
+            className="h-9 w-9 p-0 hover:bg-slate-100 border-slate-300"
             onClick={() => {
               onPageChange(table.getState().pagination.pageIndex + 2)
               table.nextPage()
@@ -97,7 +97,7 @@ export const DataTablePagination = <T,>({
           </Button>
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
+            className="hidden h-9 w-9 p-0 lg:flex hover:bg-slate-100 border-slate-300"
             onClick={() => {
               onPageChange(table.getPageCount())
               table.setPageIndex(table.getPageCount() - 1)

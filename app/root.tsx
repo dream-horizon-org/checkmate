@@ -74,7 +74,7 @@ export function Layout({children}: {children: React.ReactNode}) {
         <GlobalLoading />
         <SearchModal />
         <div className="h-[calc(100%-64px)] bg-slate-50">
-          <div className="px-20 py-0 h-full transition-[padding] duration-300" style={{paddingLeft: 'var(--sidebar-width)'}}>
+          <div className="pr-8 py-0 h-full transition-[padding] duration-300" style={{paddingLeft: 'calc(2rem + var(--sidebar-width))'}}>
             {children}
           </div>
         </div>

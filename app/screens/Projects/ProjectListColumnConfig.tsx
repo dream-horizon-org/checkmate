@@ -45,11 +45,13 @@ export const centered = (title: string) => {
 export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
   {
     header: () => (
-      <HeaderComponent position={'left'} heading="ID" className="pl-2" />
+      <div className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        ID
+      </div>
     ),
     cell: ({row}) => {
       return (
-        <div className="text-left font-semibold text-gray-700">
+        <div className="text-left font-medium text-slate-500 text-sm">
           #{row.original.projectId}
         </div>
       )
@@ -59,7 +61,7 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
   },
   {
     header: () => (
-      <div className="text-left text-sm font-extrabold text-black">
+      <div className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
         Project Name
       </div>
     ),
@@ -70,7 +72,7 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
 
       const navigate = useCustomNavigate()
       return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5 py-1">
           <Tooltip
             anchor={
               <div
@@ -81,14 +83,14 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
                     e,
                   )
                 }}
-                className="font-semibold text-slate-900 hover:text-slate-700 cursor-pointer hover:underline transition-colors">
+                className="font-semibold text-slate-900 hover:text-slate-700 cursor-pointer hover:underline transition-colors text-base">
                 {row.original.projectName}
               </div>
             }
             content={<div className="text-center max-w-xs">{content}</div>}
           />
           {row.original.projectDescription && (
-            <span className="text-xs text-gray-500 line-clamp-1">
+            <span className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
               {row.original.projectDescription}
             </span>
           )}
@@ -96,11 +98,11 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
       )
     },
     accessorKey: 'name',
-    size: 300,
+    size: 350,
   },
   {
     header: () => (
-      <div className="text-left text-sm font-extrabold text-black">
+      <div className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
         Created By
       </div>
     ),
@@ -108,10 +110,10 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
       const createdOn = getDateDetail(new Date(row.original.createdOn))
       return (
         <div className="flex flex-col gap-1">
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-slate-900 text-sm">
             {row.original.createdByName}
           </span>
-          <span className="text-xs text-gray-500">{createdOn}</span>
+          <span className="text-xs text-slate-500">{createdOn}</span>
         </div>
       )
     },
@@ -119,7 +121,11 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
     size: 200,
   },
   {
-    header: centered('Tests'),
+    header: () => (
+      <div className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Tests
+      </div>
+    ),
     cell: ({row}) => {
       const navigate = useCustomNavigate()
       return (
@@ -132,17 +138,21 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
             )
           }}
           size="sm"
-          className="w-full max-w-[100px] mx-auto"
+          className="mx-auto font-medium"
           variant="outline">
           View Tests
         </Button>
       )
     },
     accessorKey: 'Tests',
-    size: 120,
+    size: 140,
   },
   {
-    header: centered('Runs'),
+    header: () => (
+      <div className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Runs
+      </div>
+    ),
     cell: ({row}) => {
       const navigate = useCustomNavigate()
       return (
@@ -155,18 +165,22 @@ export const PROJECT_LIST_COLUMN_CONFIG: ColumnDef<IProjectItem>[] = [
             )
           }}
           size="sm"
-          className="w-full max-w-[100px] mx-auto"
+          className="mx-auto font-medium"
           variant="outline">
           View Runs
         </Button>
       )
     },
     accessorKey: 'Runs',
-    size: 120,
+    size: 140,
   },
   {
     id: 'edit',
-    header: () => <div className="text-center text-sm font-extrabold">Actions</div>,
+    header: () => (
+      <div className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Actions
+      </div>
+    ),
     cell: ({row}) => {
       const {toast} = useToast()
       const [projectData, setProjectData] = useState({
