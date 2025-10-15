@@ -1,42 +1,24 @@
 import {User} from '@dao/users.dao'
 import {cn} from '~/ui/utils'
-import {SideDrawer} from './SideDrawer'
 import {UserComponent} from './UserComponent'
 import {ProjectSwitcher} from './ProjectSwitcher'
-import {Button} from '~/ui/button'
-import {Menu, FileText, MessageCircle, AlertCircle} from 'lucide-react'
+import {FileText, MessageCircle, AlertCircle} from 'lucide-react'
 import {APP_NAME} from '~/constants'
-import {useState, useEffect} from 'react'
-import {useParams, useLocation} from '@remix-run/react'
+import {useEffect} from 'react'
+import {useParams} from '@remix-run/react'
 import {useCustomNavigate} from '@hooks/useCustomNavigate'
 import {ORG_ID, SMALL_PAGE_SIZE} from '@route/utils/constants'
 
 export const AppHeader = ({user}: {user: User | undefined}) => {
   const {projectId} = useParams()
-  const location = useLocation()
   const navigate = useCustomNavigate()
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('sidebar-collapsed')
-      return saved === 'true'
-    }
-    return false
-  })
-
-  // Check if we're on pages without sidebar (projects or tests list)
-  const isProjectsPage = location.pathname.includes('/projects')
-  const isTestsPage = location.pathname.match(/\/project\/\d+\/tests/)
-  const noSidebar = isProjectsPage || isTestsPage
   
-  // Initialize CSS variable on mount and update on change
+  // Always set CSS variable to 0 (no sidebar)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      document.documentElement.style.setProperty(
-        '--sidebar-width',
-        noSidebar ? '0rem' : isCollapsed ? '4rem' : '16rem',
-      )
+      document.documentElement.style.setProperty('--sidebar-width', '0rem')
     }
-  }, [isCollapsed, noSidebar])
+  }, [])
 
   return (
     <>
@@ -49,22 +31,6 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
         )}>
         {/* Left Section */}
         <div className="flex items-center gap-4">
-          {/* Menu Toggle Button - Only show if not on projects/tests page */}
-          {!noSidebar && projectId && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 text-white hover:bg-slate-800"
-                onClick={() => setIsCollapsed(!isCollapsed)}>
-                <Menu className="h-5 w-5" />
-              </Button>
-
-              {/* Separator */}
-              <div className="h-6 w-px bg-slate-700"></div>
-            </>
-          )}
-
           {/* App Name - Clickable to go to projects */}
           <button
             onClick={(e) => {
@@ -126,11 +92,6 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
           {user?.userId && UserComponent(user)}
         </div>
       </header>
-
-      {/* Sidebar - Only show if not on projects/tests page */}
-      {!noSidebar && projectId && (
-        <SideDrawer isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-      )}
     </>
   )
 }

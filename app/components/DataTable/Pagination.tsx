@@ -30,15 +30,13 @@ export const DataTablePagination = <T,>({
   const {pageSize, pageIndex} = table.getState().pagination
 
   return (
-    <div className="flex items-center justify-between px-6 h-16 bg-slate-50">
-      <div className="text-sm text-slate-600 font-medium">
-        Showing <span className="text-slate-900 font-semibold">{pageIndex * pageSize + 1}</span> -{' '}
-        <span className="text-slate-900 font-semibold">{Math.min((pageIndex + 1) * pageSize, table.getRowCount())}</span> of{' '}
-        <span className="text-slate-900 font-semibold">{table.getRowCount()}</span> rows.
+    <div className="flex items-center justify-between px-6 py-4">
+      <div className="text-sm text-gray-700">
+        Showing <span className="font-semibold">{pageIndex * pageSize + 1}</span> - <span className="font-semibold">{Math.min((pageIndex + 1) * pageSize, table.getRowCount())}</span> of <span className="font-semibold">{table.getRowCount()}</span> rows.
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex items-center space-x-3">
-          <p className="text-sm font-medium text-slate-700">Rows per page</p>
+        <div className="flex items-center space-x-2">
+          <p className="text-sm text-gray-700">Rows per page</p>
           <Select
             value={`${pageSize}`}
             onValueChange={(value) => {
@@ -46,7 +44,7 @@ export const DataTablePagination = <T,>({
               table.setPageSize(Number(value))
               table.setPageIndex(0)
             }}>
-            <SelectTrigger className="h-9 w-[75px] bg-white border-slate-300 hover:border-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
+            <SelectTrigger className="h-8 w-[70px] bg-white border-gray-300">
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
@@ -58,13 +56,13 @@ export const DataTablePagination = <T,>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center justify-center text-sm font-medium text-slate-700">
-          Page <span className="mx-1 text-slate-900 font-semibold">{pageIndex + 1}</span> of <span className="ml-1 text-slate-900 font-semibold">{table.getPageCount()}</span>
+        <div className="flex items-center justify-center text-sm text-gray-700">
+          Page <span className="mx-1 font-semibold">{pageIndex + 1}</span> of <span className="ml-1 font-semibold">{table.getPageCount()}</span>
         </div>
         <div className="flex items-center space-x-1">
           <Button
             variant="outline"
-            className="hidden h-9 w-9 p-0 lg:flex bg-white hover:bg-slate-100 border-slate-300"
+            className="hidden h-8 w-8 p-0 lg:flex bg-white hover:bg-gray-100 border-gray-300"
             onClick={() => {
               table.setPageIndex(0)
               onPageChange(1)
@@ -75,7 +73,7 @@ export const DataTablePagination = <T,>({
           </Button>
           <Button
             variant="outline"
-            className="h-9 w-9 p-0 bg-white hover:bg-slate-100 border-slate-300"
+            className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border-gray-300"
             onClick={() => {
               onPageChange(table.getState().pagination.pageIndex)
               table.previousPage()
@@ -86,7 +84,7 @@ export const DataTablePagination = <T,>({
           </Button>
           <Button
             variant="outline"
-            className="h-9 w-9 p-0 bg-white hover:bg-slate-100 border-slate-300"
+            className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border-gray-300"
             onClick={() => {
               onPageChange(table.getState().pagination.pageIndex + 2)
               table.nextPage()
@@ -97,7 +95,7 @@ export const DataTablePagination = <T,>({
           </Button>
           <Button
             variant="outline"
-            className="hidden h-9 w-9 p-0 lg:flex bg-white hover:bg-slate-100 border-slate-300"
+            className="hidden h-8 w-8 p-0 lg:flex bg-white hover:bg-gray-100 border-gray-300"
             onClick={() => {
               onPageChange(table.getPageCount())
               table.setPageIndex(table.getPageCount() - 1)

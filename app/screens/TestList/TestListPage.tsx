@@ -88,26 +88,22 @@ export default function TestListPage() {
   }, [createRun.data])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full pt-6">
       {/* Header Section */}
-      <div className="pb-4 mb-6 border-b border-slate-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-1">Test Cases</h1>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1.5 text-slate-600">
-                  <FileText className="w-4 h-4" />
-                  <span className="font-medium">{testsCount}</span>
-                  <span className="text-slate-500">total tests</span>
-                </div>
-              </div>
+      <div className="pb-4 mb-4 border-b border-slate-200">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 mb-1">Test Cases</h1>
+            <div className="flex items-center gap-1.5">
+              <FileText className="h-3.5 w-3.5 text-slate-500" />
+              <span className="text-sm text-slate-500">{testsCount} total tests</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
+              size="default"
               onClick={(e) => {
                 navigate(
                   `/project/${projectId}/runs?page=1&pageSize=${SMALL_PAGE_SIZE}&status=Active`,

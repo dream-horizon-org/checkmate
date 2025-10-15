@@ -163,7 +163,7 @@ export const ProjectActions = () => {
     <div>
       <DropdownMenu open={actionDD} onOpenChange={setActionDD}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="shadow-sm">
+          <Button variant="outline" size="default" className="shadow-sm">
             <PlusCircledIcon className="w-4 h-4 mr-2" />
             New
           </Button>

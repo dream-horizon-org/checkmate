@@ -38,6 +38,7 @@ export const UploadDownloadButton = ({projectName}: {projectName: string}) => {
     <>
       <Button
         variant="outline"
+        size="default"
         onClick={(e) => navigate(`/project/${projectId}/uploadTests`, {}, e)}
         className="shadow-sm">
         <Upload className="w-4 h-4 mr-2" />
@@ -45,6 +46,7 @@ export const UploadDownloadButton = ({projectName}: {projectName: string}) => {
       </Button>
       <Button
         variant="outline"
+        size="default"
         onClick={handleDownload}
         disabled={isDownloading}
         className="shadow-sm">

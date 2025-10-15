@@ -69,12 +69,12 @@ export function Layout({children}: {children: React.ReactNode}) {
         <Links />
         <title>{APP_NAME}</title>
       </head>
-      <body className="h-svh bg-slate-50" style={{'--sidebar-width': '0rem'} as React.CSSProperties}>
+      <body className="h-svh bg-slate-50">
         {showHeader && <AppHeader user={user} />}
         <GlobalLoading />
         <SearchModal />
         <div className="h-[calc(100%-64px)] bg-slate-50">
-          <div className="pr-8 py-0 h-full transition-[padding] duration-300" style={{paddingLeft: 'calc(2rem + var(--sidebar-width))'}}>
+          <div className="px-8 py-0 h-full">
             {children}
           </div>
         </div>

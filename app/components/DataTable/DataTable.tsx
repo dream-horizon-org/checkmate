@@ -55,7 +55,7 @@ export function DataTable<T>({
   }, [table.getState().pagination.pageIndex])
 
   return (
-    <div className="flex flex-col h-full w-full border border-slate-200 rounded-lg bg-white shadow-sm">
+    <div className="flex flex-col h-full w-full bg-white">
       {/* Scrollable Table */}
       <div
         ref={containerRef}
@@ -80,16 +80,16 @@ export function DataTable<T>({
               'top-0',
               'left-0',
               'z-20',
-              'h-11',
+              'h-12',
               'overflow-hidden',
-              'bg-slate-50',
-              'border-b',
-              'border-slate-200',
+              'bg-gray-50',
+              'border-b-2',
+              'border-gray-300',
             )}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-slate-700 font-semibold text-xs uppercase tracking-wide px-4 py-3">
+                  <TableHead key={header.id} className="text-gray-700 font-semibold text-xs uppercase tracking-wider px-6 py-3.5">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -108,7 +108,7 @@ export function DataTable<T>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   className={cn(
-                    'hover:bg-slate-50 transition-colors cursor-default border-b border-slate-100 last:border-0',
+                    'h-[52px] hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-200 last:border-b',
                   )}
                   onClick={(event) => handleRowClick(row, event)}>
                   {row.getVisibleCells().map((cell) => {
@@ -116,7 +116,7 @@ export function DataTable<T>({
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          'px-4 py-3',
+                          'px-6 py-3',
                           columnStyle?.[cell.column.id] ?? '',
                         )}
                         isConcise={isConcise}>
@@ -150,8 +150,8 @@ export function DataTable<T>({
                     </svg>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <p className="text-lg font-semibold text-slate-900">No tests found</p>
-                    <p className="text-sm text-slate-500">Try adjusting your filters or create a new test to get started</p>
+                    <p className="text-lg font-semibold text-slate-900">No data found</p>
+                    <p className="text-sm text-slate-500">Try adjusting your filters or search criteria</p>
                   </div>
                 </div>
               </TableCell>
@@ -163,7 +163,7 @@ export function DataTable<T>({
 
       {/* Fixed Pagination */}
       {table.getRowCount() > 0 ? (
-        <div className="flex-shrink-0 border-t border-slate-200">
+        <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50">
           <DataTablePagination
             table={table}
             onPageSizeChange={onPageSizeChange}
