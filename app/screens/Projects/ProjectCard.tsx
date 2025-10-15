@@ -106,33 +106,14 @@ export const ProjectCard = ({project}: ProjectCardProps) => {
 
   const createdOn = getDateDetail(new Date(project.createdOn))
 
-  // Generate a consistent color based on project name
-  const generateColor = (name: string) => {
-    const colors = [
-      'bg-blue-500',
-      'bg-purple-500',
-      'bg-pink-500',
-      'bg-green-500',
-      'bg-yellow-500',
-      'bg-red-500',
-      'bg-indigo-500',
-      'bg-teal-500',
-      'bg-orange-500',
-      'bg-cyan-500',
-    ]
-    const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length
-    return colors[index]
-  }
-
   const projectInitial = project.projectName.charAt(0).toUpperCase()
-  const iconColor = generateColor(project.projectName)
 
   return (
     <div className="group bg-white border border-slate-200 rounded-lg p-5 hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col h-full">
       {/* Header Section */}
       <div className="flex items-start gap-3 mb-4">
         {/* Dynamic Icon */}
-        <div className={`flex-shrink-0 w-10 h-10 rounded-md ${iconColor} flex items-center justify-center text-white font-semibold text-lg`}>
+        <div className="flex-shrink-0 w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center text-slate-700 font-semibold text-lg">
           {projectInitial}
         </div>
         
