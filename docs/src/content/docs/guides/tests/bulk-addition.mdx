@@ -1,72 +1,106 @@
 ---
-title: Bulk Addition of Test Cases
+title: Import & Export
+description: Bulk import and export test cases using CSV files
 ---
 
-Managing test cases in bulk is made easy with Checkmate's bulk upload feature. This guide provides detailed steps to upload test cases using a `.csv` file, including required formats and additional considerations.
+import { Aside } from '@astrojs/starlight/components';
 
-### Bulk Upload Steps
+Import and export test cases in bulk using CSV files. Perfect for migrations, backups, and large-scale test management.
 
-- **Navigate to the Tests Listing Page**
-  - Go to the **Tests Listing Page** by clicking on **Tests** in the project listing.
-- **Click on Upload Tests**
-  - Locate and click the **Upload Tests** button.
-- **Upload the `.csv` File**
-  - Choose your `.csv` file for upload. Ensure the file follows the prescribed format.
-- **(Optional) Select Label for Test Cases**
-  - Assign a label to your test cases. This step is optional but can help with categorization.
-- **Submit Tests**
-  - Click **Submit Tests** to process the uploaded file.
+## Download Tests
+
+Export your existing tests as CSV for backups, templates, or external analysis.
+
+1. Click **Download** on the Tests page
+2. Select filters (optional) to export specific tests
+3. The CSV downloads with all test data
+
+**Use Cases:**
+- Create templates for bulk uploads
+- Backup test data
+- Share tests with external tools
+- Analyze test coverage in spreadsheets
+
+<Aside type="tip">
+  Apply filters before downloading to export only specific tests (by section, priority, platform, etc.).
+</Aside>
+
+## Upload Process
+
+1. Click **Upload** on the Tests page
+2. Select your CSV file (must follow the required format)
+3. (Optional) Assign a label to all imported tests
+4. Click **Submit Tests**
+
+The system validates and imports tests, auto-creating sections and squads as needed.
+
+## CSV Format
+
+### Required Columns
+
+| Column | Requirements | Notes |
+|--------|-------------|-------|
+| **Title** | Min 5 characters | Test case name |
+| **Section** | Hierarchy path | Use `>` for nesting: `Parent > Child > Test Section` |
+
+### Optional Columns
+
+| Column | Valid Values | Default |
+|--------|-------------|---------|
+| **Id** | Any number | Auto-generated |
+| **Priority** | Critical, High, Medium, Low | Medium |
+| **Platform** | All Platforms, Android Web And iOS Only, Android Web and Playstore, Only Android, Only iOS, Only Playstore | All Platforms |
+| **Test Covered By** | Contract, E2E, Integration, Manual, Unit | Manual |
+| **Automation Status** | Not Automatable, Automated, Automatable | Automatable |
+| **Squad** | Any text | Auto-created if new |
+| **Steps** | Text | - |
+| **Preconditions** | Text | - |
+| **Expected Result** | Text | - |
+| **Description** | Text | - |
+| **Additional Groups** | Text | - |
+| **Automation Id** | Text | - |
+| **Section Description** | Text | - |
+
+## Section Hierarchy
+
+Sections are created automatically based on the path in your CSV.
+
+**Example:**
+```
+Account Management > Cash In > Payment Listing
+```
+
+This creates:
+- **Account Management** (parent)
+  - **Cash In** (child)
+    - **Payment Listing** (child)
+
+<Aside type="caution">
+  Section names are case-sensitive. Typos will create duplicate sections.
+</Aside>
+
+## Migration from TestRail
+
+Use the **Id** column to preserve test IDs from TestRail:
+
+- If **Id** is provided: Uses that ID in Checkmate
+- If **Id** is empty: Auto-generates a new ID
+
+This ensures links and references remain intact during migration.
+
+## Best Practices
+
+- **Download as template** - Export existing tests to get the correct format
+- **Validate format** - Check your CSV in a spreadsheet tool before uploading
+- **Start small** - Test with 5-10 rows before bulk importing hundreds
+- **Check sections** - Verify section hierarchy paths are correct
+- **Review defaults** - Ensure default values match your needs
+- **Use filters** - Export specific test subsets for targeted templates
 
 ---
 
-### CSV Format and Uploading Guidelines
+## Next Steps
 
-##### Must Have Columns
-
-- **Title**: Character length must be greater than 5.
-- **Section**:
-  - Adding tests to a specific section like **Payment Listing** which is in _Account Management > Cash In_, specify section as `Account Management > Cash In > Payment Listing`
-  - Ensure correct spelling, as new sections will be created if they do not exist.
-
----
-
-##### Optional Columns
-
-- **Id**: If provided the same `testId` will be used in Checkmate. Otherwise, a new `testId` will be generated, usefull in migration.
-- **Squad**: If the squad exists in the database, it will be linked to the test case. Otherwise, a new squad will be created.
-- **Steps**: Text content.
-- **Preconditions**: Text content.
-- **Expected Result**: Text content.
-- **Description**: Text content.
-- **Additional Groups**: Text content.
-- **Automation Id**: Text content.
-- **Section Description**: Text content.
-- **Priority**: Must be one of `Critical`, `High`, `Medium`, `Low`, default is **Medium**.
-- **Platform**: Must be one of: `All Platforms`, `Android Web And iOS Only`, `Android Web and Playstore`, `Only Android`, `Only iOS`, `Only Playstore`,
-  , default is **All Platforms**.
-- **Test Covered By**: Must be one of `Contract`, `E2E`, `Integration`, `Manual`, `Unit`, default is **Manual**.
-- **Automation Status**: Must be one of `Not Automatable`, `Automated`, `Automatable`, default is **Automatable**.
-
-#### CSV Template
-
-<div class="text-xs">
-
-| Column Name         | Required | Notes                                                 |
-| ------------------- | -------- | ----------------------------------------------------- |
-| Title               | Yes      | Minimum 5 characters.                                 |
-| Section             | Yes      | Section Hierarchy Structure                           |
-| Steps               | No       | Minimum 5 characters.                                 |
-| Id                  | No       | Test ID from Testrail; autogenerated if not provided. |
-| Squad               | No       | Auto-created if squad doesn’t exist.                  |
-| Priority            | No       | Defaults to `Medium` if not provided.                 |
-| Platform            | No       | Defaults to `All Platforms` if not provided.          |
-| Test Covered By     | No       | Defaults to `Manual` if not provided.                 |
-| Automation Status   | No       | Defaults to `Automatable` if not provided.            |
-| Preconditions       | No       | Text content. Optional.                               |
-| Expected Result     | No       | Text content. Optional.                               |
-| Description         | No       | Text content. Optional.                               |
-| Additional Groups   | No       | Text content. Optional.                               |
-| Automation Id       | No       | Text content. Optional.                               |
-| Section Description | No       | Text content. Optional.                               |
-
-</div>
+- [Manage Tests](/guides/tests/tests) - View and organize imported tests
+- [Execute Runs](/guides/runs/runs) - Run your imported test cases
+- [Filter Tests](/guides/tests/tests#view--filter-tests) - Use advanced filtering options

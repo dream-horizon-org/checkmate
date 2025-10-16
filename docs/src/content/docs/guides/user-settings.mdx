@@ -1,32 +1,72 @@
 ---
 title: User Settings
+description: Manage your profile, API tokens, and view your permissions
 ---
 
-This section explains how to **generate tokens** and **manage user roles** in Checkmate.
+import { Aside } from '@astrojs/starlight/components';
+
+Access your user settings to generate API tokens for automation, view your current role and permissions, and manage your profile.
+
+## Access User Settings
+
+Click on your **profile avatar** in the top-right corner of the header → Select **User Details**
+
+## API Tokens
+
+Generate tokens for API authentication and automation workflows.
+
+**Generate Token:**
+1. Click **Generate Token** on the User Details page
+2. Copy the generated token immediately
+3. Store it securely (token is shown only once)
+
+**Use Cases:**
+- API authentication
+- CI/CD pipeline integration
+- Automated test execution
+- Third-party tool integration
+
+<Aside type="caution" title="Security">
+  Tokens provide full API access with your permissions. Never share tokens or commit them to version control.
+</Aside>
+
+**Delete Token:**
+Click **Delete Token** → Confirm → Token is revoked immediately
+
+<Aside type="note">
+  Deleting a token will break any integrations using it. Generate a new token before deleting the old one to avoid downtime.
+</Aside>
+
+## View Your Role
+
+Your current role and permissions are displayed on the User Details page.
+
+**Role Levels:**
+- **Admin** - Full access including user management
+- **User** - Create and modify tests and runs
+- **Reader** - View-only access
+
+See [RBAC Documentation](/project/rbac) for detailed permissions by role.
+
+## Admin Panel
+
+Administrators can access the Admin Panel to manage users across the organization.
+
+**Access:** User Details page → **Admin Panel** button (Admin only)
+
+**Capabilities:**
+- View all users
+- Update user roles
+- Assign organization-level permissions
+
+<Aside type="tip">
+  Contact your administrator if you need additional permissions or role changes.
+</Aside>
 
 ---
 
-#### 1. Generating a Token
+## Next Steps
 
-To generate a new token, follow these steps:
-
-1. Navigate to the **User Details** page, by clicking on user profile on right side of header.
-2. Locate the **Generate** button and click it.
-3. A secure token will be generated automatically and displayed on the screen.
-4. Use the generated token as needed for API access.
-
----
-
-#### 2. Managing User Roles
-
-To manage the roles of users, follow these steps:
-
-1. Navigate to the **Admin Panel** via the **User Details** page.
-   :::note
-   **Note:** This feature is available only for users with **admin privileges**.
-   :::
-2. In the Admin Panel, locate the user whose role you wish to modify.
-3. Use the role dialog menu to assign or update the user’s role (e.g., Admin, Editor, Viewer).
-4. Click **Update Role** to confirm the update.
-
-If the role management is successful, a notification will appear with the message: **"Role Updated Successfully"**.
+- [RBAC Documentation](/project/rbac) - Understand role permissions
+- [API Authentication](/guides/api/authentication) - Learn how to use tokens
+- [API Reference](/guides/api/openapi) - Explore available APIs

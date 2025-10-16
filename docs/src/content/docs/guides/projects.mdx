@@ -1,59 +1,74 @@
 ---
 title: Managing Projects
+description: Create, organize, and manage your testing projects
 ---
 
-This section outlines the steps to **create**, **edit**, and **delete projects** seamlessly using Checkmate.
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
----
+Projects are the foundation of your test management workflow. Each project contains test cases, test runs, and team members with specific permissions.
 
-### 1. Creating a Project
+## View Projects
 
-To create a new project, follow these steps:
+The projects page displays all your projects in a card layout. Use the search bar to filter projects by name.
 
-1. Click the **Add Project** button.
-2. You will be directed to the project creation page.
-3. Enter the required information.
-   > **Note:** The project name must contain at least **5 characters**.
-4. Once all fields are completed, click **Create**.
+**Key Information:**
+- Project name and description
+- Creator and creation date
+- Quick access to Tests and Runs
+- Edit and delete actions
 
-If the project is successfully created, a notification will appear with the message: **"Project Added"**.
+## Create a Project
+
+Click **New Project** and fill in:
+
+- **Project Name** - 5 to 50 characters (required)
+- **Project Description** - Optional details about the project
+
+Click **Create** to save. You'll see a success notification with the project details.
+
+<Aside type="note">
+  Project names must be unique within your organization.
+</Aside>
 
 <details>
-  <summary>Video Tutorial</summary>
-  ![Add Project](./../../../assets/create-project.gif)
+  <summary>View Demo</summary>
+  ![Create Project](./../../../assets/create-project.gif)
 </details>
 
----
+## Edit a Project
 
-### 2. Editing a Project
-
-To modify an existing project, proceed as follows:
-
-1. Locate the project in the table and click the **Pencil Icon**.
-2. An editable pop-up form will appear.
-3. Update the required fields with the new details.
-4. Click **Save Changes** to confirm.
-
-Upon successful editing, a notification will appear with the message: **"Success"**. The changes will immediately reflect in the project table.
+Click the **pencil icon** on any project card to update its name or description. Changes are saved immediately and reflected across all views.
 
 <details>
-  <summary>Video Tutorial</summary>
+  <summary>View Demo</summary>
   ![Edit Project](./../../../assets/edit-project.gif)
 </details>
 
----
+## Delete a Project
 
-### 3. Deleting a Project
+Click the **archive icon** and confirm deletion. This action is permanent and removes all associated data.
 
-To remove a project, take the following steps:
-
-1. Locate the project in the table and click the **Delete Icon**.
-2. A confirmation dialog will appear.
-3. Click **Yes, Delete** to confirm the action.
-
-If the deletion is successful, a notification will appear with the message: **"Success"**.
+<Aside type="caution" title="Warning">
+  Deleting a project removes all tests, runs, and related data permanently. This cannot be undone.
+</Aside>
 
 <details>
-  <summary>Video Tutorial</summary>
+  <summary>View Demo</summary>
   ![Delete Project](./../../../assets/delete-project.gif)
 </details>
+
+## Quick Actions
+
+From each project card:
+
+- **Tests** - View and manage all test cases
+- **Runs** - Access test execution history
+- Click the **project name** to navigate directly to the test cases page
+
+---
+
+## Next Steps
+
+- [Manage Test Cases](/guides/tests/tests) - Create and organize tests
+- [Execute Test Runs](/guides/runs/runs) - Run and track testing progress
+- [Configure RBAC](/project/rbac) - Set up team permissions

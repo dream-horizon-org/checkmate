@@ -1,0 +1,519 @@
+---
+title: Database Design
+description: Complete database schema reference for Checkmate's MySQL database
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+Checkmate uses MySQL 8.0 as its primary database, designed to efficiently manage organizations, projects, test cases, test runs, and associated metadata.
+
+### Design Principles
+
+- **Normalized Structure** - Minimize data redundancy
+- **Referential Integrity** - Foreign keys enforce relationships
+- **Performance Optimized** - Strategic indexes on frequently queried columns
+- **Audit Trail** - CreatedBy, updatedBy, timestamps on key entities
+- **Soft Deletes** - Status flags instead of hard deletes where appropriate
+
+### Schema Visualization
+
+You can visualize the complete schema by importing `_schema.sql` into [dbdiagram.io](https://dbdiagram.io/home).
+
+**Schema File Location:** `/sql/_schema.sql`
+
+---
+
+## Database Structure
+
+### Table Categories
+
+The database consists of **16 tables** organized into four categories:
+
+**1. Core Entities** (5 tables)
+- `users` - System users
+- `organisations` - Organization entities
+- `projects` - Test projects
+- `tests` - Test cases
+- `runs` - Test runs
+
+**2. Test Organization** (3 tables)
+- `sections` - Hierarchical test organization
+- `squads` - Team ownership
+- `labels` - Flexible tagging
+
+**3. Test Metadata** (5 tables)
+- `type` - Test types
+- `priority` - Priority levels
+- `platform` - Target platforms
+- `automationStatus` - Automation state
+- `testCoveredBy` - Coverage type
+
+**4. Relationship Tables** (3 tables)
+- `labelTestMap` - Many-to-many (labels ↔ tests)
+- `testRunMap` - Many-to-many (tests ↔ runs)
+- `testRunsStatusHistory` - Audit trail for test results
+
+---
+
+## Entity Relationships
+
+```
+organisations (1) ──→ (N) projects
+projects (1) ──→ (N) tests
+projects (1) ──→ (N) runs
+projects (1) ──→ (N) sections (hierarchical)
+projects (1) ──→ (N) squads
+projects (1) ──→ (N) labels
+
+tests (N) ←──→ (N) labels (via labelTestMap)
+tests (N) ←──→ (N) runs (via testRunMap)
+tests (N) ──→ (1) section
+tests (N) ──→ (1) squad
+tests (N) ──→ (1) priority
+tests (N) ──→ (1) platform
+tests (N) ──→ (1) automationStatus
+tests (N) ──→ (1) testCoveredBy
+
+testRunMap (N) ──→ (N) testRunsStatusHistory
+```
+
+---
+
+## Core Entities
+
+### Users
+
+System users with authentication and role-based access.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `userId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `userName` | varchar(100) | NOT NULL | Display name |
+| `email` | varchar(100) | NOT NULL, UNIQUE | Email address |
+| `ssoId` | varchar(200) | UNIQUE | Google OAuth SSO ID |
+| `profileUrl` | text | | Profile image URL |
+| `role` | enum | NOT NULL, DEFAULT 'user' | `admin`, `user`, `reader` |
+| `token` | varchar(500) | UNIQUE | API authentication token |
+| `updatedBy` | int | FK → users.userId | Last modifier |
+| `status` | enum | DEFAULT 'active' | `active`, `archive`, `delete` |
+
+<Aside type="note">
+  Users are never hard-deleted. The status field marks inactive accounts.
+</Aside>
+
+### Organizations
+
+Top-level entities that group projects and users.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `orgId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `orgName` | varchar(20) | NOT NULL, UNIQUE | Organization name |
+| `createdBy` | int | FK → users.userId | Creator |
+| `createdOn` | timestamp | DEFAULT CURRENT_TIMESTAMP | Creation time |
+
+### Projects
+
+Containers for test cases and test runs.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `projectId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `projectName` | varchar(50) | NOT NULL | Project name |
+| `projectDescription` | varchar(255) | | Description |
+| `createdBy` | int | FK → users.userId | Creator |
+| `createdOn` | timestamp | DEFAULT CURRENT_TIMESTAMP | Creation time |
+| `orgId` | int | NOT NULL, FK → organisations.orgId | Owner organization |
+| `testsCount` | int | DEFAULT 0 | Cached test count |
+| `runsCount` | int | DEFAULT 0 | Cached run count |
+| `status` | enum | DEFAULT 'Active' | `Active`, `Archived`, `Deleted` |
+| `updatedOn` | timestamp | ON UPDATE CURRENT_TIMESTAMP | Last update |
+| `updatedBy` | int | FK → users.userId | Last modifier |
+
+**Indexes:**
+- `projectsNameIndex` on `projectName`
+- `projectsProjectIdIndex` on `projectId`
+- `projectOrgUniqueIndex` (UNIQUE) on `(projectName, orgId)`
+
+<Aside type="tip">
+  The unique index on (projectName, orgId) ensures project names are unique within an organization but can repeat across organizations.
+</Aside>
+
+### Tests
+
+Test cases with detailed specifications and metadata.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `testId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `sectionId` | int | FK → sections.sectionId | Hierarchical section |
+| `projectId` | int | NOT NULL, FK → projects.projectId | Owner project |
+| `title` | varchar(750) | NOT NULL | Test title |
+| `squadId` | int | FK → squads.squadId | Responsible squad |
+| `priorityId` | int | FK → priority.priorityId | Priority level |
+| `typeId` | int | FK → type.typeId | Test type |
+| `automationStatusId` | int | FK → automationStatus | Automation status |
+| `platformId` | int | FK → platform.platformId | Target platform |
+| `testCoveredById` | int | FK → testCoveredBy | Coverage type |
+| `preconditions` | text | | Setup requirements |
+| `steps` | text | | Execution steps |
+| `expectedResult` | text | | Expected outcome |
+| `description` | text | | Test description |
+| `jiraTicket` | text | | Associated Jira ticket |
+| `additionalGroups` | text | | Custom grouping |
+| `defects` | text | | Related defects |
+| `automationId` | text | | Automation script ID |
+| `createdBy` | int | FK → users.userId | Creator |
+| `createdOn` | timestamp | DEFAULT CURRENT_TIMESTAMP | Creation time |
+| `updatedBy` | int | FK → users.userId | Last modifier |
+| `updatedOn` | timestamp | ON UPDATE CURRENT_TIMESTAMP | Last update |
+
+**Indexes:**
+- `testIdIndex` on `testId`
+- `projectIdIndex` on `projectId`
+
+### Runs
+
+Test execution runs containing selected tests.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `runId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `runName` | varchar(255) | NOT NULL | Run name |
+| `runDescription` | text | | Description |
+| `projectId` | int | NOT NULL, FK → projects.projectId | Owner project |
+| `testsCount` | int | DEFAULT 0 | Number of tests |
+| `passed` | int | DEFAULT 0 | Passed count |
+| `failed` | int | DEFAULT 0 | Failed count |
+| `retest` | int | DEFAULT 0 | Retest count |
+| `blocked` | int | DEFAULT 0 | Blocked count |
+| `untested` | int | DEFAULT 0 | Untested count |
+| `skipped` | int | DEFAULT 0 | Skipped count |
+| `createdBy` | int | FK → users.userId | Creator |
+| `createdOn` | timestamp | DEFAULT CURRENT_TIMESTAMP | Creation time |
+| `updatedOn` | timestamp | ON UPDATE CURRENT_TIMESTAMP | Last update |
+| `updatedBy` | int | FK → users.userId | Last modifier |
+| `status` | enum | DEFAULT 'Active' | `Active`, `Locked` |
+| `lockedBy` | int | FK → users.userId | User who locked |
+| `lockedOn` | timestamp | | Lock time |
+
+**Indexes:**
+- `runIdIndex` on `runId`
+- `projectIdIndex` on `projectId`
+
+<Aside type="note">
+  Status counts (passed, failed, etc.) are denormalized for performance. They're updated when test statuses change.
+</Aside>
+
+---
+
+## Test Organization
+
+### Sections
+
+Hierarchical organization of tests within projects.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `sectionId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `sectionName` | varchar(255) | NOT NULL | Section name |
+| `sectionDescription` | text | | Description |
+| `projectId` | int | NOT NULL, FK → projects.projectId | Owner project |
+| `parentSectionId` | int | FK → sections.sectionId | Parent section (null = root) |
+| `createdBy` | int | FK → users.userId | Creator |
+| `createdOn` | timestamp | DEFAULT CURRENT_TIMESTAMP | Creation time |
+
+**Hierarchy:** Self-referencing via `parentSectionId` allows unlimited nesting.
+
+**Example:**
+```
+Login & Auth (parentSectionId = null)
+├── Email Login (parentSectionId = 1)
+└── Social Login (parentSectionId = 1)
+```
+
+### Squads
+
+Teams or groups responsible for tests.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `squadId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `squadName` | varchar(100) | NOT NULL | Squad name |
+| `projectId` | int | NOT NULL, FK → projects.projectId | Owner project |
+| `createdBy` | int | FK → users.userId | Creator |
+| `createdOn` | timestamp | DEFAULT CURRENT_TIMESTAMP | Creation time |
+
+### Labels
+
+Flexible tagging system for tests.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `labelId` | int | PK, AUTO_INCREMENT | Unique identifier |
+| `labelName` | varchar(100) | NOT NULL | Label name |
+| `projectId` | int | NOT NULL, FK → projects.projectId | Owner project |
+| `createdBy` | int | FK → users.userId | Creator |
+| `createdOn` | timestamp | DEFAULT CURRENT_TIMESTAMP | Creation time |
+
+---
+
+## Test Metadata
+
+These tables store predefined values for test attributes.
+
+### Priority
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `priorityId` | int | PK, AUTO_INCREMENT |
+| `priorityName` | varchar(20) | NOT NULL, UNIQUE |
+
+**Values:** `Critical`, `High`, `Medium`, `Low`
+
+### Platform
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `platformId` | int | PK, AUTO_INCREMENT |
+| `platformName` | varchar(50) | NOT NULL, UNIQUE |
+
+**Values:** `All Platforms`, `Android Only`, `iOS Only`, `Web Only`, `Android Web and Playstore`, etc.
+
+### Automation Status
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `automationStatusId` | int | PK, AUTO_INCREMENT |
+| `automationStatusName` | varchar(20) | NOT NULL, UNIQUE |
+
+**Values:** `Not Automatable`, `Automated`, `Automatable`
+
+### Test Covered By
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `testCoveredById` | int | PK, AUTO_INCREMENT |
+| `testCoveredByName` | varchar(15) | NOT NULL, UNIQUE |
+
+**Values:** `Manual`, `E2E`, `Integration`, `Unit`, `Contract`
+
+### Type
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `typeId` | int | PK, AUTO_INCREMENT |
+| `typeName` | varchar(20) | NOT NULL, UNIQUE |
+
+**Values:** (Project-specific test types)
+
+---
+
+## Relationship Tables
+
+### labelTestMap
+
+Many-to-many relationship between labels and tests.
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | int | PK, AUTO_INCREMENT |
+| `labelId` | int | NOT NULL, FK → labels.labelId |
+| `testId` | int | NOT NULL, FK → tests.testId |
+
+**Unique Constraint:** `(labelId, testId)` - prevents duplicate mappings
+
+### testRunMap
+
+Many-to-many relationship between tests and runs.
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | int | PK, AUTO_INCREMENT |
+| `testId` | int | NOT NULL, FK → tests.testId |
+| `runId` | int | NOT NULL, FK → runs.runId |
+| `status` | enum | DEFAULT 'Untested' |
+| `updatedBy` | int | FK → users.userId |
+| `updatedOn` | timestamp | ON UPDATE CURRENT_TIMESTAMP |
+
+**Status Values:** `Passed`, `Failed`, `Blocked`, `Retest`, `Skipped`, `Untested`
+
+**Unique Constraint:** `(testId, runId)` - prevents duplicate test assignments
+
+### testRunsStatusHistory
+
+Audit trail for test status changes in runs.
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `historyId` | int | PK, AUTO_INCREMENT |
+| `testRunMapId` | int | NOT NULL, FK → testRunMap.id |
+| `status` | enum | NOT NULL |
+| `comment` | text | |
+| `updatedBy` | int | FK → users.userId |
+| `updatedOn` | timestamp | DEFAULT CURRENT_TIMESTAMP |
+
+**Purpose:** Track complete history of status changes for audit and reporting.
+
+---
+
+## Design Decisions
+
+### Why Denormalized Counts?
+
+Tables like `projects` and `runs` store counts (`testsCount`, `passed`, `failed`, etc.) for performance:
+
+**Benefits:**
+- Fast dashboard queries (no expensive COUNT operations)
+- Reduced database load
+- Better user experience with instant stats
+
+**Trade-off:**
+- Requires careful update logic
+- Potential for inconsistency (mitigated by transactions)
+
+### Why Soft Deletes?
+
+Using status flags instead of hard deletes:
+
+**Benefits:**
+- Preserve audit trail
+- Enable undo functionality
+- Maintain referential integrity
+- Support historical reporting
+
+**Implementation:**
+- `projects.status`: Active, Archived, Deleted
+- `users.status`: active, archive, delete
+
+### Why Separate Metadata Tables?
+
+Priority, platform, automationStatus, etc. are separate tables instead of enums:
+
+**Benefits:**
+- Centralized management
+- Easy to extend without schema changes
+- Consistent across projects
+- Supports future customization per organization
+
+---
+
+## Performance Optimizations
+
+### Strategic Indexes
+
+**Projects:**
+- `projectName` - Fast search by name
+- `(projectName, orgId)` - Enforce uniqueness, fast lookups
+
+**Tests:**
+- `projectId` - Filter tests by project
+- `testId` - Primary key lookups
+
+**Runs:**
+- `projectId` - Filter runs by project
+- `runId` - Primary key lookups
+
+### Query Patterns
+
+**Optimized Queries:**
+- Paginated test lists use `LIMIT` and `OFFSET`
+- Filters use indexed columns (projectId, sectionId, squadId)
+- Status counts avoid real-time aggregation
+
+**Avoid:**
+- Full table scans
+- Unindexed WHERE clauses
+- N+1 query problems (use JOINs)
+
+---
+
+## Schema Migrations
+
+Checkmate uses Drizzle ORM for schema management.
+
+**Migration Files:** `sql/_migration*.sql`
+
+**Process:**
+1. Define schema in TypeScript (`app/db/schema/`)
+2. Generate migration with Drizzle
+3. Apply migration to database
+4. Seed initial data if needed
+
+**Seed Data:** `app/db/seed/` contains initial values for metadata tables.
+
+---
+
+## Database Access
+
+### Connection Configuration
+
+```typescript
+// drizzle.config.ts
+export default {
+  schema: "./app/db/schema/*",
+  out: "./sql",
+  driver: "mysql2",
+  dbCredentials: {
+    uri: process.env.DATABASE_URL
+  }
+}
+```
+
+### ORM Layer
+
+Drizzle ORM provides:
+- Type-safe queries
+- SQL-like syntax
+- Automatic migrations
+- Connection pooling
+
+**Example Query:**
+```typescript
+// Get all tests for a project
+const tests = await db
+  .select()
+  .from(testsTable)
+  .where(eq(testsTable.projectId, projectId))
+  .limit(10)
+  .offset(0);
+```
+
+---
+
+## Best Practices
+
+### For Developers
+
+- **Always use transactions** for multi-table updates
+- **Update counts** when modifying tests/runs
+- **Check foreign keys** before deleting
+- **Use prepared statements** (ORM handles this)
+- **Index new query columns** if adding filters
+
+### For Database Admins
+
+- **Regular backups** - Daily snapshots recommended
+- **Monitor query performance** - Check slow query log
+- **Index maintenance** - Rebuild indexes periodically
+- **Connection pooling** - Configure max connections appropriately
+
+---
+
+## Additional Resources
+
+- [System Architecture](/tech/architecture) - Overall system design
+- [Drizzle ORM Documentation](https://orm.drizzle.team/) - ORM reference
+- [MySQL 8.0 Documentation](https://dev.mysql.com/doc/refman/8.0/en/) - Database reference
+- Schema Visualization: Import `/sql/_schema.sql` into [dbdiagram.io](https://dbdiagram.io/)
+
+---
+
+## Next Steps
+
+- [Setup Guide](/project/setup) - Configure database locally
+- [API Reference](/guides/api/openapi) - Understand data flows
+- [Contributing](https://github.com/dream-sports-labs/checkmate/blob/master/CONTRIBUTING.md) - Schema change process
+
