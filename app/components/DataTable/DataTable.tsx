@@ -82,14 +82,14 @@ export function DataTable<T>({
               'z-20',
               'h-12',
               'overflow-hidden',
-              'bg-gray-50',
-              'border-b-2',
-              'border-gray-300',
+              'bg-slate-50',
+              'border-b',
+              'border-slate-200',
             )}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-gray-700 font-semibold text-xs uppercase tracking-wider px-6 py-3.5">
+                  <TableHead key={header.id} className="text-slate-700 font-semibold text-sm px-4 py-3">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -108,7 +108,7 @@ export function DataTable<T>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   className={cn(
-                    'h-[52px] hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-200 last:border-b',
+                    'hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-200 last:border-b',
                   )}
                   onClick={(event) => handleRowClick(row, event)}>
                   {row.getVisibleCells().map((cell) => {
@@ -116,7 +116,7 @@ export function DataTable<T>({
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          'px-6 py-3',
+                          'px-4 py-4',
                           columnStyle?.[cell.column.id] ?? '',
                         )}
                         isConcise={isConcise}>
@@ -163,7 +163,7 @@ export function DataTable<T>({
 
       {/* Fixed Pagination */}
       {table.getRowCount() > 0 ? (
-        <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50">
+        <div className="flex-shrink-0 border-t border-slate-200 bg-slate-50">
           <DataTablePagination
             table={table}
             onPageSizeChange={onPageSizeChange}
