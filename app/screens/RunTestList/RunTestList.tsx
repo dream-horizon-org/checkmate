@@ -436,10 +436,10 @@ export default function RunTestList() {
   }
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col w-full h-full">
       {/* Header Section */}
       <div className="pb-6 mb-6 border-b border-slate-200">
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex justify-between items-center mb-5">
           {runData ? (
             <RunPageTitle runData={runData} />
           ) : (
@@ -463,7 +463,7 @@ export default function RunTestList() {
       </div>
 
       {/* Search and Filter Section */}
-      <div className="flex-shrink-0 flex items-center gap-2 pb-4 mb-4 border-b border-slate-200">
+      <div className="flex flex-shrink-0 gap-2 items-center pb-4 mb-4 border-b border-slate-200">
         <SearchBar
           handlechange={handleChange}
           placeholdertext="Search by title or id..."
@@ -489,7 +489,7 @@ export default function RunTestList() {
       </div>
 
       {/* Data Table */}
-      <div className="flex-1 overflow-hidden">
+      <div className="overflow-hidden flex-1">
         <DataTable
           isConcise={true}
           table={table}
