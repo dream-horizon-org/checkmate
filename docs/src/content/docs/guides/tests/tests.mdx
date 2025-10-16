@@ -1,90 +1,124 @@
 ---
-title: Tests
+title: Managing Tests
+description: Create, organize, and manage test cases within your projects
 ---
 
-Managing test cases effectively is a crucial part of test management. This guide provides step-by-step instructions for **creating**, **editing**, and **deleting** test cases, both individually and in bulk, as well as for adding labels, squads, and runs.
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
-### Managing Single Test Cases
+Test cases are the building blocks of your testing strategy. Organize them into sections, filter by attributes, and execute them in test runs.
 
-#### 1. Creating a Test Case
+## View & Filter Tests
 
-1. Navigate to the **Tests Listing Page**.
-2. Click on **Add Test**.
-3. Provide the following details:
-   - **Mandatory Fields**: Title and Section.
-   - **Default Fields**: Priority, Automation Status, Platform, Test Covered By (adjust as needed).
-   - **Optional Fields**: Fill in additional attributes if required.
-4. Choose one of the following actions:
-   - **Add Test Case**: Adds the test and navigates to the **Tests Listing Page**.
-   - **Add & Next**: Adds the test and opens a fresh **Add Test Page**.
-   - **Cancel**: Returns to the **Tests Listing Page** without saving.
+The tests page displays all test cases for a project. Use the powerful filtering and search tools to find specific tests.
 
-> **Note**: _Section_ and _Squad_ can be added by if not exist
+**Available Filters:**
+- Priority, Platform, Automation Status
+- Squad, Labels, Test Covered By
+- Sections (hierarchical organization)
+- Combined AND/OR logic
 
-<details>
-  <summary>Video Tutorial</summary>
-  ![Add Test Cases](./../../../../assets/add-test.gif)
-</details>
+**Search:** Filter tests by title using the search bar.
 
-#### 2. Editing a Test Case
+## Create a Test
 
-1. On the **Tests Listing Page**, click the **Edit** button next to the desired test.
-2. Update the required fields with the new details.
-3. Choose one of the following actions:
-   - **Update Test**: Saves the changes.
-   - **Cancel**: Returns to the **Tests Listing Page** without saving.
+Click **New** → **Add Test** and fill in the required fields:
 
-<details>
-  <summary>Video Tutorial</summary>
-  ![Edit Test Cases](./../../../../assets/edit-test.gif)
-</details>
+**Required Fields:**
+- **Title** - Test case name
+- **Section** - Organize tests hierarchically
 
-#### 3. Deleting a Test Case
+**Default Fields:**
+- Priority, Automation Status, Platform, Test Covered By
 
-1. On the **Tests Listing Page**, click the **Delete** button next to the test.
-2. Confirm the deletion in the confirmation dialog.
+**Optional Fields:**
+- Description, Pre-conditions, Steps, Expected Results
+- Squad, Labels, Custom fields
+
+**Actions:**
+- **Create Test** - Save and return to list
+- **Add & Create Another** - Save and create another test
+- **Cancel** - Discard changes
+
+<Aside type="tip">
+  Create new Sections and Squads on-the-fly while adding tests.
+</Aside>
 
 <details>
-  <summary>Video Tutorial</summary>
-  ![Delete Test Cases](./../../../../assets/delete-test.gif)
+  <summary>View Demo</summary>
+  ![Create Test](./../../../../assets/add-test.gif)
 </details>
 
-### Managing Multiple Test Cases
+## Edit a Test
 
-#### 1. Deleting Multiple Test Cases
-
-1. Select the tests on the **Tests Listing Page**.
-2. Click the **Delete Tests** button.
-3. Confirm the deletion in the dialog box.
+Click the **menu icon** on any test row and select **Edit**. Update any field and click **Update Test** to save changes.
 
 <details>
-  <summary>Video Tutorial</summary>
-  ![Delete Multiple Test Cases](./../../../../assets/delete-bulk-test.gif)
+  <summary>View Demo</summary>
+  ![Edit Test](./../../../../assets/edit-test.gif)
 </details>
 
-#### 2. Changing Attributes for Multiple Test Cases
+## Delete Tests
 
-1. Select the tests on the **Tests Listing Page**.
-2. Click **Add Property**.
-3. From the dropdown, select a property and its value.
-4. Click **Apply**.
+**Single Test:**
+Click the **menu icon** → **Delete** → Confirm
 
-   - **For Labels**: Selected label is added to the existing label of test.
-   - **For Other Attributes**: Replaces the current value with the selected one.
+**Multiple Tests:**
+Select tests using checkboxes → **Delete** → Confirm
+
+<Aside type="caution">
+  Deleted tests cannot be recovered.
+</Aside>
 
 <details>
-  <summary>Video Tutorial</summary>
-  ![Attributes Multiple Test
-  Cases](./../../../../assets/multiple-test-cases-attribute.gif)
+  <summary>View Demo - Single</summary>
+  ![Delete Test](./../../../../assets/delete-test.gif)
 </details>
-
-### Adding Labels, Squads, and Runs
-
-1. Select the relevant field from the dropdown.
-2. Fill in the required details.
-3. Click **Apply**.
 
 <details>
-  <summary>Video Tutorial</summary>
-  ![Add Labels](./../../../../assets/add-label.gif)
+  <summary>View Demo - Bulk</summary>
+  ![Delete Multiple Tests](./../../../../assets/delete-bulk-test.gif)
 </details>
+
+## Bulk Operations
+
+Select multiple tests and use **Add Property** to update attributes in bulk.
+
+**Behavior:**
+- **Labels** - Adds to existing labels
+- **Other Attributes** - Replaces current value
+
+<details>
+  <summary>View Demo</summary>
+  ![Bulk Update](./../../../../assets/multiple-test-cases-attribute.gif)
+</details>
+
+## Sections & Organization
+
+Organize tests into hierarchical sections for better management.
+
+**Create Sections:**
+Click **New** → **Add Section** or create while adding tests
+
+**Section Features:**
+- Hierarchical structure (parent/child)
+- Filter tests by section
+- Bulk select by section
+
+## Quick Actions
+
+- **Upload/Download** - Import/export tests in bulk
+- **View Runs** - Access test execution history
+- **Columns** - Customize table view
+- **Add Label/Squad/Run** - Quick creation from dropdown
+
+<details>
+  <summary>View Demo - Add Label</summary>
+  ![Add Label](./../../../../assets/add-label.gif)
+</details>
+
+---
+
+## Next Steps
+
+- [Bulk Addition](/guides/tests/bulk-addition) - Import tests via CSV/JSON
+- [Execute Test Runs](/guides/runs/runs) - Run and track test execution
