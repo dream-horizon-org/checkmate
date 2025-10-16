@@ -111,10 +111,11 @@ export const AddResultDialog = ({
       <Button
         disabled={!isAddResultEnabled}
         variant={isAddResultEnabled ? 'default' : 'outline'}
+        size="default"
         className={cn(
-          `${
-            shouldAnimate ? 'animate-bounce' : ''
-          } transition-all duration-300`,
+          'shadow-sm',
+          shouldAnimate ? 'animate-bounce' : '',
+          'transition-all duration-300',
         )}>
         Add Result
       </Button>
@@ -130,12 +131,12 @@ export const AddResultDialog = ({
       anchorComponent={
         <div className={containerClassName}>{triggerComponent(variant)}</div>
       }
-      headerComponent={<DialogTitle>Add Result</DialogTitle>}
+      headerComponent={<DialogTitle className="text-slate-900">Add Result</DialogTitle>}
       contentComponent={
-        <div className="flex flex-col gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <label htmlFor="name" className="text-right text-sm">
-              Status :
+        <div className="flex flex-col gap-5 py-4">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="name" className="text-sm font-medium text-slate-700">
+              Status
             </label>
             <ComboboxDemo
               value={status}
@@ -144,26 +145,26 @@ export const AddResultDialog = ({
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="comment" className="text-left text-sm">
-              Comment :
+            <label htmlFor="comment" className="text-sm font-medium text-slate-700">
+              Comment
             </label>
             <Textarea
-              placeholder={'Your comment here'}
+              placeholder="Add your comment here..."
               onChange={(e) => setComment(e.target.value)}
             />
           </div>
         </div>
       }
       footerComponent={
-        <updateStatusFetcher.Form method={'POST'}>
+        <updateStatusFetcher.Form method="POST">
           <DialogClose disabled={status === ''}>
             <Button
               type="button"
               variant="default"
               onClick={onAddResultSubmited}
-              className="w-full bg-blue-600"
+              className="w-full"
               disabled={updateStatusFetcher.state !== 'idle' || status === ''}>
-              {'Add Result'}
+              Add Result
             </Button>
           </DialogClose>
         </updateStatusFetcher.Form>

@@ -436,54 +436,60 @@ export default function RunTestList() {
   }
 
   return (
-    <div className={cn('flex flex-col py-6 h-full w-full')}>
-      <div className={'flex items-center mb-4'}>
-        {runData ? (
-          <RunPageTitle runData={runData} />
-        ) : (
-          <Skeleton className={'h-8 w-[250px]'} />
-        )}
-      </div>
-      <div className={'flex mb-6 gap-8 justify-between'}>
-        <RunMetaData testRunsMetaData={testRunsMetaData} />
-
-        {runData?.status === 'Active' ? (
-          <RunActions table={table} runData={runData} />
-        ) : (
-          runData && (
-            <DownLoadTests
-              tooltipText={'Download Report'}
-              fetchUrl={`/${API.DownloadReport}?runId=${runData.runId}`}
-              fileName={`${runData.runName}-run`}
-            />
-          )
-        )}
-      </div>
-      <div className={cn('flex flex-col gap-4 h-[calc(100%-160px)]')}>
-        <div className={'flex gap-2 h-12'}>
-          <SearchBar
-            handlechange={handleChange}
-            placeholdertext={'Search by title or id...'}
-            searchstring={textSearch}
-          />
-
-          {testRunsData?.[0]?.runStatus === 'Active' && (
-            <AddResultDialog
-              getSelectedRows={getSelectedRows}
-              runId={runData?.runId ?? 0}
-              onAddResultSubmit={onAddResultSubmit}
-              isAddResultEnabled={isAddResultEnabled()}
-            />
+    <div className="flex flex-col h-full w-full">
+      {/* Header Section */}
+      <div className="pb-6 mb-6 border-b border-slate-200">
+        <div className="flex items-center justify-between mb-5">
+          {runData ? (
+            <RunPageTitle runData={runData} />
+          ) : (
+            <Skeleton className="h-8 w-[250px]" />
           )}
-
-          <TestsFilters
-            filter={filter}
-            setFilter={setFilter}
-            onFilterApply={onFilterApply}
-          />
-
-          <ToggleColumns table={table} />
+          
+          {runData?.status === 'Active' ? (
+            <RunActions table={table} runData={runData} />
+          ) : (
+            runData && (
+              <DownLoadTests
+                tooltipText="Download Report"
+                fetchUrl={`/${API.DownloadReport}?runId=${runData.runId}`}
+                fileName={`${runData.runName}-run`}
+              />
+            )
+          )}
         </div>
+        
+        <RunMetaData testRunsMetaData={testRunsMetaData} />
+      </div>
+
+      {/* Search and Filter Section */}
+      <div className="flex-shrink-0 flex items-center gap-2 pb-4 mb-4 border-b border-slate-200">
+        <SearchBar
+          handlechange={handleChange}
+          placeholdertext="Search by title or id..."
+          searchstring={textSearch}
+        />
+
+        {testRunsData?.[0]?.runStatus === 'Active' && (
+          <AddResultDialog
+            getSelectedRows={getSelectedRows}
+            runId={runData?.runId ?? 0}
+            onAddResultSubmit={onAddResultSubmit}
+            isAddResultEnabled={isAddResultEnabled()}
+          />
+        )}
+
+        <TestsFilters
+          filter={filter}
+          setFilter={setFilter}
+          onFilterApply={onFilterApply}
+        />
+
+        <ToggleColumns table={table} />
+      </div>
+
+      {/* Data Table */}
+      <div className="flex-1 overflow-hidden">
         <DataTable
           isConcise={true}
           table={table}
@@ -493,6 +499,7 @@ export default function RunTestList() {
           hideScrollBar={true}
         />
       </div>
+      
       {state !== 'idle' ? <Loader /> : null}
     </div>
   )

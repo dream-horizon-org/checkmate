@@ -13,21 +13,29 @@ const TEST_STATUS_TO_DISPLAY = [
 export const TEST_STATUS_TEXT_COLOR_MAPPING: {[key: string]: string} = {
   passed: 'text-green-600',
   failed: 'text-red-600',
-  retest: 'text-yellow-500',
+  retest: 'text-orange-600',
+}
+
+export const TEST_STATUS_BG_COLOR_MAPPING: {[key: string]: string} = {
+  passed: 'bg-green-50 border-green-200',
+  failed: 'bg-red-50 border-red-200',
+  retest: 'bg-orange-50 border-orange-200',
+  untested: 'bg-slate-50 border-slate-200',
+  total: 'bg-blue-50 border-blue-200',
 }
 
 export const RunMetaData = ({testRunsMetaData}: {testRunsMetaData: any}) => {
   if (!testRunsMetaData) {
     return (
-      <div className="flex gap-6">
+      <div className="flex gap-4">
         {Array(5)
           .fill(null)
           .map((_, index) => (
             <div
               key={index}
-              className="h-24 flex flex-col min-w-32 bg-gray-50 p-2 rounded-md shadow-md">
-              <Skeleton className="h-4 w-1/3 mb-2 rounded" />
-              <Skeleton className="h-8 w-1/2 rounded" />
+              className="h-24 flex flex-col min-w-32 bg-slate-50 px-4 py-3 rounded-lg border border-slate-200">
+              <Skeleton className="h-4 w-16 mb-2 rounded" />
+              <Skeleton className="h-7 w-12 rounded" />
             </div>
           ))}
       </div>
@@ -35,7 +43,7 @@ export const RunMetaData = ({testRunsMetaData}: {testRunsMetaData: any}) => {
   }
 
   return (
-    <div className={'flex gap-6'}>
+    <div className="flex gap-4">
       {Object.keys(testRunsMetaData).map((key, index) => {
         if (TEST_STATUS_TO_DISPLAY.includes(key)) {
           const percentageValue =
@@ -49,26 +57,34 @@ export const RunMetaData = ({testRunsMetaData}: {testRunsMetaData: any}) => {
                 )
 
           return (
-            <Card key={index} className={'h-24 flex flex-col min-w-32'}>
-              <CardHeader
-                className={`text-base text-slate-400 capitalize ${TEST_STATUS_TEXT_COLOR_MAPPING[key]}`}>
-                {key}
-              </CardHeader>
-              <CardContent>
+            <div
+              key={index}
+              className={`h-24 flex flex-col justify-between min-w-32 px-4 py-3 rounded-lg border ${TEST_STATUS_BG_COLOR_MAPPING[key] || 'bg-slate-50 border-slate-200'}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">
+                  {key}
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2">
                 <span
-                  className={`text-2xl font-normal ${
-                    testRunsMetaData[key] > 0 &&
-                    TEST_STATUS_TEXT_COLOR_MAPPING[key]
+                  className={`text-2xl font-semibold ${
+                    testRunsMetaData[key] > 0 && TEST_STATUS_TEXT_COLOR_MAPPING[key]
+                      ? TEST_STATUS_TEXT_COLOR_MAPPING[key]
+                      : key === 'total'
+                      ? 'text-blue-600'
+                      : key === 'untested'
+                      ? 'text-slate-600'
+                      : 'text-slate-900'
                   }`}>
                   {testRunsMetaData[key]}
                 </span>
                 {key !== 'total' && (
-                  <span className={'text text-gray-500'}>
-                    {` (${percentageValue}%)`}
+                  <span className="text-sm text-slate-500 font-medium">
+                    {`${percentageValue}%`}
                   </span>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )
         }
       })}

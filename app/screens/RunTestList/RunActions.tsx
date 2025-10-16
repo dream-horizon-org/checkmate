@@ -138,7 +138,8 @@ export const RunActions = React.memo(({table, runData}: IRunActions) => {
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="ml-auto"
+            size="default"
+            className="shadow-sm"
             onClick={() => setActionDD(true)}>
             Actions
           </Button>

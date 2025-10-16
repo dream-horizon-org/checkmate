@@ -1,5 +1,4 @@
-import {Tooltip} from '@components/Tooltip/Tooltip'
-import {cn} from '@ui/utils'
+import {Button} from '@ui/button'
 import {Download, LoaderCircle} from 'lucide-react'
 import {throttle} from '../TestList/utils'
 import {useState} from 'react'
@@ -31,24 +30,18 @@ export const DownLoadTests = ({
   )
 
   return (
-    <Tooltip
-      anchor={
-        !downloading ? (
-          <Download
-            size={style?.size}
-            strokeWidth={style?.strokeWidth}
-            onClick={debouncedDownloadTestsExecution}
-            className={cn('hover:cursor-pointer', className)}
-          />
-        ) : (
-          <LoaderCircle
-            size={style?.size}
-            strokeWidth={style?.strokeWidth}
-            className={'animate-spin'}
-          />
-        )
-      }
-      content={tooltipText}
-    />
+    <Button
+      variant="outline"
+      size="default"
+      onClick={debouncedDownloadTestsExecution}
+      disabled={downloading}
+      className="shadow-sm">
+      {downloading ? (
+        <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <Download className="h-4 w-4 mr-2" />
+      )}
+      {tooltipText}
+    </Button>
   )
 }
