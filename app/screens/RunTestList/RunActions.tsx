@@ -1,23 +1,17 @@
 import {RunDetails} from '@api/runData'
-import {Tooltip} from '@components/Tooltip/Tooltip'
 import {useCustomNavigate} from '@hooks/useCustomNavigate'
 import {useParams} from '@remix-run/react'
 import {Table} from '@tanstack/react-table'
 import {Button} from '@ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@ui/dropdown-menu'
-import {
-  DeleteIcon,
   Download,
-  EditIcon,
-  ListRestart,
-  LockIcon,
+  Edit,
+  Trash2,
+  RotateCcw,
+  Lock,
+  LoaderCircle,
 } from 'lucide-react'
-import {ReactElement, useEffect, useMemo, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {LockRunDialog} from './LockRunDialog'
 import {RemoveTestsDialog} from './RemoveTestsDialog'
 import {ResetRunsDialog} from './ResetRunDialog'
@@ -27,62 +21,24 @@ import {downloadReport} from './utils'
 import {API} from '@route/utils/api'
 import {Tests} from '@api/runTestsList'
 
-enum ACTIONS {
-  EDIT = 'EDIT',
-  LOCK = 'LOCK',
-  REMOVE_TEST = 'REMOVE TEST',
-  RESET_RUN = 'RESET RUN',
-  DOWNLOAD = 'DOWNLOAD',
-}
-
-const ACTION_ITEMS: {
-  id: number
-  action: ACTIONS
-  icon: ReactElement
-}[] = [
-  {
-    id: 1,
-    action: ACTIONS.EDIT,
-    icon: <EditIcon size={14} />,
-  },
-  {
-    id: 2,
-    action: ACTIONS.REMOVE_TEST,
-    icon: <DeleteIcon size={14} />,
-  },
-  {
-    id: 3,
-    action: ACTIONS.RESET_RUN,
-    icon: <Tooltip anchor={<ListRestart size={14} />} content={'Reset Run'} />,
-  },
-  {
-    id: 4,
-    action: ACTIONS.LOCK,
-    icon: <LockIcon size={14} />,
-  },
-  {
-    id: 5,
-    action: ACTIONS.DOWNLOAD,
-    icon: <Download size={14} />,
-  },
-]
-
 interface IRunActions {
   table: Table<Tests>
   runData: RunDetails
 }
+
 export const RunActions = React.memo(({table, runData}: IRunActions) => {
   const [resetRunDialog, setResetRunDialog] = useState<boolean>(false)
   const [lockRunDialog, setLockRunDialog] = useState<boolean>(false)
   const [removeTestDialog, setRemoveTestDialog] = useState<boolean>(false)
+  const [downloading, setDownloading] = useState<boolean>(false)
   const params = useParams()
   const projectId = +(params['projectId'] ?? 0)
   const navigate = useCustomNavigate()
-  const [actionDD, setActionDD] = useState<boolean>(false)
   const [apiResponse, setApiResponse] = useState<{
     success: boolean
     message: string
   } | null>(null)
+
   useEffect(() => {
     if (apiResponse && apiResponse?.success) {
       toast({
@@ -97,55 +53,75 @@ export const RunActions = React.memo(({table, runData}: IRunActions) => {
     }
   }, [apiResponse])
 
-  const handleRunAction = (action: ACTIONS) => {
-    setActionDD(false)
-    if (action === ACTIONS.LOCK) setLockRunDialog(true)
-    else if (action === ACTIONS.REMOVE_TEST) {
-      setRemoveTestDialog(true)
-    } else if (action === ACTIONS.EDIT)
-      navigate(`/project/${projectId}/editRun/${runData?.runId ?? 0}`)
-    else if (action === ACTIONS.RESET_RUN) {
-      setResetRunDialog(true)
-    } else if (action === ACTIONS.DOWNLOAD) {
-      console.log('Download')
-      downloadReport({
-        fetchUrl: `/${API.DownloadReport}?runId=${runData.runId}`,
-        fileName: `${runData.runName}-run`,
-        setDownloading: () => {},
-      })
-    }
+  const handleEdit = () => {
+    navigate(`/project/${projectId}/editRun/${runData?.runId ?? 0}`)
   }
 
-  const actionItemView = useMemo(() => {
-    return ACTION_ITEMS.map((action) => (
-      <DropdownMenuItem
-        onSelect={() => handleRunAction(action.action)}
-        key={action.id}
-        disabled={
-          !(
-            table.getIsSomePageRowsSelected() || table.getIsAllRowsSelected()
-          ) && action.action === 'REMOVE TEST'
-        }
-        className="capitalize">
-        <span className={'mr-2'}>{action.icon}</span> {action.action}
-      </DropdownMenuItem>
-    ))
-  }, [table.getIsSomePageRowsSelected(), table.getIsAllRowsSelected()])
+  const handleDownload = () => {
+    downloadReport({
+      fetchUrl: `/${API.DownloadReport}?runId=${runData.runId}`,
+      fileName: `${runData.runName}-run`,
+      setDownloading,
+    })
+  }
+
+  const isRemoveTestDisabled = !(
+    table.getIsSomePageRowsSelected() || table.getIsAllRowsSelected()
+  )
 
   return (
-    <div>
-      <DropdownMenu open={actionDD} onOpenChange={setActionDD}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="default"
-            className="shadow-sm"
-            onClick={() => setActionDD(true)}>
-            Actions
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">{actionItemView}</DropdownMenuContent>
-      </DropdownMenu>
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="default"
+        onClick={handleEdit}
+        className="shadow-sm">
+        <Edit className="h-4 w-4 mr-2" />
+        Edit
+      </Button>
+
+      <Button
+        variant="outline"
+        size="default"
+        onClick={() => setRemoveTestDialog(true)}
+        disabled={isRemoveTestDisabled}
+        className="shadow-sm hover:bg-red-50 hover:border-red-300 hover:text-red-700">
+        <Trash2 className="h-4 w-4 mr-2" />
+        Remove Tests
+      </Button>
+
+      <Button
+        variant="outline"
+        size="default"
+        onClick={() => setResetRunDialog(true)}
+        className="shadow-sm">
+        <RotateCcw className="h-4 w-4 mr-2" />
+        Reset
+      </Button>
+
+      <Button
+        variant="outline"
+        size="default"
+        onClick={() => setLockRunDialog(true)}
+        className="shadow-sm">
+        <Lock className="h-4 w-4 mr-2" />
+        Lock
+      </Button>
+
+      <Button
+        variant="outline"
+        size="default"
+        onClick={handleDownload}
+        disabled={downloading}
+        className="shadow-sm">
+        {downloading ? (
+          <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+        ) : (
+          <Download className="h-4 w-4 mr-2" />
+        )}
+        Download
+      </Button>
+
       <ResetRunsDialog
         state={resetRunDialog}
         setState={setResetRunDialog}
