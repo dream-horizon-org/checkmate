@@ -66,17 +66,8 @@ export default defineConfig({
             {
               label: "Application",
               items: [
-                "project/application-structure",
-                "tech/db-schema",
-                "tech/hld",
-                {
-                  label: "Tech Stack Used",
-                  slug: "tech/techstack",
-                  badge: {
-                    text: "WIP",
-                    variant: "caution",
-                  },
-                },
+                "tech/architecture",
+                "tech/database",
               ],
             },
             {
@@ -84,7 +75,6 @@ export default defineConfig({
               items: [
                 "guides/api",
                 "guides/api/authentication",
-                "guides/api/reference",
                 "guides/api/examples",
                 "guides/api/openapi",
               ],
