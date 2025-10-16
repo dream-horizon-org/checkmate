@@ -1,0 +1,2030 @@
+openapi: 3.0.3
+info:
+  title: Checkmate Test Management API
+  description: |
+    Comprehensive API documentation for Checkmate - a modern test case management system built with Remix, MySQL, and Drizzle ORM.
+    
+    ## Features
+    - Project and Test Management
+    - Test Run Execution
+    - Role-Based Access Control (RBAC)
+    - Google OAuth Authentication
+    - Test Status Tracking and History
+    
+    ## Authentication
+    All endpoints require authentication via session cookies. Users must be logged in through Google OAuth.
+    
+    ## Authorization
+    Access to resources is controlled via Casbin RBAC with three role levels:
+    - **Admin**: Full access to all resources
+    - **User**: Can create, read, update resources
+    - **Reader**: Read-only access
+  version: 1.0.0
+  contact:
+    name: Checkmate API Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server (default port 3000, configurable via PORT env var)
+  - url: https://your-production-domain.com
+    description: Production server (replace with your actual production URL)
+
+tags:
+  - name: Projects
+    description: Project management endpoints
+  - name: Tests
+    description: Test case management endpoints
+  - name: Runs
+    description: Test run management endpoints
+  - name: Organizations
+    description: Organization management endpoints
+  - name: Users
+    description: User management endpoints
+  - name: Configuration
+    description: System configuration endpoints (labels, priorities, platforms, etc.)
+  - name: Reports
+    description: Reporting and download endpoints
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: user_session
+      description: |
+        Session cookie from Google OAuth authentication.
+        
+        **How to get:**
+        1. Navigate to /login
+        2. Authenticate with Google
+        3. Cookie is automatically set
+        
+        **Usage:**
+        - Browsers automatically include this cookie
+        - cURL: Use `-b cookies.txt` or `-H "Cookie: user_session=value"`
+    
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+      description: |
+        API token authentication for programmatic access.
+        
+        **How to get:**
+        1. Login via web interface
+        2. Call POST /api/v1/token/generate with your userId
+        3. Copy the returned token
+        
+        **Usage:**
+        - Include in Authorization header: `Bearer your_token_here`
+        - Example: `Authorization: Bearer abc123xyz`
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        status:
+          type: integer
+          description: HTTP status code
+      required:
+        - error
+        - status
+
+    SuccessResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Response data
+        status:
+          type: integer
+          description: HTTP status code
+          example: 200
+
+    Project:
+      type: object
+      properties:
+        projectId:
+          type: integer
+          description: Unique project identifier
+        projectName:
+          type: string
+          description: Name of the project
+        projectDescription:
+          type: string
+          nullable: true
+          description: Project description
+        createdOn:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        createdBy:
+          type: string
+          description: User who created the project
+        orgId:
+          type: integer
+          description: Organization ID
+
+    Test:
+      type: object
+      properties:
+        testId:
+          type: integer
+          description: Unique test identifier
+        title:
+          type: string
+          minLength: 5
+          maxLength: 750
+          description: Test case title
+        description:
+          type: string
+          nullable: true
+          description: Test case description
+        sectionId:
+          type: integer
+          nullable: true
+          description: Section ID
+        projectId:
+          type: integer
+          description: Project ID
+        squadId:
+          type: integer
+          nullable: true
+          description: Squad ID
+        preConditions:
+          type: string
+          nullable: true
+          description: Test preconditions
+        steps:
+          type: string
+          nullable: true
+          description: Test execution steps
+        expectedResult:
+          type: string
+          nullable: true
+          description: Expected test result
+        priorityId:
+          type: integer
+          description: Priority ID (required)
+        typeId:
+          type: integer
+          nullable: true
+          description: Test type ID
+        automationStatusId:
+          type: integer
+          description: Automation status ID (required)
+        testCoveredById:
+          type: integer
+          nullable: true
+          description: Test coverage type ID
+        platformId:
+          type: integer
+          nullable: true
+          description: Platform ID
+        labelIds:
+          type: array
+          items:
+            type: integer
+          description: Array of label IDs
+        jiraTicket:
+          type: string
+          nullable: true
+          description: Associated Jira ticket
+        defects:
+          type: string
+          nullable: true
+          description: Known defects
+        automationId:
+          type: string
+          nullable: true
+          description: Automation test ID
+        additionalGroups:
+          type: string
+          nullable: true
+          description: Additional test groups
+
+    Run:
+      type: object
+      properties:
+        runId:
+          type: integer
+          description: Unique run identifier
+        runName:
+          type: string
+          description: Name of the test run
+        projectId:
+          type: integer
+          description: Project ID
+        createdBy:
+          type: string
+          description: User who created the run
+        createdOn:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        status:
+          type: string
+          enum: [Active, Locked]
+          description: Run status
+
+    TestStatus:
+      type: string
+      enum:
+        - Passed
+        - Failed
+        - Blocked
+        - Untested
+        - Retest
+        - Archived
+        - Skipped
+        - InProgress
+      description: Test execution status
+
+    Label:
+      type: object
+      properties:
+        labelId:
+          type: integer
+          description: Unique label identifier
+        labelName:
+          type: string
+          description: Label name
+        projectId:
+          type: integer
+          description: Project ID
+
+    Squad:
+      type: object
+      properties:
+        squadId:
+          type: integer
+          description: Unique squad identifier
+        squadName:
+          type: string
+          description: Squad name
+        projectId:
+          type: integer
+          description: Project ID
+
+    Section:
+      type: object
+      properties:
+        sectionId:
+          type: integer
+          description: Unique section identifier
+        sectionName:
+          type: string
+          description: Section name
+        parentId:
+          type: integer
+          nullable: true
+          description: Parent section ID for hierarchy
+        projectId:
+          type: integer
+          description: Project ID
+
+    Priority:
+      type: object
+      properties:
+        priorityId:
+          type: integer
+        priorityName:
+          type: string
+          enum: [Critical, High, Medium, Low, Trivial]
+
+    AutomationStatus:
+      type: object
+      properties:
+        automationStatusId:
+          type: integer
+        automationStatusName:
+          type: string
+
+    Platform:
+      type: object
+      properties:
+        platformId:
+          type: integer
+        platformName:
+          type: string
+
+    TestCoveredBy:
+      type: object
+      properties:
+        testCoveredById:
+          type: integer
+        testCoveredByName:
+          type: string
+
+    Type:
+      type: object
+      properties:
+        typeId:
+          type: integer
+        typeName:
+          type: string
+
+    Organization:
+      type: object
+      properties:
+        orgId:
+          type: integer
+        orgName:
+          type: string
+        createdBy:
+          type: integer
+        createdOn:
+          type: string
+          format: date-time
+
+    User:
+      type: object
+      properties:
+        userId:
+          type: integer
+        userName:
+          type: string
+        userEmail:
+          type: string
+          format: email
+        userType:
+          type: string
+          enum: [admin, user, reader]
+
+security:
+  - cookieAuth: []
+  - bearerAuth: []
+
+paths:
+  # ============================================
+  # PROJECT ENDPOINTS
+  # ============================================
+  /api/v1/projects:
+    get:
+      tags:
+        - Projects
+      summary: Get all projects
+      description: Retrieve a paginated list of projects for an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Organization ID
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 100
+          description: Number of items per page
+        - name: textSearch
+          in: query
+          schema:
+            type: string
+          description: Text search filter
+        - name: projectDescription
+          in: query
+          schema:
+            type: string
+          description: Filter by project description
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      projects:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Project'
+                      org:
+                        $ref: '#/components/schemas/Organization'
+                  status:
+                    type: integer
+                    example: 200
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /api/v1/project/create:
+    post:
+      tags:
+        - Projects
+      summary: Create a new project
+      description: Create a new project in an organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - projectName
+                - orgId
+              properties:
+                projectName:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                  description: Project name
+                projectDescription:
+                  type: string
+                  nullable: true
+                  description: Project description
+                orgId:
+                  type: integer
+                  description: Organization ID
+      responses:
+        '200':
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      projectId:
+                        type: integer
+                      message:
+                        type: string
+                  status:
+                    type: integer
+                    example: 200
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/project/edit:
+    put:
+      tags:
+        - Projects
+      summary: Update a project
+      description: Update project details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - projectId
+                - projectName
+              properties:
+                projectId:
+                  type: integer
+                  description: Project ID
+                projectName:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                  description: Project name
+                projectDescription:
+                  type: string
+                  nullable: true
+                  description: Project description
+      responses:
+        '200':
+          description: Project updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad request
+
+  /api/v1/project/update-status:
+    put:
+      tags:
+        - Projects
+      summary: Update project status
+      description: Archive or activate a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - projectId
+                - projectStatus
+              properties:
+                projectId:
+                  type: integer
+                projectStatus:
+                  type: string
+                  enum: [Active, Archived]
+      responses:
+        '200':
+          description: Project status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/project/detail:
+    get:
+      tags:
+        - Projects
+      summary: Get project details
+      description: Retrieve detailed information about a specific project
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Project ID
+      responses:
+        '200':
+          description: Project details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+                  status:
+                    type: integer
+
+  # ============================================
+  # TEST ENDPOINTS
+  # ============================================
+  /api/v1/project/tests:
+    get:
+      tags:
+        - Tests
+      summary: Get all tests
+      description: Retrieve a paginated and filtered list of tests for a project
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: textSearch
+          in: query
+          schema:
+            type: string
+          description: Search by title or test ID
+        - name: priority
+          in: query
+          schema:
+            type: string
+          description: Filter by priority (comma-separated IDs)
+        - name: status
+          in: query
+          schema:
+            type: string
+          description: Filter by automation status (comma-separated IDs)
+        - name: squad
+          in: query
+          schema:
+            type: string
+          description: Filter by squad (comma-separated IDs)
+        - name: label
+          in: query
+          schema:
+            type: string
+          description: Filter by labels (comma-separated IDs)
+        - name: platform
+          in: query
+          schema:
+            type: string
+          description: Filter by platform (comma-separated IDs)
+        - name: section
+          in: query
+          schema:
+            type: string
+          description: Filter by section (comma-separated IDs)
+      responses:
+        '200':
+          description: List of tests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      tests:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Test'
+                      totalCount:
+                        type: integer
+                  status:
+                    type: integer
+
+  /api/v1/test/create:
+    post:
+      tags:
+        - Tests
+      summary: Create a test case
+      description: Create a new test case in a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - projectId
+                - priorityId
+                - automationStatusId
+                - labelIds
+              properties:
+                title:
+                  type: string
+                  minLength: 5
+                  maxLength: 750
+                description:
+                  type: string
+                  nullable: true
+                sectionId:
+                  type: integer
+                  nullable: true
+                new_section:
+                  type: string
+                  nullable: true
+                  description: Create a new section (use ">" for nested sections)
+                projectId:
+                  type: integer
+                squadId:
+                  type: integer
+                  nullable: true
+                new_squad:
+                  type: string
+                  nullable: true
+                preConditions:
+                  type: string
+                  nullable: true
+                steps:
+                  type: string
+                  nullable: true
+                expectedResult:
+                  type: string
+                  nullable: true
+                priorityId:
+                  type: integer
+                typeId:
+                  type: integer
+                  nullable: true
+                automationStatusId:
+                  type: integer
+                testCoveredById:
+                  type: integer
+                  nullable: true
+                platformId:
+                  type: integer
+                  nullable: true
+                labelIds:
+                  type: array
+                  items:
+                    type: integer
+                jiraTicket:
+                  type: string
+                  nullable: true
+                defects:
+                  type: string
+                  nullable: true
+                automationId:
+                  type: string
+                  nullable: true
+                additionalGroups:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Test created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      testId:
+                        type: integer
+                      testTitle:
+                        type: string
+                      message:
+                        type: string
+                  status:
+                    type: integer
+
+  /api/v1/test/update:
+    put:
+      tags:
+        - Tests
+      summary: Update a test case
+      description: Update an existing test case
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - testId
+                - title
+                - projectId
+                - priorityId
+                - automationStatusId
+                - labelIds
+              properties:
+                testId:
+                  type: integer
+                title:
+                  type: string
+                  minLength: 5
+                  maxLength: 750
+                description:
+                  type: string
+                  nullable: true
+                sectionId:
+                  type: integer
+                  nullable: true
+                new_section:
+                  type: string
+                  nullable: true
+                projectId:
+                  type: integer
+                squadId:
+                  type: integer
+                  nullable: true
+                new_squad:
+                  type: string
+                  nullable: true
+                preConditions:
+                  type: string
+                  nullable: true
+                steps:
+                  type: string
+                  nullable: true
+                expectedResult:
+                  type: string
+                  nullable: true
+                priorityId:
+                  type: integer
+                typeId:
+                  type: integer
+                  nullable: true
+                automationStatusId:
+                  type: integer
+                testCoveredById:
+                  type: integer
+                  nullable: true
+                platformId:
+                  type: integer
+                  nullable: true
+                labelIds:
+                  type: array
+                  items:
+                    type: integer
+                jiraTicket:
+                  type: string
+                  nullable: true
+                defects:
+                  type: string
+                  nullable: true
+                automationId:
+                  type: string
+                  nullable: true
+                additionalGroups:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Test updated successfully
+
+  /api/v1/test/delete:
+    delete:
+      tags:
+        - Tests
+      summary: Delete a test case
+      description: Delete a test case by ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - testId
+              properties:
+                testId:
+                  type: integer
+      responses:
+        '200':
+          description: Test deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                  status:
+                    type: integer
+
+  /api/v1/test/bulk-add:
+    post:
+      tags:
+        - Tests
+      summary: Bulk create tests
+      description: Create multiple test cases at once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tests
+                - projectId
+              properties:
+                projectId:
+                  type: integer
+                tests:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - title
+                    properties:
+                      title:
+                        type: string
+                      description:
+                        type: string
+                      sectionId:
+                        type: integer
+                      priorityId:
+                        type: integer
+                      automationStatusId:
+                        type: integer
+      responses:
+        '200':
+          description: Tests created successfully
+
+  /api/v1/test/bulk-delete:
+    delete:
+      tags:
+        - Tests
+      summary: Bulk delete tests
+      description: Delete multiple test cases at once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - testIds
+              properties:
+                testIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Tests deleted successfully
+
+  /api/v1/test/bulk-update:
+    put:
+      tags:
+        - Tests
+      summary: Bulk update tests
+      description: Update multiple test cases at once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - testIds
+                - projectId
+              properties:
+                testIds:
+                  type: array
+                  items:
+                    type: integer
+                projectId:
+                  type: integer
+                priorityId:
+                  type: integer
+                  nullable: true
+                squadId:
+                  type: integer
+                  nullable: true
+                automationStatusId:
+                  type: integer
+                  nullable: true
+                labelIds:
+                  type: array
+                  items:
+                    type: integer
+                  nullable: true
+      responses:
+        '200':
+          description: Tests updated successfully
+
+  /api/v1/test/details:
+    get:
+      tags:
+        - Tests
+      summary: Get test details
+      description: Retrieve detailed information about a specific test
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: testId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Test details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Test'
+                  status:
+                    type: integer
+
+  /api/v1/project/tests-count:
+    get:
+      tags:
+        - Tests
+      summary: Get tests count
+      description: Get total count of tests in a project
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Test count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                  status:
+                    type: integer
+
+  /api/v1/test/test-status-history:
+    get:
+      tags:
+        - Tests
+      summary: Get test status history
+      description: Retrieve the status change history for a test
+      parameters:
+        - name: testId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Test status history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          $ref: '#/components/schemas/TestStatus'
+                        changedBy:
+                          type: string
+                        changedOn:
+                          type: string
+                          format: date-time
+                        comment:
+                          type: string
+                  status:
+                    type: integer
+
+  # ============================================
+  # RUN ENDPOINTS
+  # ============================================
+  /api/v1/runs:
+    get:
+      tags:
+        - Runs
+      summary: Get all runs
+      description: Retrieve a paginated list of test runs for a project
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: textSearch
+          in: query
+          schema:
+            type: string
+        - name: runStatus
+          in: query
+          schema:
+            type: string
+            enum: [Active, Locked]
+      responses:
+        '200':
+          description: List of runs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      runs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Run'
+                      totalCount:
+                        type: integer
+                  status:
+                    type: integer
+
+  /api/v1/run/create:
+    post:
+      tags:
+        - Runs
+      summary: Create a test run
+      description: Create a new test run with selected tests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runName
+                - projectId
+                - testIds
+              properties:
+                runName:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                projectId:
+                  type: integer
+                testIds:
+                  type: array
+                  items:
+                    type: integer
+                  description: Array of test IDs to include in the run
+      responses:
+        '200':
+          description: Run created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      runId:
+                        type: integer
+                      message:
+                        type: string
+                  status:
+                    type: integer
+
+  /api/v1/run/edit:
+    put:
+      tags:
+        - Runs
+      summary: Update a run
+      description: Update run name or add/remove tests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runId
+              properties:
+                runId:
+                  type: integer
+                runName:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                testIds:
+                  type: array
+                  items:
+                    type: integer
+                  description: Array of test IDs to add to the run
+      responses:
+        '200':
+          description: Run updated successfully
+
+  /api/v1/run/delete:
+    delete:
+      tags:
+        - Runs
+      summary: Delete a run
+      description: Delete a test run by ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runId
+              properties:
+                runId:
+                  type: integer
+      responses:
+        '200':
+          description: Run deleted successfully
+
+  /api/v1/run/detail:
+    get:
+      tags:
+        - Runs
+      summary: Get run details
+      description: Retrieve detailed information about a specific run
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Run details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Run'
+                  status:
+                    type: integer
+
+  /api/v1/run/tests:
+    get:
+      tags:
+        - Runs
+      summary: Get run tests
+      description: Retrieve all tests in a run with their status
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: textSearch
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+          description: Filter by test status
+      responses:
+        '200':
+          description: List of tests in run
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      tests:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            testId:
+                              type: integer
+                            title:
+                              type: string
+                            status:
+                              $ref: '#/components/schemas/TestStatus'
+                      totalCount:
+                        type: integer
+                  status:
+                    type: integer
+
+  /api/v1/run/state-detail:
+    get:
+      tags:
+        - Runs
+      summary: Get run state details
+      description: Get aggregated status counts for a run
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Run state details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      passed:
+                        type: integer
+                      failed:
+                        type: integer
+                      blocked:
+                        type: integer
+                      untested:
+                        type: integer
+                      retest:
+                        type: integer
+                      archived:
+                        type: integer
+                      skipped:
+                        type: integer
+                      inProgress:
+                        type: integer
+                  status:
+                    type: integer
+
+  /api/v1/run/update-test-status:
+    put:
+      tags:
+        - Runs
+      summary: Update test status in run
+      description: Update the execution status of tests in a run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runId
+                - testIdStatusArray
+              properties:
+                runId:
+                  type: integer
+                testIdStatusArray:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      testId:
+                        type: integer
+                      status:
+                        $ref: '#/components/schemas/TestStatus'
+                comment:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Test status updated successfully
+
+  /api/v1/run/lock:
+    put:
+      tags:
+        - Runs
+      summary: Lock/unlock a run
+      description: Lock or unlock a test run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runId
+                - lock
+              properties:
+                runId:
+                  type: integer
+                lock:
+                  type: boolean
+                  description: true to lock, false to unlock
+      responses:
+        '200':
+          description: Run lock status updated
+
+  /api/v1/run/reset:
+    put:
+      tags:
+        - Runs
+      summary: Reset run status
+      description: Reset all Passed tests to Retest status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runId
+              properties:
+                runId:
+                  type: integer
+      responses:
+        '200':
+          description: Run reset successfully
+
+  /api/v1/run/remove-tests:
+    put:
+      tags:
+        - Runs
+      summary: Remove tests from run
+      description: Remove specific tests from a run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runId
+                - testIds
+              properties:
+                runId:
+                  type: integer
+                testIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Tests removed successfully
+
+  /api/v1/run/test-status:
+    get:
+      tags:
+        - Runs
+      summary: Get test status in run
+      description: Get the current status of a test in a run
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: testId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Test status in run
+
+  /api/v1/run/test-status-history:
+    get:
+      tags:
+        - Runs
+      summary: Get test status history in run
+      description: Get the status change history of a test within a run
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: testId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Test status history in run
+
+  # ============================================
+  # CONFIGURATION ENDPOINTS
+  # ============================================
+  /api/v1/labels:
+    get:
+      tags:
+        - Configuration
+      summary: Get labels
+      description: Get all labels for a project
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of labels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Label'
+                  status:
+                    type: integer
+
+  /api/v1/project/add-labels:
+    post:
+      tags:
+        - Configuration
+      summary: Add label
+      description: Create a new label for a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - labelName
+                - projectId
+              properties:
+                labelName:
+                  type: string
+                projectId:
+                  type: integer
+      responses:
+        '200':
+          description: Label created successfully
+
+  /api/v1/project/squads:
+    get:
+      tags:
+        - Configuration
+      summary: Get squads
+      description: Get all squads for a project
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of squads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Squad'
+                  status:
+                    type: integer
+
+  /api/v1/project/add-squads:
+    post:
+      tags:
+        - Configuration
+      summary: Add squad
+      description: Create a new squad for a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - squadName
+                - projectId
+              properties:
+                squadName:
+                  type: string
+                projectId:
+                  type: integer
+      responses:
+        '200':
+          description: Squad created successfully
+
+  /api/v1/project/sections:
+    get:
+      tags:
+        - Configuration
+      summary: Get sections
+      description: Get all sections for a project (hierarchical)
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of sections
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Section'
+                  status:
+                    type: integer
+
+  /api/v1/project/add-section:
+    post:
+      tags:
+        - Configuration
+      summary: Add section
+      description: Create a new section for a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sectionName
+                - projectId
+              properties:
+                sectionName:
+                  type: string
+                projectId:
+                  type: integer
+                parentId:
+                  type: integer
+                  nullable: true
+                  description: Parent section ID for nested sections
+      responses:
+        '200':
+          description: Section created successfully
+
+  /api/v1/project/edit-section:
+    put:
+      tags:
+        - Configuration
+      summary: Edit section
+      description: Update a section name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sectionId
+                - sectionName
+              properties:
+                sectionId:
+                  type: integer
+                sectionName:
+                  type: string
+      responses:
+        '200':
+          description: Section updated successfully
+
+  /api/v1/priority:
+    get:
+      tags:
+        - Configuration
+      summary: Get priorities
+      description: Get all priorities for an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of priorities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Priority'
+                  status:
+                    type: integer
+
+  /api/v1/automation-status:
+    get:
+      tags:
+        - Configuration
+      summary: Get automation statuses
+      description: Get all automation statuses for an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of automation statuses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AutomationStatus'
+                  status:
+                    type: integer
+
+  /api/v1/platform:
+    get:
+      tags:
+        - Configuration
+      summary: Get platforms
+      description: Get all platforms for an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of platforms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Platform'
+                  status:
+                    type: integer
+
+  /api/v1/test-covered-by:
+    get:
+      tags:
+        - Configuration
+      summary: Get test covered by options
+      description: Get all test coverage types for an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of test covered by options
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TestCoveredBy'
+                  status:
+                    type: integer
+
+  /api/v1/type:
+    get:
+      tags:
+        - Configuration
+      summary: Get types
+      description: Get all test types for an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Type'
+                  status:
+                    type: integer
+
+  # ============================================
+  # ORGANIZATION ENDPOINTS
+  # ============================================
+  /api/v1/orgs:
+    get:
+      tags:
+        - Organizations
+      summary: Get organizations
+      description: Get list of all organizations
+      responses:
+        '200':
+          description: List of organizations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Organization'
+                  status:
+                    type: integer
+
+  /api/v1/org/detail:
+    get:
+      tags:
+        - Organizations
+      summary: Get organization details
+      description: Get detailed information about an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Organization details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Organization'
+                  status:
+                    type: integer
+
+  # ============================================
+  # USER ENDPOINTS
+  # ============================================
+  /api/v1/user/details:
+    get:
+      tags:
+        - Users
+      summary: Get user details
+      description: Get details of the currently authenticated user
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+                  status:
+                    type: integer
+
+  /api/v1/all-users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: Get list of all users (Admin only)
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  status:
+                    type: integer
+        '403':
+          description: Forbidden - Admin access required
+
+  /api/v1/user/update-role:
+    put:
+      tags:
+        - Users
+      summary: Update user role
+      description: Update a user's role (Admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - userType
+              properties:
+                userId:
+                  type: integer
+                userType:
+                  type: string
+                  enum: [admin, user, reader]
+      responses:
+        '200':
+          description: User role updated successfully
+        '403':
+          description: Forbidden - Admin access required
+
+  /api/v1/token/generate:
+    post:
+      tags:
+        - Users
+      summary: Generate API token
+      description: Generate a new API token for the user
+      responses:
+        '200':
+          description: Token generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                  status:
+                    type: integer
+
+  /api/v1/token/delete:
+    delete:
+      tags:
+        - Users
+      summary: Delete API token
+      description: Delete/revoke an API token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tokenId
+              properties:
+                tokenId:
+                  type: integer
+      responses:
+        '200':
+          description: Token deleted successfully
+
+  # ============================================
+  # REPORTS ENDPOINTS
+  # ============================================
+  /api/v1/run/report-download:
+    get:
+      tags:
+        - Reports
+      summary: Download run report
+      description: Download a CSV report of test run results
+      parameters:
+        - name: runId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
+  /api/v1/tests/download:
+    get:
+      tags:
+        - Reports
+      summary: Download tests
+      description: Download tests in CSV format
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
