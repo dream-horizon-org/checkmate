@@ -42,7 +42,10 @@ export default defineConfig({
         {
           label: "User Guide",
           items: [
-            "guides/projects",
+            {
+              label: "Projects",
+              items: ["guides/projects"],
+            },
             {
               label: "Tests",
               items: ["guides/tests/tests", "guides/tests/bulk-addition"],
@@ -51,17 +54,31 @@ export default defineConfig({
               label: "Runs",
               items: ["guides/runs/runs", "guides/runs/run-detail"],
             },
-            "guides/user-settings",
             {
-              label: "RBAC",
-              slug: "project/rbac",
+              label: "Users",
+              items: ["guides/user-settings", "project/rbac"],
             },
           ],
         },
         {
           label: "Developer Docs",
           items: [
-            "project/application-structure",
+            {
+              label: "Application",
+              items: [
+                "project/application-structure",
+                "tech/db-schema",
+                "tech/hld",
+                {
+                  label: "Tech Stack Used",
+                  slug: "tech/techstack",
+                  badge: {
+                    text: "WIP",
+                    variant: "caution",
+                  },
+                },
+              ],
+            },
             {
               label: "API Documentation",
               items: [
@@ -72,16 +89,6 @@ export default defineConfig({
                 "guides/api/openapi",
               ],
             },
-            {
-              label: "TechStack Used",
-              slug: "tech/techstack",
-              badge: {
-                text: "WIP",
-                variant: "caution",
-              },
-            },
-            "tech/db-schema",
-            "tech/hld",
           ],
         },
       ],
