@@ -31,7 +31,11 @@ export default defineConfig({
           label: "Introduction",
           items: [
             "project/introduction",
-            "project/application-structure",
+          ],
+        },
+        {
+          label: "Setup",
+          items: [
             "project/setup",
           ],
         },
@@ -49,6 +53,16 @@ export default defineConfig({
             },
             "guides/user-settings",
             {
+              label: "RBAC",
+              slug: "project/rbac",
+            },
+          ],
+        },
+        {
+          label: "Developer Docs",
+          items: [
+            "project/application-structure",
+            {
               label: "API Documentation",
               items: [
                 "guides/api",
@@ -58,15 +72,6 @@ export default defineConfig({
                 "guides/api/openapi",
               ],
             },
-            {
-              label: "RBAC",
-              slug: "project/rbac",
-            },
-          ],
-        },
-        {
-          label: "Developer Docs",
-          items: [
             {
               label: "TechStack Used",
               slug: "tech/techstack",
