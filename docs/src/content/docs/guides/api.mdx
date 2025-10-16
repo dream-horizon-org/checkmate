@@ -1,7 +1,171 @@
 ---
-title: REST API
+title: REST API Overview
+description: Complete guide to Checkmate's REST API for automation and integration
 ---
 
-Checkmate's REST API was designed to access and automate various aspects of Checkmate's project structure to implement custom scripts and automation integrations. We designed and implemented the REST API to support most of the use cases.
+import { Card, CardGrid } from '@astrojs/starlight/components';
 
-[Postman](https://documenter.getpostman.com/view/23217307/2sAYXFgwRt) collection of APIs is currently available, comprehensive documentation is in progress.
+Checkmate's REST API enables you to access and automate various aspects of your test management workflow. Build custom integrations, automate test case creation, and manage test runs programmatically.
+
+## API Base URL
+
+```
+Development: http://localhost:3000
+Production: https://your-production-domain.com
+```
+
+## Quick Links
+
+<CardGrid>
+  <Card title="Authentication" icon="key">
+    Learn how to authenticate your API requests using session cookies or API tokens.
+    
+    [View Authentication Guide →](/guides/api/authentication)
+  </Card>
+  
+  <Card title="API Reference" icon="open-book">
+    Explore all available endpoints with request/response examples.
+    
+    [View API Reference →](/guides/api/reference)
+  </Card>
+  
+  <Card title="Examples" icon="puzzle">
+    Ready-to-use code examples in multiple languages.
+    
+    [View Examples →](/guides/api/examples)
+  </Card>
+  
+  <Card title="OpenAPI Spec" icon="document">
+    Download our OpenAPI 3.0 specification for automated tooling.
+    
+    [Download OpenAPI →](https://github.com/dream-sports-labs/checkmate/blob/master/openapi.yaml)
+  </Card>
+</CardGrid>
+
+## API Features
+
+### 🔐 Secure Authentication
+- **Google OAuth** for web interface
+- **API Tokens** for programmatic access
+- **Session cookies** for browser-based apps
+
+### 🛡️ Role-Based Access Control (RBAC)
+- **Reader** - Read-only access
+- **User** - Create and update resources
+- **Admin** - Full administrative access
+
+### 📊 Comprehensive Coverage
+- **Projects** - Create and manage test projects
+- **Tests** - CRUD operations for test cases
+- **Runs** - Execute and track test runs
+- **Labels, Squads, Sections** - Organize your tests
+- **Reports** - Download test reports and analytics
+
+### 🚀 Developer-Friendly
+- RESTful design principles
+- JSON request/response format
+- Detailed error messages
+- OpenAPI 3.0 specification
+- Postman collection available
+
+## Getting Started
+
+### 1. Authenticate
+
+Choose your authentication method:
+
+```bash
+# Generate an API token (requires session)
+curl -X POST http://localhost:3000/api/v1/token/generate \
+  -b cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1}'
+```
+
+### 2. Make Your First Request
+
+```bash
+# Get all projects
+curl -X GET "http://localhost:3000/api/v1/projects?orgId=1&page=1&pageSize=10" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json"
+```
+
+### 3. Create a Test Case
+
+```bash
+# Create a new test
+curl -X POST http://localhost:3000/api/v1/test/create \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Verify user login",
+    "projectId": 1,
+    "sectionId": 5,
+    "priorityId": 2,
+    "steps": "1. Open login page\n2. Enter credentials\n3. Click login",
+    "expectedResult": "User logged in successfully"
+  }'
+```
+
+## Response Format
+
+All API responses follow a consistent format:
+
+### Success Response
+```json
+{
+  "data": {
+    // Response data here
+  },
+  "status": 200
+}
+```
+
+### Error Response
+```json
+{
+  "error": "Error message here",
+  "status": 400
+}
+```
+
+## Common Status Codes
+
+| Code | Meaning |
+|------|---------|
+| `200` | Success - Request completed successfully |
+| `201` | Created - Resource created successfully |
+| `400` | Bad Request - Invalid parameters or missing required fields |
+| `401` | Unauthorized - Authentication required or failed |
+| `403` | Forbidden - Insufficient permissions |
+| `404` | Not Found - Resource doesn't exist |
+| `500` | Internal Server Error - Server error occurred |
+
+## Rate Limiting
+
+Currently, there are no rate limits enforced. However, we recommend:
+- Batch operations when possible
+- Implement exponential backoff for retries
+- Use pagination for large datasets
+
+## Support & Resources
+
+- **Postman Collection**: [View in Postman](https://documenter.getpostman.com/view/23217307/2sAYXFgwRt)
+- **OpenAPI Spec**: Available in the repository root
+- **GitHub Issues**: [Report bugs or request features](https://github.com/dream-sports-labs/checkmate/issues)
+- **Discord**: [Join our community](https://discord.gg/wBQXeYAKNc)
+
+## Next Steps
+
+<CardGrid>
+  <Card title="Authentication" icon="right-arrow">
+    Set up authentication for your API requests
+  </Card>
+  <Card title="API Reference" icon="right-arrow">
+    Explore all available endpoints
+  </Card>
+  <Card title="Examples" icon="right-arrow">
+    See code examples in your language
+  </Card>
+</CardGrid>

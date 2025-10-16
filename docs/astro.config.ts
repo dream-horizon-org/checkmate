@@ -48,7 +48,16 @@ export default defineConfig({
               items: ["guides/runs/runs", "guides/runs/run-detail"],
             },
             "guides/user-settings",
-            "guides/api",
+            {
+              label: "API Documentation",
+              items: [
+                "guides/api",
+                "guides/api/authentication",
+                "guides/api/reference",
+                "guides/api/examples",
+                "guides/api/openapi",
+              ],
+            },
             {
               label: "RBAC",
               slug: "project/rbac",
@@ -67,14 +76,7 @@ export default defineConfig({
               },
             },
             "tech/db-schema",
-            {
-              label: "HLD",
-              slug: "tech/hld",
-              badge: {
-                text: "WIP",
-                variant: "caution",
-              },
-            },
+            "tech/hld",
           ],
         },
       ],
