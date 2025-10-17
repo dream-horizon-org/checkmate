@@ -48,7 +48,13 @@ export const SectionList = () => {
       runSectionFetcher.load(
         `/${API.GetSections}?projectId=${projectId}&runId=${runId}`,
       )
-  }, [])
+  }, [projectId, runId])
+
+  // Reset selections when project changes
+  useEffect(() => {
+    setSelectedSections([])
+    setOpenSections([])
+  }, [projectId])
 
   useEffect(() => {
     if (runId && runSectionFetcher.data?.data && sectionFetcher.data?.data) {
