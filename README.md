@@ -30,7 +30,7 @@ This Test Case Management Tool is designed to address the challenges faced by te
 
 1. Clone the repository:
    ```sh
-   git clone git@github.com:dream-sports-labs/checkmate.git
+   git clone git@github.com:ds-horizon/checkmate.git
    ```
 2. Create an .env file at root level, based on .env.example.
 3. Install dependencies
@@ -116,4 +116,4 @@ This project is published under the [MIT License](/LICENSE).
 
 ## ✉️ Contact
 
-If you need feedback or support, reach out via the [Issue Tracker](https://github.com/dream-sports-labs/checkmate/issues) or [Discord](https://discord.gg/wBQXeYAKNc).
+If you need feedback or support, reach out via the [Issue Tracker](https://github.com/ds-horizon/checkmate/issues) or [Discord](https://discord.gg/wBQXeYAKNc).

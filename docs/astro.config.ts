@@ -23,7 +23,7 @@ export default defineConfig({
         alt: "Checkmate",
       },
       social: {
-        github: "https://github.com/dream-sports-labs/checkmate",
+        github: "https://github.com/ds-horizon/checkmate",
         discord: "https://discord.gg/wBQXeYAKNc",
       },
       sidebar: [
