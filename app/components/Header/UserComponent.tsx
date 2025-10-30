@@ -26,28 +26,41 @@ export const UserComponent = (user: User) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={'outline-none'}>
-        <Avatar asChild className={'cursor-pointer border-2 z-50'}>
-          {user?.profileUrl ? (
-            <AvatarImage src={user.profileUrl} alt="@shadcn" />
-          ) : (
-            <img
-              className="flex items-center space-x-4 cursor-pointer"
-              style={{width: 'auto'}}
-              src={Profile}
-            />
-          )}
-        </Avatar>
+      <DropdownMenuTrigger className="outline-none">
+        <div className="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-slate-800 transition-colors">
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-medium text-white">
+              {user?.userName}
+            </span>
+            <span className="text-xs text-slate-400 capitalize">
+              {user?.role}
+            </span>
+          </div>
+          <Avatar className="h-9 w-9 cursor-pointer border-2 border-slate-700">
+            {user?.profileUrl ? (
+              <AvatarImage src={user.profileUrl} alt={user.userName} />
+            ) : (
+              <img
+                className="flex items-center space-x-4 cursor-pointer"
+                style={{width: 'auto'}}
+                src={Profile}
+                alt="User Profile"
+              />
+            )}
+          </Avatar>
+        </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={logout}>
-          <LogOut size={16} className={'mr-4'} /> Logout
-        </DropdownMenuItem>
-        <DropdownMenuItem
+      <DropdownMenuContent className="w-48" align="end">
+        <DropdownMenuItem 
           onClick={(e) => {
             navigate('/userDetails', {}, e)
-          }}>
-          Details
+          }}
+          className="cursor-pointer">
+          View Details
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 focus:text-red-600">
+          <LogOut size={16} className="mr-2" />
+          Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -43,35 +43,33 @@ const RUN_STATUS_ICON: any = {
 export const RunListColumnConfig: ColumnDef<IRunListTable>[] = [
   {
     accessorKey: 'status',
-    header: '',
+    header: () => <div className="text-center">Status</div>,
     cell: ({row}) => {
       return (
-        <Tooltip
-          anchor={RUN_STATUS_ICON[row.original.status]}
-          content={row.original.status}
-        />
+        <div className="flex items-center justify-center">
+          <Tooltip
+            anchor={RUN_STATUS_ICON[row.original.status]}
+            content={row.original.status}
+          />
+        </div>
       )
     },
   },
   {
     accessorKey: 'runId',
-    header: () => (
-      <div className="ml-8 text-sm font-extrabold text-black">Run ID</div>
-    ),
+    header: () => <div className="text-left">Run ID</div>,
     cell: ({row}) => {
-      return <div className="ml-8 py-2">{row.original.runId}</div>
+      return <div className="text-left text-slate-600 text-sm">{row.original.runId}</div>
     },
   },
   {
     accessorKey: 'runName',
-    header: () => (
-      <div className="mx-16 pl-20 text-sm font-extrabold text-black text-left">
-        Name
-      </div>
-    ),
+    header: () => <div className="text-left">Name</div>,
     cell: ({row}) => {
       return (
-        <div className="mx-16 pl-16 py-2 text-left">{row.original.runName}</div>
+        <div className="text-left text-sm text-slate-700 font-medium cursor-pointer hover:text-slate-900">
+          {row.original.runName}
+        </div>
       )
     },
   },
@@ -79,21 +77,23 @@ export const RunListColumnConfig: ColumnDef<IRunListTable>[] = [
     accessorKey: 'info',
     header: ({table, column}) => {
       return (
-        <Button
-          className="pl-8 text-sm font-extrabold text-black text-left"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          {table?.getRowModel()?.rows[0]?.original?.status === 'Locked'
-            ? 'Locked By'
-            : 'Created By'}
-          {column.getIsSorted() === false ? (
-            <HeightIcon />
-          ) : column.getIsSorted() === 'asc' ? (
-            <ArrowDownIcon />
-          ) : (
-            <ArrowUpIcon />
-          )}
-        </Button>
+        <div className="text-left">
+          <Button
+            className="h-auto p-0 hover:bg-transparent justify-start"
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+            {table?.getRowModel()?.rows[0]?.original?.status === 'Locked'
+              ? 'Locked By'
+              : 'Created By'}
+            {column.getIsSorted() === false ? (
+              <HeightIcon className="ml-1.5 h-3.5 w-3.5 text-slate-400" />
+            ) : column.getIsSorted() === 'asc' ? (
+              <ArrowDownIcon className="ml-1.5 h-3.5 w-3.5 text-slate-600" />
+            ) : (
+              <ArrowUpIcon className="ml-1.5 h-3.5 w-3.5 text-slate-600" />
+            )}
+          </Button>
+        </div>
       )
     },
     cell: ({row}) => {
@@ -107,10 +107,10 @@ export const RunListColumnConfig: ColumnDef<IRunListTable>[] = [
           : getFormatedDate(new Date(row.original.createdOn))
 
       return (
-        <>
-          {createdBy} <br />
-          <span className={'text-xs text-left text-gray-500'}>{createdOn}</span>
-        </>
+        <div className="text-left">
+          <div className="text-sm text-slate-700">{createdBy}</div>
+          <div className="text-xs text-slate-500">{createdOn}</div>
+        </div>
       )
     },
     sortingFn: (rowA, rowB) => {
@@ -122,7 +122,7 @@ export const RunListColumnConfig: ColumnDef<IRunListTable>[] = [
   },
   {
     accessorKey: 'runId',
-    header: () => {},
+    header: () => <div className="text-center">Actions</div>,
     cell: ({row}) => {
       const fetcher = useFetcher<{data: {success: boolean}; error: string}>()
       const onSubmit = () => {
@@ -151,35 +151,37 @@ export const RunListColumnConfig: ColumnDef<IRunListTable>[] = [
       }, [fetcher.data])
 
       return (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center">
           <CustomDialog
             variant="delete"
             anchorComponent={
-              <Trash2 size={24} color={'red'} className={'cursor-pointer'} />
+              <button className="h-8 w-8 inline-flex items-center justify-center hover:bg-slate-100 rounded-md transition-colors">
+                <Trash2 size={16} className="text-red-600" />
+              </button>
             }
             contentComponent={
               <>
-                <div className="text-lg font-semibold">
+                <div className="text-lg font-semibold text-slate-900">
                   Are you sure you want to delete{' '}
-                  <span className={'text-destructive'}>
+                  <span className="text-red-600 font-semibold">
                     {row.original.runName}
                   </span>
                   ?
                 </div>
-                <div className="flex flex-col mt-4 text-xs text-gray-500">
-                  This action cannot be undone, it will permanently delete this
-                  run and its data.
+                <div className="mt-4 text-sm text-slate-600">
+                  This action cannot be undone. It will permanently delete this
+                  run and all its associated data.
                 </div>
               </>
             }
             footerComponent={
               <>
                 <DialogClose>
-                  <Button variant={'outline'}>Cancel</Button>
+                  <Button variant="outline">Cancel</Button>
                 </DialogClose>
                 <DialogClose>
                   <Button
-                    className="bg-destructive/90 hover:bg-destructive font-semibold"
+                    className="bg-red-600 hover:bg-red-700 font-semibold"
                     onClick={onSubmit}>
                     Delete
                   </Button>

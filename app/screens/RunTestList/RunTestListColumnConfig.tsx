@@ -42,22 +42,25 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
   {
     accessorKey: 'select',
     header: ({table}) => (
-      <Checkbox
-        className="ml-4"
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
+      <div className="flex items-center">
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      </div>
     ),
     cell: ({row}) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+      <div className="flex items-center">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -67,11 +70,11 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
     header: () => (
       <SortingHeaderComponent
         heading={TestListingColumns.testId}
-        className="text-left"
+        position="left"
       />
     ),
     cell: ({row}) => (
-      <div className="flex w-12 overflow-visible truncate text-left">
+      <div className="text-left text-sm text-slate-600">
         {row.original.testId}
       </div>
     ),
@@ -79,7 +82,7 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
   },
   {
     accessorKey: TestListingColumns.title,
-    header: () => <SortingHeaderComponent heading={TestListingColumns.title} />,
+    header: () => <SortingHeaderComponent heading={TestListingColumns.title} position="left" />,
 
     cell: ({row, table}) => {
       const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -120,15 +123,14 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
     header: () => (
       <HeaderComponent
         heading={TestListingColumns.status}
-        position={'left'}
-        className="ml-8"
+        position="center"
       />
     ),
     cell: ({row}) => {
       const params = useParams()
       const runId = +(params['runId'] ?? 0)
       return row.original.runStatus === 'Active' ? (
-        <div>
+        <div className="flex items-center justify-center">
           <AddResultDialog
             getSelectedRows={() => {
               return [{testId: row.original.testId}]
@@ -139,7 +141,9 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
           />
         </div>
       ) : (
-        <div className="text-center">{row.original.testStatus}</div>
+        <div className="flex items-center justify-center text-sm text-slate-700">
+          {row.original.testStatus}
+        </div>
       )
     },
     enableHiding: false,
@@ -149,13 +153,12 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
     header: () => (
       <HeaderComponent
         heading={TestListingColumns.testedBy}
-        position={'left'}
-        className="ml-8"
+        position="left"
       />
     ),
     cell: ({row}) => {
       return (
-        <div className={cn('text-center', 'py-2', 'truncate')}>
+        <div className="text-left text-sm text-slate-700 truncate">
           {row.original.testedBy ? row.original.testedBy : '-'}
         </div>
       )
@@ -174,11 +177,11 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
   {
     accessorKey: TestListingColumns.squad,
     header: () => (
-      <HeaderComponent position={'left'} heading={TestListingColumns.squad} />
+      <HeaderComponent position="left" heading={TestListingColumns.squad} />
     ),
     cell: ({row}) => {
       return (
-        <div className={cn('text-left', 'py-2', 'text-nowrap')}>
+        <div className="text-left text-sm text-slate-700 text-nowrap">
           {row.original.squadName}
         </div>
       )
@@ -188,7 +191,7 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
     accessorKey: TestListingColumns.platform,
     header: () => (
       <SortingHeaderComponent
-        position={'left'}
+        position="left"
         heading={TestListingColumns.platform}
       />
     ),
@@ -200,27 +203,26 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
     accessorKey: TestListingColumns.automationStatus,
     header: () => (
       <SortingHeaderComponent
-        position={'left'}
+        position="left"
         heading={TestListingColumns.automationStatus}
-        className="w-38"
       />
     ),
     cell: ({row}) => (
-      <div className="text-left">{row.original.automationStatus}</div>
+      <div className="text-left text-sm text-slate-700">{row.original.automationStatus}</div>
     ),
   },
   {
     accessorKey: TestListingColumns.labelName,
     header: () => (
       <HeaderComponent
-        position={'left'}
+        position="left"
         heading={TestListingColumns.labelName}
       />
     ),
     cell: ({row}) => (
       <Tooltip
         anchor={
-          <div className="text-left max-w-32 truncate">
+          <div className="text-left max-w-32 truncate text-sm text-slate-700">
             {row.original.labelNames}
           </div>
         }
@@ -232,12 +234,12 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
     accessorKey: TestListingColumns.section,
     header: () => (
       <SortingHeaderComponent
-        position={'left'}
+        position="left"
         heading={TestListingColumns.section}
       />
     ),
     cell: ({row}) => (
-      <div className="text-left max-w-32 truncate">
+      <div className="text-left max-w-32 truncate text-sm text-slate-700">
         {row.original.sectionName}
       </div>
     ),
@@ -246,17 +248,14 @@ export const RunTestListColumnConfig: ColumnDef<Tests>[] = [
     accessorKey: TestListingColumns.testCoveredBy,
     header: () => (
       <HeaderComponent
-        position={'left'}
+        position="left"
         heading={TestListingColumns.testCoveredBy}
-        className="w-32"
       />
     ),
     cell: ({row}) => {
       return (
-        <div>
-          <div className={'max-w-32 text-left truncate text-s'}>
-            {row.original.testCoveredBy}
-          </div>
+        <div className="max-w-32 text-left truncate text-sm text-slate-700">
+          {row.original.testCoveredBy}
         </div>
       )
     },

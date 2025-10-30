@@ -51,11 +51,6 @@ export const TestDetailDrawer = ({
 }) => {
   const testDetailFetcher = useFetcher<{data: TestDetailAPI}>()
   const [data, setData] = useState<TestDetailAPI | null>(null)
-  const infoTextStyle = {
-    fontSize: 14,
-    color: 'rgb(31 41 55)',
-    paddingTop: 2,
-  }
   const testStatusHistoryFetcher = useFetcher<any>()
   const [testStatusHistory, setTestStatusHistory] = useState<{
     data: StatusEntry[]
@@ -99,110 +94,113 @@ export const TestDetailDrawer = ({
   return (
     <CustomDrawer isOpen={isOpen} onClose={onClose}>
       {data ? (
-        <div
-          style={{
-            fontSize: 14,
-            padding: 4,
-            marginTop: 16,
-            backgroundColor: 'rgb(241 245 249)',
-            minHeight: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-          }}>
-          <InputLabels className="ml-2" labelName={data?.title} />
-          <InputsSpacing />
-          <div className="flex flex-row flex-wrap gap-4 bg-gray-50 p-4 rounded-lg shadow-md">
-            {data?.description && (
-              <div className="w-full items-center">
-                <InputLabels labelName={'Description'} />
-                <div style={infoTextStyle}>{data?.description}</div>
-              </div>
-            )}
-            <div className="w-full items-center">
-              <InputLabels labelName={'Test Id'} />
-              <div style={infoTextStyle}>{data?.testId}</div>
-              <InputsSpacing />
+        <div className="h-full flex flex-col bg-slate-50">
+          {/* Fixed Header */}
+          <div className="flex-shrink-0 px-6 py-5 bg-white border-b border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900">{data?.title}</h2>
+          </div>
 
-              <InputLabels labelName={'Section'} />
-              <div style={infoTextStyle}>{data?.section}</div>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <div className="space-y-6">
+              {/* Description & Basic Info */}
+              <div className="bg-white rounded-lg border border-slate-200 p-5">
+                {data?.description && (
+                  <div className="mb-4">
+                    <InputLabels labelName="Description" />
+                    <p className="text-sm text-slate-700 mt-1.5">{data?.description}</p>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <InputLabels labelName="Test ID" />
+                    <p className="text-sm text-slate-700 mt-1.5">{data?.testId}</p>
+                  </div>
+                  <div>
+                    <InputLabels labelName="Section" />
+                    <p className="text-sm text-slate-700 mt-1.5">{data?.section}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Properties Grid */}
+              <div className="bg-white rounded-lg border border-slate-200 p-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <OptionContent data={data?.squad} heading="Squad" />
+                  <OptionContent
+                    data={data?.labelNames?.split(',')?.join(', ')}
+                    heading="Labels"
+                  />
+                  <OptionContent data={data?.priority} heading="Priority" />
+                  <OptionContent
+                    data={data?.automationStatusName}
+                    heading="Automation Status"
+                  />
+                  <OptionContent data={data?.type} heading="Type" />
+                  <OptionContent data={data?.platform} heading="Platform" />
+                  <OptionContent
+                    data={data?.testCoveredBy}
+                    heading="Test Covered By"
+                  />
+                  <LinkContent heading="Jira Ticket" data={data?.jiraTicket} />
+                  <OptionContent data={data?.defects} heading="Defects" />
+                  <OptionContent data={data?.automationId} heading="Automation ID" />
+                </div>
+              </div>
+
+              {/* Test Details */}
+              <div className="bg-white rounded-lg border border-slate-200 p-5 space-y-4">
+                <TextContent data={data?.preConditions} heading="Preconditions" />
+                <TextContent data={data?.steps} heading="Steps" />
+                <TextContent
+                  data={data?.expectedResult}
+                  heading="Expected Result"
+                />
+                <TextContent
+                  data={data?.additionalGroups}
+                  heading="Additional Groups"
+                />
+              </div>
             </div>
           </div>
-          <InputsSpacing />
-          <div className="flex flex-wrap gap-4 bg-gray-50 p-4 rounded-lg shadow-md">
-            <OptionContent data={data?.squad} heading="Squad" />
-            <OptionContent
-              data={data?.labelNames?.split(',')?.join(', ')}
-              heading="Labels"
-            />
-            <OptionContent data={data?.priority} heading="Priority" />
-            <OptionContent
-              data={data?.automationStatusName}
-              heading="Automation Status"
-            />
-            <OptionContent data={data?.type} heading="Type" />
-            <OptionContent data={data?.platform} heading="Plaform" />
-            <OptionContent
-              data={data?.testCoveredBy}
-              heading="Test Covered By"
-            />
-            <LinkContent heading="Jira Ticket" data={data?.jiraTicket} />
-            <OptionContent data={data?.defects} heading="Defects" />
-            <OptionContent data={data?.automationId} heading="Automation Id" />
-          </div>
-          <InputsSpacing />
-          <div className="flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-md max-h-fit">
-            <TextContent data={data?.preConditions} heading={'Preconditions'} />
-            <TextContent data={data?.steps} heading={'Steps'} />
-            <TextContent
-              data={data?.expectedResult}
-              heading={'Expected Result'}
-            />
-            <TextContent
-              data={data?.additionalGroups}
-              heading={'Additional Groups'}
-            />
-          </div>
-          <InputsSpacing />
-          <div className="py-2 flex items-center justify-end gap-4 text-sm w-full border-cyan-900 max-h-28">
-            {pageType === 'runTestDetail' && runActive && testStatusHistory && (
-              <AddResultDialog
-                getSelectedRows={() => {
-                  return [{testId: props.testId}]
-                }}
-                runId={props?.runId ?? 0}
-                variant="detailPageUpdate"
-                currStatus={
-                  (testStatusHistory?.data?.[0]?.status as TestStatusType) ??
-                  (TestStatusType.Untested as TestStatusType)
-                }
-              />
-            )}
-            {testStatusHistory && (
-              <TestStatusHistroyDialog
-                data={testStatusHistory}
-                pageType={pageType}
-              />
-            )}
-            <Button onClick={testDetailClicked}>Test Details</Button>
+
+          {/* Fixed Footer */}
+          <div className="flex-shrink-0 px-6 py-4 bg-white border-t border-slate-200">
+            <div className="flex items-center justify-end gap-3">
+              {pageType === 'runTestDetail' && runActive && testStatusHistory && (
+                <AddResultDialog
+                  getSelectedRows={() => {
+                    return [{testId: props.testId}]
+                  }}
+                  runId={props?.runId ?? 0}
+                  variant="detailPageUpdate"
+                  currStatus={
+                    (testStatusHistory?.data?.[0]?.status as TestStatusType) ??
+                    (TestStatusType.Untested as TestStatusType)
+                  }
+                />
+              )}
+              {testStatusHistory && (
+                <TestStatusHistroyDialog
+                  data={testStatusHistory}
+                  pageType={pageType}
+                />
+              )}
+              <Button variant="default" size="default" onClick={testDetailClicked}>
+                View Full Details
+              </Button>
+            </div>
           </div>
         </div>
       ) : (
-        <div
-          style={{
-            fontSize: 14,
-            padding: 4,
-            marginTop: 16,
-            backgroundColor: 'rgb(241 245 249)',
-            minHeight: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-          }}>
-          <Skeleton className="h-6 w-1/2" />
-          <Skeleton className="h-32 w-full rounded-lg" />
-          <Skeleton className="h-32 w-full rounded-lg" />
-          <Skeleton className="h-48 w-full rounded-lg" />
-          <Skeleton className="h-8 w-1/4 self-end" />
+        <div className="h-full flex flex-col bg-slate-50 p-6 gap-6">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-40 w-full rounded-lg" />
+          <Skeleton className="h-40 w-full rounded-lg" />
+          <Skeleton className="h-56 w-full rounded-lg" />
+          <div className="flex justify-end mt-auto">
+            <Skeleton className="h-10 w-32" />
+          </div>
         </div>
       )}
     </CustomDrawer>

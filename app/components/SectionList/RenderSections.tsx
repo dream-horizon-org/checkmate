@@ -79,18 +79,20 @@ const RenderSections = memo(
     )
 
     return (
-      <ul className="relative font-poppins" key={`${level}`}>
+      <ul className="relative" key={`${level}`}>
         {sections !== null ? (
           sections.map((section, index) => (
             <li key={section.sectionId} className="relative py-1">
               <div className="flex flex-row items-center cursor-pointer">
-                <div onClick={() => toggleSection(section.sectionId)}>
+                <div 
+                  onClick={() => toggleSection(section.sectionId)}
+                  className="p-0.5 hover:bg-slate-100 rounded transition-colors">
                   {openSections.includes(section.sectionId) &&
                   section.subSections?.length > 0 ? (
-                    <ChevronDown size={14} stroke="grey" />
+                    <ChevronDown size={14} className="text-slate-500" />
                   ) : !openSections.includes(section.sectionId) &&
                     section.subSections?.length > 0 ? (
-                    <ChevronRight size={14} stroke="grey" />
+                    <ChevronRight size={14} className="text-slate-500" />
                   ) : (
                     <div className="w-[14px]" />
                   )}
@@ -98,13 +100,13 @@ const RenderSections = memo(
                 {level > 0 && (
                   <>
                     <div
-                      className={`absolute border-l border-gray-400 h-full top-0 left-[-6px] overflow-hidden ${
+                      className={`absolute border-l border-slate-300 h-full top-0 left-[-6px] overflow-hidden ${
                         index === sections?.length - 1 ? 'h-1/2' : ''
                       }`}
                     />
                     <div
                       className={cn(
-                        'absolute left-[-6px] border-t-[1px] border-gray-400 w-3',
+                        'absolute left-[-6px] border-t-[1px] border-slate-300 w-3',
                         section.subSections?.length > 0 ? '' : 'w-6',
                       )}
                     />
@@ -113,17 +115,17 @@ const RenderSections = memo(
                 <div className="relative group flex flex-row items-center gap-1">
                   <div
                     className={cn(
-                      `flex items-center border border-transparent hover:bg-blue-200 rounded-md px-2`,
+                      `flex items-center border border-transparent hover:bg-slate-50 rounded-md px-2 py-1 transition-colors`,
                       selectedSections.includes(section.sectionId)
-                        ? 'bg-blue-300 hover:bg-blue-300'
+                        ? 'bg-slate-100 hover:bg-slate-100'
                         : '',
                     )}>
                     <Checkbox
                       style={{
                         borderRadius: 3,
                       }}
-                      checkIconClassName="h-3 w-3 align-middle flex items-center mr-2 cursor-pointer pr-0.5"
-                      className="h-3 w-3 align-middle flex items-center mr-2 cursor-pointer"
+                      checkIconClassName="h-3.5 w-3.5 align-middle flex items-center mr-2 cursor-pointer"
+                      className="h-3.5 w-3.5 align-middle flex items-center mr-2 cursor-pointer border-slate-300"
                       checked={selectedSections.includes(section.sectionId)}
                       onClick={(e) =>
                         applySectionFilter(
@@ -138,7 +140,7 @@ const RenderSections = memo(
                         <div
                           onClick={() => toggleSection(section.sectionId)}
                           className="flex flex-row items-center gap-1">
-                          <span className="text-xs truncate">
+                          <span className="text-sm text-slate-700 truncate">
                             {section.sectionName}
                           </span>
                         </div>
@@ -154,29 +156,35 @@ const RenderSections = memo(
                     />
                   </div>
                   {!runId && (
-                    <div className="flex flex-row items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute top-1/2 left-full transform -translate-y-1/2 ml-2 pb-0.5">
+                    <div className="flex flex-row items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute top-1/2 left-full transform -translate-y-1/2 ml-2">
                       <Tooltip
                         anchor={
-                          <CirclePlus
-                            color="green"
+                          <button
                             onClick={() =>
                               addSubsectionClicked(section.sectionId)
                             }
-                            size={16}
-                          />
+                            className="p-1 hover:bg-slate-100 rounded transition-colors">
+                            <CirclePlus
+                              size={14}
+                              className="text-slate-500 hover:text-slate-700"
+                            />
+                          </button>
                         }
                         content="Add SubSection"
                       />
 
                       <Tooltip
                         anchor={
-                          <Pencil
+                          <button
                             onClick={() => {
                               editSubsectionClicked(section.sectionId)
                             }}
-                            color="#2d7071"
-                            size={14}
-                          />
+                            className="p-1 hover:bg-slate-100 rounded transition-colors">
+                            <Pencil
+                              size={13}
+                              className="text-slate-500 hover:text-slate-700"
+                            />
+                          </button>
                         }
                         content="Edit Section"
                       />

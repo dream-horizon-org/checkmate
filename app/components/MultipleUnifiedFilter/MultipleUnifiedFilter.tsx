@@ -106,50 +106,52 @@ export const MultipleUnifiedFilter = ({
   const ContentCompenent = () => {
     return (
       <>
-        <div className={cn('flex', 'flex-wrap', 'justify-between pr-8')}>
+        <div className="grid grid-cols-2 gap-3">
           {selectedFilters.map((filter, index) => {
             return (
-              <div key={index} className="flex flex-row">
+              <div key={index} className="flex items-center gap-1">
                 <FilterDropdown
                   key={filter.filterName}
                   filter={filter}
                   handleCheckboxChange={handleCheckboxChange}
                 />
                 {!!filter.filterOptions.some((option) => option.checked) ? (
-                  <RotateCcw
-                    color="#ff3c00"
-                    className={'self-center cursor-pointer -ml-1'}
-                    size={15}
-                    strokeWidth={2}
+                  <button
                     onClick={() => resetFilter(filter.filterName)}
-                  />
-                ) : (
-                  <div className="w-4 h-4" />
-                )}
+                    className="p-1.5 hover:bg-slate-100 rounded-md transition-colors">
+                    <RotateCcw
+                      className="text-slate-500 hover:text-slate-700"
+                      size={14}
+                      strokeWidth={2}
+                    />
+                  </button>
+                ) : null}
               </div>
             )
           })}
         </div>
 
-        <RadioGroup
-          className="mt-4"
-          defaultValue={filterType}
-          onValueChange={(value) => {
-            setSelectedType(value)
-          }}>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="and" id="and" />
-            <Label className="text-xs" htmlFor="and">
-              {AND_SELECTION}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="or" id="or" />
-            <Label className="text-xs" htmlFor="or">
-              {OR_SELECTION}
-            </Label>
-          </div>
-        </RadioGroup>
+        <div className="mt-5 pt-5 border-t border-slate-200">
+          <h4 className="text-xs font-semibold text-slate-700 mb-3 uppercase tracking-wide">Match Criteria</h4>
+          <RadioGroup
+            defaultValue={filterType}
+            onValueChange={(value) => {
+              setSelectedType(value)
+            }}>
+            <div className="flex items-center space-x-2 py-1.5">
+              <RadioGroupItem value="and" id="and" />
+              <Label className="text-sm text-slate-600 font-normal cursor-pointer" htmlFor="and">
+                {AND_SELECTION}
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2 py-1.5">
+              <RadioGroupItem value="or" id="or" />
+              <Label className="text-sm text-slate-600 font-normal cursor-pointer" htmlFor="or">
+                {OR_SELECTION}
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
       </>
     )
   }
@@ -157,23 +159,22 @@ export const MultipleUnifiedFilter = ({
   return variant === 'popover' ? (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="px-4">Filter</div>
+        <div className="px-4 text-sm font-medium">Filter</div>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
-        <div className={cn('flex', 'flex-col')}>
+      <PopoverContent className="w-[480px] border-slate-200 shadow-lg p-5">
+        <div className="flex flex-col">
+          <h3 className="text-base font-semibold text-slate-900 mb-4">Filter Options</h3>
           <ContentCompenent />
-          <PopoverClose className={'flex w-full'}>
+          <PopoverClose className="flex w-full mt-5">
             <Button
-              className={
-                'flex bg-blue-600 hover:bg-blue-800 self-center w-full mt-4 disabled:bg-gray-500'
-              }
+              className="flex bg-slate-900 hover:bg-slate-800 w-full"
               onClick={applyFilterClick}>
-              Apply
+              Apply Filters
             </Button>
           </PopoverClose>
-          <div className="text-xs flex flex-col mt-4 text-red-600">
-            <span>{NONE_SELECTED}</span>
-            <span>{MULTIPLE_SELECTED}</span>
+          <div className="text-xs flex flex-col mt-4 pt-4 border-t border-slate-200 text-slate-500 gap-1.5">
+            <p className="leading-relaxed">{NONE_SELECTED}</p>
+            <p className="leading-relaxed">{MULTIPLE_SELECTED}</p>
           </div>
         </div>
       </PopoverContent>
@@ -182,23 +183,21 @@ export const MultipleUnifiedFilter = ({
     <CustomDialog
       anchorComponent={<Button className="px-4">Apply Filter</Button>}
       headerComponent={
-        <DialogTitle className="mb-2">Select Filters</DialogTitle>
+        <DialogTitle className="mb-4 text-slate-900 text-base font-semibold">Filter Options</DialogTitle>
       }
       contentComponent={<ContentCompenent />}
       footerComponent={
         <div className="flex flex-col w-full">
-          <DialogClose>
+          <DialogClose className="mt-5">
             <Button
-              className={
-                'flex bg-blue-600 hover:bg-blue-800 self-center w-full mt-4  disabled:bg-gray-500'
-              }
+              className="flex bg-slate-900 hover:bg-slate-800 w-full"
               onClick={applyFilterClick}>
-              Apply
+              Apply Filters
             </Button>
           </DialogClose>
-          <div className="text-xs flex flex-col mt-4 text-red-600">
-            <span>{NONE_SELECTED}</span>
-            <span>{MULTIPLE_SELECTED}</span>
+          <div className="text-xs flex flex-col mt-4 pt-4 border-t border-slate-200 text-slate-500 gap-1.5">
+            <p className="leading-relaxed">{NONE_SELECTED}</p>
+            <p className="leading-relaxed">{MULTIPLE_SELECTED}</p>
           </div>
         </div>
       }

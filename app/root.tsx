@@ -69,12 +69,14 @@ export function Layout({children}: {children: React.ReactNode}) {
         <Links />
         <title>{APP_NAME}</title>
       </head>
-      <body className={'h-svh'}>
+      <body className="h-svh bg-slate-50">
         {showHeader && <AppHeader user={user} />}
         <GlobalLoading />
         <SearchModal />
-        <div className={'h-[calc(100%-56px)] px-20 bg-slate-100'}>
-          {children}
+        <div className="h-[calc(100%-64px)] bg-slate-50">
+          <div className="px-8 py-0 h-full">
+            {children}
+          </div>
         </div>
         <Toaster />
         <ScrollRestoration />

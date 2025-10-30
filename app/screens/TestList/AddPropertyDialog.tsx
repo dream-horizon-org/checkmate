@@ -131,7 +131,7 @@ export const AddProperty = (props: AddProps) => {
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          className={cn(props.containerClassName)}
+          className={cn('shadow-sm', props.containerClassName)}
           disabled={selectedRows.length > 0 ? false : true}
           variant="outline">
           Add Property

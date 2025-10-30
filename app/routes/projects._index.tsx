@@ -84,30 +84,44 @@ export function Projects() {
   }
 
   return (
-    <div className={cn('flex', 'flex-col', 'h-full')}>
-      <div className={cn('py-8', 'flex justify-between')}>
-        {orgName ? (
-          <span className={cn('text-2xl', 'font-medium')}>
-            {orgName} Projects
-          </span>
-        ) : (
-          <Skeleton className={cn('w-1/5', 'h-8')} />
-        )}
-        <Link
-          className={cn('flex-row', 'flex')}
-          to={`/org/${orgId}/createProject`}>
-          <PlusCircledIcon className={cn('size-8', 'mx-2')} />
-          <span className={cn('text-2xl', 'font-medium')}>Add Project</span>
-        </Link>
+    <div className="flex flex-col h-full pt-6">
+      {/* Header Section - Sleek and Modern */}
+      <div className="pb-5 mb-6 border-b border-slate-200">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col gap-1">
+            {orgName ? (
+              <>
+                <h1 className="text-2xl font-bold text-slate-900">
+                  Projects
+                </h1>
+                <p className="text-sm text-slate-500">
+                  {orgName}
+                </p>
+              </>
+            ) : (
+              <Skeleton className="w-64 h-10" />
+            )}
+          </div>
+          <Link
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow"
+            to={`/org/${orgId}/createProject`}>
+            <PlusCircledIcon className="size-4" />
+            <span>New Project</span>
+          </Link>
+        </div>
+
+        {/* Search Bar */}
+        <div className="w-full max-w-sm">
+          <SearchBar
+            handlechange={onChange}
+            placeholdertext={'Search projects...'}
+            searchstring={searchParams.get('textSearch') ?? ''}
+          />
+        </div>
       </div>
-      <div className={cn('mb-4')}>
-        <SearchBar
-          handlechange={onChange}
-          placeholdertext={'Search by Project Name...'}
-          searchstring={searchParams.get('textSearch') ?? ''}
-        />
-      </div>
-      <div className={cn('flex', 'overflow-auto', 'pb-8')}>
+
+      {/* Projects Grid */}
+      <div className="flex-1 overflow-y-auto pb-6">
         <ProjectsTable projects={data} />
       </div>
     </div>
