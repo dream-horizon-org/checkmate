@@ -16,12 +16,12 @@ export function generateRbacPolicy(): IRbacPolicy[] {
 
     switch (endpoint) {
       case API.AddProjects:
-        role = AccessType.USER
+        role = AccessType.ADMIN
         action = ApiTypes.POST
         break
 
       case API.DeleteRun:
-        role = AccessType.USER
+        role = AccessType.ADMIN
         action = ApiTypes.DELETE
         break
 
@@ -31,12 +31,12 @@ export function generateRbacPolicy(): IRbacPolicy[] {
       case API.RunReset:
       case API.UpdateUserRole:
       case API.RunRemoveTest:
-        role = AccessType.USER
+        role = AccessType.ADMIN
         action = ApiTypes.PUT
         break
 
       case API.GetAllUser:
-        role = AccessType.USER
+        role = AccessType.ADMIN
         action = ApiTypes.GET
         break
 
