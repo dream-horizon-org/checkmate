@@ -1,0 +1,131 @@
+---
+title: Roles & Permissions
+description: Understand role-based access control and permissions in Checkmate
+---
+
+Checkmate uses Role-Based Access Control (RBAC) to manage permissions. Each user is assigned a role that determines what they can view and modify.
+
+## Role Hierarchy
+
+Roles are hierarchical - higher roles inherit all permissions from lower roles.
+
+### Reader (View-Only)
+
+**Capabilities:**
+- View projects, tests, and runs
+- Download reports and test data
+- View user details
+- Generate personal API tokens
+- Access all read-only APIs
+
+**Cannot:**
+- Create or modify any resources
+- Delete anything
+- Change user roles
+
+**Use Case:** External stakeholders, observers, or team members who need visibility without editing rights.
+
+### User (Standard)
+
+**Capabilities:**
+- All Reader permissions, plus:
+- Create and edit tests
+- Create and edit test runs
+- Update test statuses
+- Add labels, squads, and sections
+- Bulk operations (import, export, update)
+- Delete tests
+
+**Cannot:**
+- Manage projects (create, edit, delete)
+- Delete or reset runs
+- Manage user roles
+- Lock/unlock runs
+
+**Use Case:** QA engineers, testers, developers who actively work with tests and runs.
+
+### Admin (Full Access)
+
+**Capabilities:**
+- All User permissions, plus:
+- Create, edit, and archive projects
+- Delete and reset runs
+- Lock and unlock runs
+- Remove tests from runs
+- Manage user roles
+- Access admin panel
+- View all users
+
+**Use Case:** Team leads, project managers, administrators who need full control over projects and users.
+
+## Permission Comparison
+
+:::tip
+  Need a role change? Contact your organization administrator through the Admin Panel.
+:::
+
+| **Action** | **Reader** | **User** | **Admin** |
+|------------|:----------:|:--------:|:---------:|
+| View projects, tests, runs | ✅ | ✅ | ✅ |
+| Download reports | ✅ | ✅ | ✅ |
+| Generate API tokens | ✅ | ✅ | ✅ |
+| Create/edit tests | ❌ | ✅ | ✅ |
+| Create/edit runs | ❌ | ✅ | ✅ |
+| Update test statuses | ❌ | ✅ | ✅ |
+| Delete tests | ❌ | ✅ | ✅ |
+| Bulk operations | ❌ | ✅ | ✅ |
+| Create/edit/archive projects | ❌ | ❌ | ✅ |
+| Lock/unlock runs | ❌ | ❌ | ✅ |
+| Reset runs | ❌ | ❌ | ✅ |
+| Delete runs | ❌ | ❌ | ✅ |
+| Manage user roles | ❌ | ❌ | ✅ |
+| Access admin panel | ❌ | ❌ | ✅ |
+
+## API Permissions
+
+Each role has access to specific API endpoints. See the [API Documentation](/guides/api) for detailed endpoint information.
+
+### Admin-Only APIs
+
+Admin users have exclusive access to these management endpoints:
+
+- **Project Management:** Create, edit, archive projects
+- **Run Management:** Delete runs, reset all test statuses, remove tests from runs, lock/unlock runs
+- **User Management:** Update user roles, view all users
+
+### User APIs
+
+User role can access these operational endpoints:
+
+- **Test Management:** Create, edit, delete tests (single and bulk)
+- **Run Management:** Create and edit runs
+- **Test Execution:** Update test statuses in runs
+- **Organization:** Add labels, squads, sections
+
+### Reader APIs
+
+Reader role has access to all read-only endpoints:
+
+- **Data Retrieval:** Get projects, tests, runs, users, organizations
+- **Reports:** Download test data and run reports
+- **Metadata:** Get labels, squads, sections, priorities, platforms
+- **Personal:** Generate/delete own API tokens
+
+## Best Practices
+
+- **Principle of Least Privilege:** Assign users the minimum role needed for their responsibilities
+- **Regular Reviews:** Periodically review user roles and permissions
+- **Admin Limitation:** Limit Admin role to trusted team leads and managers
+- **Token Security:** Treat API tokens as passwords - never share or commit them
+
+:::caution
+  Admin users have full access to all projects and data. Only assign this role to trusted team members.
+:::
+
+---
+
+## Next Steps
+
+- [User Settings](/guides/user-settings) - Manage your profile and tokens
+- [API Authentication](/guides/api/authentication) - Learn how to use your tokens
+- [API Reference](/guides/api/openapi) - Explore all available endpoints

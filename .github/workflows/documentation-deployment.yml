@@ -2,7 +2,7 @@ name: Docs Deployment
 
 on:
   push:
-    branches: [feat/docusaurus]
+    branches: [master]
     paths:
       - 'website/**'
   workflow_dispatch:
@@ -19,13 +19,30 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Enable Corepack and Set up Yarn 4.0.0
-        run: corepack enable && corepack prepare yarn@4.0.0 --activate
-
-      - name: Build and Upload Checkmate Docs
-        uses: withastro/action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: docs
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack and Set up Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.10.3 --activate
+
+      - name: Install Dependencies
+        working-directory: ./website
+        run: yarn install --immutable
+
+      - name: Build Docusaurus Website
+        working-directory: ./website
+        run: yarn build
+        env:
+          GOOGLE_ANALYTICS_TOKEN: ${{ secrets.GOOGLE_ANALYTICS_TOKEN }}
+
+      - name: Upload Build Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build
         env:
           GOOGLE_ANALYTICS_TOKEN: ${{ secrets.GOOGLE_ANALYTICS_TOKEN }}
 
@@ -36,6 +53,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy Checkmate Docs to GitHub Pages
+      - name: Deploy Docusaurus Website to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

@@ -1,0 +1,106 @@
+---
+title: Import & Export
+description: Bulk import and export test cases using CSV files
+---
+
+
+
+Import and export test cases in bulk using CSV files. Perfect for migrations, backups, and large-scale test management.
+
+## Download Tests
+
+Export your existing tests as CSV for backups, templates, or external analysis.
+
+1. Click **Download** on the Tests page
+2. Select filters (optional) to export specific tests
+3. The CSV downloads with all test data
+
+**Use Cases:**
+- Create templates for bulk uploads
+- Backup test data
+- Share tests with external tools
+- Analyze test coverage in spreadsheets
+
+:::tip
+  Apply filters before downloading to export only specific tests (by section, priority, platform, etc.).
+:::
+
+## Upload Process
+
+1. Click **Upload** on the Tests page
+2. Select your CSV file (must follow the required format)
+3. (Optional) Assign a label to all imported tests
+4. Click **Submit Tests**
+
+The system validates and imports tests, auto-creating sections and squads as needed.
+
+## CSV Format
+
+### Required Columns
+
+| Column | Requirements | Notes |
+|--------|-------------|-------|
+| **Title** | Min 5 characters | Test case name |
+| **Section** | Hierarchy path | Use `>` for nesting: `Parent > Child > Test Section` |
+
+### Optional Columns
+
+| Column | Valid Values | Default |
+|--------|-------------|---------|
+| **Id** | Any number | Auto-generated |
+| **Priority** | Critical, High, Medium, Low | Medium |
+| **Platform** | All Platforms, Android Web And iOS Only, Android Web and Playstore, Only Android, Only iOS, Only Playstore | All Platforms |
+| **Test Covered By** | Contract, E2E, Integration, Manual, Unit | Manual |
+| **Automation Status** | Not Automatable, Automated, Automatable | Automatable |
+| **Squad** | Any text | Auto-created if new |
+| **Steps** | Text | - |
+| **Preconditions** | Text | - |
+| **Expected Result** | Text | - |
+| **Description** | Text | - |
+| **Additional Groups** | Text | - |
+| **Automation Id** | Text | - |
+| **Section Description** | Text | - |
+
+## Section Hierarchy
+
+Sections are created automatically based on the path in your CSV.
+
+**Example:**
+```
+Account Management > Cash In > Payment Listing
+```
+
+This creates:
+- **Account Management** (parent)
+  - **Cash In** (child)
+    - **Payment Listing** (child)
+
+:::caution
+  Section names are case-sensitive. Typos will create duplicate sections.
+:::
+
+## Migration from TestRail
+
+Use the **Id** column to preserve test IDs from TestRail:
+
+- If **Id** is provided: Uses that ID in Checkmate
+- If **Id** is empty: Auto-generates a new ID
+
+This ensures links and references remain intact during migration.
+
+## Best Practices
+
+- **Download as template** - Export existing tests to get the correct format
+- **Validate format** - Check your CSV in a spreadsheet tool before uploading
+- **Start small** - Test with 5-10 rows before bulk importing hundreds
+- **Check sections** - Verify section hierarchy paths are correct
+- **Review defaults** - Ensure default values match your needs
+- **Use filters** - Export specific test subsets for targeted templates
+
+---
+
+## Next Steps
+
+- [Manage Tests](/guides/tests/tests) - View and organize imported tests
+- [Execute Runs](/guides/runs/runs) - Run your imported test cases
+- [Filter Tests](/guides/tests/tests#view--filter-tests) - Use advanced filtering options
