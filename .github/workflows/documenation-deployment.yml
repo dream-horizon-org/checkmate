@@ -2,9 +2,9 @@ name: Docs Deployment
 
 on:
   push:
-    branches: [master]
+    branches: [feat/docusaurus]
     paths:
-      - 'docs/**'
+      - 'website/**'
   workflow_dispatch:
 
 permissions:
