@@ -18,15 +18,11 @@ export const HeaderComponent = ({
   position?: 'center' | 'left' | 'right'
   className?: string
 }) => {
-  const positionClass = `text-${position}`
+  const positionClass = position === 'left' ? 'text-left' : position === 'right' ? 'text-right' : 'text-center'
 
   return (
     <div
       className={cn(
-        'text-sm',
-        'text-gray-700',
-        'font-bold',
-        'ml-4',
         'truncate',
         positionClass,
         className,
@@ -76,28 +72,26 @@ export const TitleRowComponent = ({
   }, [columnWidth])
 
   return (
-    <div>
-      <Tooltip
-        anchor={
-          <div
-            className={cn(
-              'text-left truncate',
-              clickable
-                ? 'cursor-pointer hover:underline hover:text-blue-700'
-                : 'hover:no-underline hover:text-current cursor-default',
-              className,
-            )}
-            style={{
-              width: maxWidth,
-              maxWidth: 600,
-            }}
-            onClick={onClick}>
-            {content}
-          </div>
-        }
-        content={content}
-      />
-    </div>
+    <Tooltip
+      anchor={
+        <div
+          className={cn(
+            'text-left truncate text-sm',
+            clickable
+              ? 'cursor-pointer hover:underline hover:text-slate-900 text-slate-700 font-medium'
+              : 'hover:no-underline hover:text-current cursor-default text-slate-700',
+            className,
+          )}
+          style={{
+            width: maxWidth,
+            maxWidth: 600,
+          }}
+          onClick={onClick}>
+          {content}
+        </div>
+      }
+      content={content}
+    />
   )
 }
 
@@ -111,12 +105,12 @@ export const SortIcon = ({
   sortBy: string | null
 }) => {
   if (!sortOrder || !sortBy || sortBy.toLowerCase() !== heading.toLowerCase())
-    return <ChevronsUpDown className="ml-2 h-4 w-4" />
+    return <ChevronsUpDown className="ml-1.5 h-3.5 w-3.5 text-slate-400" />
 
   return sortOrder === 'asc' ? (
-    <ArrowUpNarrowWide className="ml-2 h-4 w-4" />
+    <ArrowUpNarrowWide className="ml-1.5 h-3.5 w-3.5 text-slate-600" />
   ) : (
-    <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+    <ArrowDownWideNarrow className="ml-1.5 h-3.5 w-3.5 text-slate-600" />
   )
 }
 
@@ -139,12 +133,14 @@ export const SortingHeaderComponent = ({
     removeSort = true
   }
 
+  const positionClass = position === 'left' ? 'justify-start' : position === 'right' ? 'justify-end' : 'justify-center'
+
   return (
     <Button
       variant="ghost"
       className={cn(
-        'font-bold text-sm text-gray-700 truncate',
-        position,
+        'truncate h-auto p-0 hover:bg-transparent',
+        positionClass,
         className,
       )}
       onClick={() =>
@@ -173,19 +169,19 @@ export const PriorityRowComponent = ({priority}: {priority: string}) => {
   const textColor = (priority: string) => {
     switch (priority) {
       case 'Critical':
-        return '#f01000'
+        return '#dc2626'
       case 'High':
-        return '#c74022'
+        return '#ea580c'
       case 'Medium':
-        return '#ffc40c'
+        return '#ca8a04'
       case 'Low':
-        return '#323ea8'
+        return '#2563eb'
       default:
-        return 'text-gray-700'
+        return '#64748b'
     }
   }
   return (
-    <span style={{color: textColor(priority)}} className={cn('text-left')}>
+    <span style={{color: textColor(priority)}} className="text-left text-sm font-medium">
       {priority}
     </span>
   )
@@ -193,20 +189,17 @@ export const PriorityRowComponent = ({priority}: {priority: string}) => {
 
 export const PlatformComponent = ({
   content,
-
   className,
 }: {
   content: string
   className?: string
 }) => (
-  <div>
-    <Tooltip
-      anchor={
-        <div className={cn('w-20 text-left truncate', className)}>
-          {content}
-        </div>
-      }
-      content={content}
-    />
-  </div>
+  <Tooltip
+    anchor={
+      <div className={cn('max-w-32 text-left truncate text-sm text-slate-700', className)}>
+        {content}
+      </div>
+    }
+    content={content}
+  />
 )

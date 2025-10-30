@@ -1,92 +1,59 @@
 import {useLocation, useParams} from '@remix-run/react'
-import {LARGE_PAGE_SIZE, ORG_ID, SMALL_PAGE_SIZE} from '@route/utils/constants'
-import {useState} from 'react'
-import {APP_NAME} from '~/constants'
-import {Separator} from '~/ui/separator'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '~/ui/sheet'
-import logo from '../../assets/logo.png'
-import {ContentComponent, FooterComponent} from './SideDrawrComponents'
+import {LARGE_PAGE_SIZE, SMALL_PAGE_SIZE} from '@route/utils/constants'
+import {useEffect} from 'react'
+import {ListChecks, Play} from 'lucide-react'
+import {cn} from '~/ui/utils'
+import {NavItem} from './SideDrawrComponents'
 
-export const SideDrawer = () => {
-  const orgId = ORG_ID
-  const [sideDrawerOpen, setSideDrawerOpen] = useState<boolean>(false)
+interface SideDrawerProps {
+  isCollapsed: boolean
+  setIsCollapsed: (value: boolean) => void
+}
+
+export const SideDrawer = ({isCollapsed}: SideDrawerProps) => {
   const {projectId} = useParams()
   const location = useLocation()
   const containsRun = location.pathname.includes('run')
   const containsRuns = location.pathname.includes('runs')
 
-  return (
-    <Sheet open={sideDrawerOpen} onOpenChange={setSideDrawerOpen} key="left">
-      <SheetTrigger onClick={() => setSideDrawerOpen(true)}>
-        <img
-          className="flex items-center space-x-4 cursor-pointer my-2"
-          src={logo}
-          alt={''}
-          style={{height: 32, width: 'auto'}}
-        />
-      </SheetTrigger>
-      <div className="flex mr-auto ml-4 text-3xl text-gray-900 tracking-wide">
-        {APP_NAME}
-      </div>
-      <SheetContent side="left" className="w-[100px] sm:w-[300px] pl-8 pt-12">
-        <SheetHeader>
-          <SheetTitle className="font-bold">Content</SheetTitle>
-        </SheetHeader>
-        <Separator className="my-4" />
-        <div className="flex flex-col justify-between h-16 mt-8">
-          <div className="items-center">
-            <ContentComponent
-              setSideDrawerOpen={setSideDrawerOpen}
-              text="Projects"
-              navigateTo={`/projects?orgId=${orgId}&page=1&pageSize=${SMALL_PAGE_SIZE}`}
-            />
+  useEffect(() => {
+    // Save sidebar state to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sidebar-collapsed', String(isCollapsed))
+    }
+  }, [isCollapsed])
 
-            {projectId && (
-              <div className="flex flex-col items-start">
-                {!containsRuns && (
-                  <ContentComponent
-                    setSideDrawerOpen={setSideDrawerOpen}
-                    text="Runs List"
-                    navigateTo={`/project/${projectId}/runs?page=1&pageSize=${SMALL_PAGE_SIZE}&status=Active`}
-                  />
-                )}
-                {containsRun && (
-                  <ContentComponent
-                    setSideDrawerOpen={setSideDrawerOpen}
-                    text="Tests"
-                    navigateTo={`/project/${projectId}/tests?page=1&pageSize=${LARGE_PAGE_SIZE}`}
-                  />
-                )}
-              </div>
-            )}
-          </div>
+  return (
+    <div
+      className={cn(
+        'fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-slate-200 shadow-sm transition-all duration-300 ease-in-out z-40 flex flex-col',
+        isCollapsed ? 'w-16' : 'w-64',
+      )}>
+      {/* Navigation Items */}
+      <nav className="flex-1 p-2">
+        <div className="space-y-1">
+          {projectId && (
+            <>
+              {!containsRuns && (
+                <NavItem
+                  icon={Play}
+                  label="Runs"
+                  to={`/project/${projectId}/runs?page=1&pageSize=${SMALL_PAGE_SIZE}&status=Active`}
+                  isCollapsed={isCollapsed}
+                />
+              )}
+              {containsRun && (
+                <NavItem
+                  icon={ListChecks}
+                  label="Tests"
+                  to={`/project/${projectId}/tests?page=1&pageSize=${LARGE_PAGE_SIZE}`}
+                  isCollapsed={isCollapsed}
+                />
+              )}
+            </>
+          )}
         </div>
-        <div className="h-3/4 flex flex-col">
-          <div className="flex flex-col gap-2 mt-auto">
-            <FooterComponent
-              href="https://checkmate.dreamsportslabs.com"
-              setSideDrawerOpen={setSideDrawerOpen}
-              text="Documentation"
-            />
-            <FooterComponent
-              href="https://discord.gg/wBQXeYAKNc"
-              setSideDrawerOpen={setSideDrawerOpen}
-              text="Ask Question"
-            />
-            <FooterComponent
-              href="https://github.com/ds-horizon/checkmate/issues"
-              setSideDrawerOpen={setSideDrawerOpen}
-              text="Report Issue"
-            />
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+      </nav>
+    </div>
   )
 }

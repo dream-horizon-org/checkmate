@@ -31,14 +31,21 @@ export default defineConfig({
           label: "Introduction",
           items: [
             "project/introduction",
-            "project/application-structure",
+          ],
+        },
+        {
+          label: "Setup",
+          items: [
             "project/setup",
           ],
         },
         {
           label: "User Guide",
           items: [
-            "guides/projects",
+            {
+              label: "Projects",
+              items: ["guides/projects"],
+            },
             {
               label: "Tests",
               items: ["guides/tests/tests", "guides/tests/bulk-addition"],
@@ -47,11 +54,9 @@ export default defineConfig({
               label: "Runs",
               items: ["guides/runs/runs", "guides/runs/run-detail"],
             },
-            "guides/user-settings",
-            "guides/api",
             {
-              label: "RBAC",
-              slug: "project/rbac",
+              label: "Users",
+              items: ["guides/user-settings", "project/rbac"],
             },
           ],
         },
@@ -59,21 +64,20 @@ export default defineConfig({
           label: "Developer Docs",
           items: [
             {
-              label: "TechStack Used",
-              slug: "tech/techstack",
-              badge: {
-                text: "WIP",
-                variant: "caution",
-              },
+              label: "Application",
+              items: [
+                "tech/architecture",
+                "tech/database",
+              ],
             },
-            "tech/db-schema",
             {
-              label: "HLD",
-              slug: "tech/hld",
-              badge: {
-                text: "WIP",
-                variant: "caution",
-              },
+              label: "API Documentation",
+              items: [
+                "guides/api",
+                "guides/api/authentication",
+                "guides/api/examples",
+                "guides/api/openapi",
+              ],
             },
           ],
         },

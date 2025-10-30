@@ -1,126 +1,406 @@
 ---
-title: Setup
+title: Setup Guide
+description: Get Checkmate running locally in minutes
 ---
 
-import { Steps } from "@astrojs/starlight/components";
+import { Steps, Tabs, TabItem, Aside, Card, CardGrid } from "@astrojs/starlight/components";
 
-#### Pre-requisites
+## Prerequisites
 
-1. **Docker Desktop**: Ensure Docker Desktop is installed and running.
-2. **Google OAuth Application**: Set up a Google OAuth application to enable login.
-   - Follow the steps on the [Google documentation](https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred) to create a new application and get a client ID and secret.
-   - **Important**: Configure the following in your GCP OAuth Dashboard:
-     - **Authorized JavaScript origins**: `http://localhost:3000` (for local development) or your domain (e.g., `https://yourdomain.com`)
-     - **Authorized redirect URIs**: `http://localhost:3000/callback` (for local development) or your domain with callback (e.g., `https://yourdomain.com/callback`)
+Before starting, ensure you have the following installed:
 
-#### Local Dev Setup
+| Requirement | Version | Purpose |
+|------------|---------|---------|
+| **Docker Desktop** | Latest | Container runtime |
+| **Node.js** | 18.x+ | JavaScript runtime |
+| **Yarn** | 1.x | Package manager |
+| **Git** | Any | Version control |
+
+<Aside type="tip">
+  **New to Docker?** Download it from [docker.com](https://www.docker.com/products/docker-desktop/) and make sure it's running before proceeding.
+</Aside>
+
+---
+
+## Google OAuth Setup
+
+Checkmate uses Google OAuth for authentication. You'll need to create a Google Cloud OAuth application.
 
 <Steps>
 
-1. Clone the repository:
-   ```sh frame="none"
-   git clone git@github.com:ds-horizon/checkmate.git
-   ```
-2. Install dependencies
-   ```sh frame="none"
-   yarn install
-   ```
-3. Create .env file:
-   - Copy the .env.example file and rename it to .env. Update it with your specific environment variables.
-   - **Required Google OAuth Configuration**:
-     ```env
-     GOOGLE_CLIENT_ID=your_google_client_id_here
-     GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+1. **Go to Google Cloud Console**
+   
+   Visit [Google Cloud Console](https://console.cloud.google.com/) and create or select a project.
+
+2. **Enable Google+ API**
+   
+   Navigate to **APIs & Services → Library** and enable the **Google+ API**.
+
+3. **Create OAuth Credentials**
+   
+   Go to **APIs & Services → Credentials** and click **Create Credentials → OAuth 2.0 Client ID**.
+
+4. **Configure OAuth Consent Screen**
+   
+   - Application name: `Checkmate` (or your preferred name)
+   - User support email: Your email
+   - Developer contact: Your email
+   - Add test users if needed
+
+5. **Configure OAuth Client**
+   
+   - Application type: **Web application**
+   - Name: `Checkmate Local` (or your preferred name)
+   - **Authorized JavaScript origins:**
      ```
-   - Ensure these values match the credentials from your Google OAuth application created in the pre-requisites step.
-4. Set up the database and seed data:
-   ```sh frame="none"
-   yarn docker:db:setup
-   ```
-   - Create a database container using Docker.
-   - Seed the database with initial data from the `seedData.sql` file.
-5. Start the application in development mode:
-   ```sh frame="none"
-   yarn dev
-   ```
-6. App will be started on http://localhost:3000
+     http://localhost:3000
+     ```
+   - **Authorized redirect URIs:**
+     ```
+     http://localhost:3000/callback
+     ```
+
+6. **Save Credentials**
+   
+   Copy the **Client ID** and **Client Secret** — you'll need these for the `.env` file.
 
 </Steps>
 
-:::caution[OAuth Configuration]
-Make sure your `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are valid and that your GCP OAuth application has the correct:
+<Aside type="caution">
+  For production deployments, replace `localhost:3000` with your actual domain (e.g., `https://yourdomain.com` and `https://yourdomain.com/callback`).
+</Aside>
 
-- **Authorized JavaScript origins**: `http://localhost:3000` (for local dev)
-- **Authorized redirect URIs**: `http://localhost:3000/callback` (for local dev)
+---
 
-For production deployments, replace `localhost:3000` with your actual domain.
-:::
+## Installation
 
-#### Docker Setup
+Choose your preferred setup method:
+
+<Tabs>
+  <TabItem label="Local Development">
+    ### Local Development Setup
+    
+    Run Checkmate locally with hot reload for development.
+    
+    <Steps>
+    
+    1. **Clone the repository**
+       ```bash
+       git clone git@github.com:dream-sports-labs/checkmate.git
+       cd checkmate
+       ```
+    
+    2. **Install dependencies**
+       ```bash
+       yarn install
+       ```
+    
+    3. **Configure environment variables**
+       
+       Copy `.env.example` to `.env`:
+       ```bash
+       cp .env.example .env
+       ```
+       
+       Update the following required values:
+       ```env
+       # Database
+       DATABASE_URL=mysql://root:password@localhost:3306/checkmate
+       
+       # Google OAuth (from previous step)
+       GOOGLE_CLIENT_ID=your_google_client_id_here
+       GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+       
+       # Session Secret (generate a random string)
+       SESSION_SECRET=your_random_session_secret_here
+       ```
+    
+    4. **Start the database**
+       ```bash
+       yarn docker:db:setup
+       ```
+       
+       This creates a MySQL container and seeds initial data.
+    
+    5. **Start the application**
+       ```bash
+       yarn dev
+       ```
+       
+       The app will be available at **http://localhost:3000**
+    
+    </Steps>
+    
+    <Aside type="tip">
+      The dev server supports hot reload — changes to your code will automatically refresh the app.
+    </Aside>
+  </TabItem>
+  
+  <TabItem label="Docker (Full Stack)">
+    ### Docker Full Stack Setup
+    
+    Run both the application and database in Docker containers (production mode).
+    
+    <Steps>
+    
+    1. **Clone the repository**
+       ```bash
+       git clone git@github.com:dream-sports-labs/checkmate.git
+       cd checkmate
+       ```
+    
+    2. **Install dependencies**
+       ```bash
+       yarn install
+       ```
+    
+    3. **Configure environment variables**
+       
+       Copy `.env.example` to `.env`:
+       ```bash
+       cp .env.example .env
+       ```
+       
+       Update the following required values:
+       ```env
+       # Database
+       DATABASE_URL=mysql://root:password@checkmate-db:3306/checkmate
+       
+       # Google OAuth
+       GOOGLE_CLIENT_ID=your_google_client_id_here
+       GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+       
+       # Session Secret
+       SESSION_SECRET=your_random_session_secret_here
+       ```
+       
+       <Aside type="note">
+         Note the hostname `checkmate-db` instead of `localhost` — this is the Docker service name.
+       </Aside>
+    
+    4. **Start all services**
+       ```bash
+       yarn docker:setup
+       ```
+       
+       This command:
+       - Creates MySQL container
+       - Seeds the database
+       - Builds and starts the application container
+       
+       The app will be available at **http://localhost:3000**
+    
+    </Steps>
+    
+    <Aside type="caution">
+      Docker setup runs in **production mode** (no hot reload). Use local development setup for active development.
+    </Aside>
+  </TabItem>
+</Tabs>
+
+---
+
+## Verify Installation
+
+After starting Checkmate, verify everything is working:
 
 <Steps>
-1. Clone the repository:
-   ```sh frame="none"
-   git clone git@github.com:ds-horizon/checkmate.git
-   ```
-1. Create an environment file:
-   - Ensure you have a .env file in place, based on .env.example.
-   - **Required Google OAuth Configuration**:
-     ```env
-     GOOGLE_CLIENT_ID=your_google_client_id_here
-     GOOGLE_CLIENT_SECRET=your_google_client_secret_here
-     ```
-2. Install dependencies
-   ```sh frame="none"
-   yarn install
-   ```
-3. Set up the application and database:
-   ```sh frame="none"
-   yarn docker:setup
-   ```
-   - Create both the application and database containers using Docker.
-   - Seed the database with initial data.
-4. App will be started on http://localhost:3000
+1. **Open the application**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+2. **Sign in with Google**
+   
+   Click "Sign in with Google" and authenticate with your Google account.
+
+3. **Check the dashboard**
+   
+   You should see the Projects page with seed data (sample projects, tests, and runs).
 
 </Steps>
 
-:::note
-Application running in docker is in **production** mode
-:::
+<Aside type="tip">
+  **First-time users** are created automatically with the `user` role. To make yourself an admin, update the `users` table in the database.
+</Aside>
 
-#### Developer Scripts
+---
 
-1. Set up the application in Docker with an existing database:
-   ```sh frame="none"
-   yarn docker:app:setup
-   ```
-   - Use this script to replicate production-like behavior in Docker while reusing an existing database container.
-   - If a database container does not already exist, this script will create one and seed data from `seedData.sql` file.
-2. Apply schema changes to the database:
-   ```sh frame="none"
-   yarn dev:db:setup
-   ```
-   - Create a database container in Docker (if one doesn’t exist).
-   - Generate the updated schema in the drizzle folder.
-   - Apply the schema to the database.
-   - Seed data from the `app/db/seed` folder.
-3. Manage the Checkmate database:
-   - Create the database and seed data from `seedData.sql` file::
-     ```sh frame="none"
-     yarn docker:db:setup
-     ```
-   - Insert seed data from seed folder:
-     ```sh frame="none"
-     yarn db:init
-     ```
-4. Monitor the database with [Drizzle Studio](https://orm.drizzle.team/docs/overview):
-   - Use the Drizzle Studio tool to explore and manage the database.
-   ```sh frame="none"
-   yarn db:studio
-   ```
-5. Generate SQL from the Drizzle schema:
-   - To export the database schema as an SQL file:
-   ```sh frame="none"
+## Database Management
+
+### Database Scripts
+
+| Command | Purpose |
+|---------|---------|
+| `yarn docker:db:setup` | Create MySQL container and seed from `seedData.sql` |
+| `yarn dev:db:setup` | Apply schema changes and seed from `app/db/seed/` |
+| `yarn db:init` | Insert seed data from `app/db/seed/` folder |
+| `yarn db:studio` | Open Drizzle Studio to explore the database |
+| `yarn db:generate` | Generate SQL files from Drizzle schema |
+
+### Drizzle Studio
+
+Explore and manage your database with a visual interface:
+
+```bash
+yarn db:studio
+```
+
+Opens at [http://localhost:4983](http://localhost:4983)
+
+**Features:**
+- Browse all tables and data
+- Edit records directly
+- Execute custom queries
+- View table relationships
+
+### Schema Migrations
+
+When modifying the database schema:
+
+<Steps>
+
+1. **Update schema files**
+   
+   Edit files in `app/db/schema/`
+
+2. **Generate migration**
+   ```bash
    yarn db:generate
    ```
-   - The generated SQL file will be saved in the drizzle folder at the project root.
+
+3. **Apply migration**
+   ```bash
+   yarn dev:db:setup
+   ```
+
+</Steps>
+
+---
+
+## Troubleshooting
+
+### Cannot connect to database
+
+**Problem:** Application can't connect to MySQL.
+
+**Solution:**
+- Verify Docker is running
+- Check container status: `docker ps`
+- Restart database: `yarn docker:db:setup`
+- Verify `DATABASE_URL` in `.env` matches your setup
+
+### Google OAuth errors
+
+**Problem:** OAuth login fails or redirects incorrectly.
+
+**Solution:**
+- Verify `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are correct
+- Check authorized origins and redirect URIs in GCP
+- Ensure you're using `http://localhost:3000` (not `https`)
+- Clear browser cookies and try again
+
+### Port 3000 already in use
+
+**Problem:** Cannot start application — port is taken.
+
+**Solution:**
+```bash
+# Find process using port 3000
+lsof -ti:3000
+
+# Kill the process
+kill -9 $(lsof -ti:3000)
+
+# Or change the port in vite.config.ts
+```
+
+### Database seed fails
+
+**Problem:** Seed data not loading correctly.
+
+**Solution:**
+- Drop and recreate database: `yarn docker:db:setup`
+- Check `seedData.sql` file exists
+- Verify MySQL container is healthy: `docker logs checkmate-db`
+
+### Permission denied errors
+
+**Problem:** Cannot access database or files.
+
+**Solution:**
+- Check Docker has necessary permissions
+- On Linux, run: `sudo usermod -aG docker $USER` (then log out and back in)
+- Verify file permissions: `ls -la`
+
+---
+
+## Environment Variables Reference
+
+### Required Variables
+
+```env
+# Database Connection
+DATABASE_URL=mysql://root:password@localhost:3306/checkmate
+
+# Google OAuth Credentials
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+
+# Session Management
+SESSION_SECRET=random_secret_string_min_32_chars
+```
+
+### Optional Variables
+
+```env
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# Logging
+LOG_LEVEL=info
+```
+
+<Aside type="tip">
+  **Generate secure secrets:** Use `openssl rand -base64 32` to generate a strong `SESSION_SECRET`.
+</Aside>
+
+---
+
+## Next Steps
+
+<CardGrid>
+  <Card title="User Guide" icon="rocket">
+    Learn how to use Checkmate
+    
+    [Get Started →](/guides/projects)
+  </Card>
+  
+  <Card title="System Architecture" icon="puzzle">
+    Understand how Checkmate works
+    
+    [Read Docs →](/tech/architecture)
+  </Card>
+  
+  <Card title="API Documentation" icon="open-book">
+    Integrate with Checkmate APIs
+    
+    [View APIs →](/guides/api)
+  </Card>
+  
+  <Card title="Contributing" icon="github">
+    Contribute to the project
+    
+    [View Guidelines →](https://github.com/dream-sports-labs/checkmate/blob/master/CONTRIBUTING.md)
+  </Card>
+</CardGrid>
+
+---
+
+## Additional Resources
+
+- **GitHub Repository:** [dream-sports-labs/checkmate](https://github.com/dream-sports-labs/checkmate)
+- **Discord Community:** [Join Discord](https://discord.gg/wBQXeYAKNc)
+- **Report Issues:** [GitHub Issues](https://github.com/dream-sports-labs/checkmate/issues)
+- **Docker Documentation:** [docker.com/docs](https://docs.docker.com/)
+- **Google OAuth Guide:** [Google Identity Platform](https://developers.google.com/identity/protocols/oauth2)

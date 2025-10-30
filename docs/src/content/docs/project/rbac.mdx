@@ -1,100 +1,133 @@
 ---
-title: Role Based Access Controller
+title: Roles & Permissions
+description: Understand role-based access control and permissions in Checkmate
 ---
 
-import { Badge } from "@astrojs/starlight/components";
+import { Aside } from "@astrojs/starlight/components";
 
-This document outlines the RBAC policies grouped by access levels. Each section includes a description of the resources, along with the APIs available for that resource.
+Checkmate uses Role-Based Access Control (RBAC) to manage permissions. Each user is assigned a role that determines what they can view and modify.
 
-#### Access Hierarchy
+## Role Hierarchy
 
-- **Admin**:
-  - Admin has full access, including all permissions granted to **User** and **Reader** roles.
-  - In addition to User and Reader privileges, Admins can perform high-level management tasks such as creating, editing, and deleting projects, runs, update user roles etc.
-- **User**:
-  - User has access to all permissions available to the **Reader** role.
-  - Additionally, Users can manage resources like test cases, runs, and labels.
-- **Reader**:
-  - Reader has view-only access to resources.
-  - Can retrieve data such as test details, reports, and project information but cannot modify or delete any resources.
+Roles are hierarchical - higher roles inherit all permissions from lower roles.
 
-#### Admin Accesses
+### Reader (View-Only)
 
-The following APIs are accessible to users with the `ADMIN` role:
+**Capabilities:**
+- View projects, tests, and runs
+- Download reports and test data
+- View user details
+- Generate personal API tokens
+- Access all read-only APIs
 
-<div class="text-xs">
+**Cannot:**
+- Create or modify any resources
+- Delete anything
+- Change user roles
 
-| **Resource**      | **Endpoint**                   | **Action** | **Description**                                   |
-| ----------------- | ------------------------------ | ---------- | ------------------------------------------------- |
-| AddProjects       | _api/v1/project/create_        | POST       | Used to add new projects.                         |
-| EditProject       | _api/v1/project/edit_          | PUT        | Edits the details of an existing project.         |
-| EditProjectStatus | _api/v1/project/update-status_ | PUT        | Updates the status [Delete/Archive] of a project. |
-| RunLock           | _api/v1/run/lock_              | PUT        | Locks a specific run to prevent future changes.   |
-| RunReset          | _api/v1/run/reset_             | PUT        | Mark the passed tests to reset.                   |
-| UpdateUserRole    | _api/v1/user/update-role_      | PUT        | Updates the role of a user in the system.         |
-| RunRemoveTest     | _api/v1/run/remove-tests_      | PUT        | Removes a test from a specific run.               |
-| GetAllUser        | _api/v1/all-users_             | GET        | Retrieves a list of all users in the system.      |
-| DeleteRun         | _api/v1/run/delete_            | DELETE     | Deletes a specific run.                           |
+**Use Case:** External stakeholders, observers, or team members who need visibility without editing rights.
 
-</div>
+### User (Standard)
 
-#### User Accesses
+**Capabilities:**
+- All Reader permissions, plus:
+- Create and edit tests
+- Create and edit test runs
+- Update test statuses
+- Add labels, squads, and sections
+- Bulk operations (import, export, update)
+- Delete tests
 
-The following APIs are accessible to users with the `USER` role:
+**Cannot:**
+- Manage projects (create, edit, delete)
+- Delete or reset runs
+- Manage user roles
+- Lock/unlock runs
 
-<div class="text-xs">
+**Use Case:** QA engineers, testers, developers who actively work with tests and runs.
 
-| **Resource**        | **Endpoint**                    | **Methods** | **Description**                        |
-| ------------------- | ------------------------------- | ----------- | -------------------------------------- |
-| RunUpdateTestStatus | _api/v1/run/update-test-status_ | PUT         | Updates the status of a test in a run. |
-| EditTest            | _api/v1/test/update_            | PUT         | Edits the details of a specific test.  |
-| EditRun             | _api/v1/run/edit_               | PUT         | Edits the details of a specific run.   |
-| EditTestsInBulk     | _api/v1/test/bulk-update_       | PUT         | Edits multiple tests in bulk.          |
-| AddLabels           | _api/v1/project/add-labels_     | POST        | Adds new labels to the project.        |
-| AddSquads           | _api/v1/project/add-squads_     | POST        | Adds new squads to the project.        |
-| AddTestBulk         | _api/v1/test/bulk-add_          | POST        | Bulk adds multiple tests.              |
-| AddRun              | _api/v1/run/create_             | POST        | Creates a new test run.                |
-| AddTest             | _api/v1/test/create_            | POST        | Adds a single test to the project.     |
-| AddSection          | _api/v1/project/add-section_    | POST        | Adds a new section within a project.   |
-| DeleteTest          | _api/v1/test/delete_            | DELETE      | Deletes a single test.                 |
-| DeleteBulkTests     | _api/v1/test/bulk-delete_       | DELETE      | Deletes multiple tests in bulk.        |
+### Admin (Full Access)
 
-</div>
+**Capabilities:**
+- All User permissions, plus:
+- Create, edit, and archive projects
+- Delete and reset runs
+- Lock and unlock runs
+- Remove tests from runs
+- Manage user roles
+- Access admin panel
+- View all users
 
-#### Reader Accesses
+**Use Case:** Team leads, project managers, administrators who need full control over projects and users.
 
-The following APIs are accessible to users with the `READER` role:
+## Permission Comparison
 
-<div class="text-xs">
+<Aside type="tip">
+  Need a role change? Contact your organization administrator through the Admin Panel.
+</Aside>
 
-| **Resource**              | **Endpoint**                      | **Methods** | **Description**                                       |
-| ------------------------- | --------------------------------- | ----------- | ----------------------------------------------------- |
-| DownloadReport            | _api/v1/run/report-download_      | GET         | Downloads a report of a run.                          |
-| DownloadTests             | _api/v1/tests/download_           | GET         | Downloads a list of tests of a project.               |
-| GetAutomationStatus       | _api/v1/automation-status_        | GET         | Retrieves the list of autmation types.                |
-| GetLabels                 | _api/v1/labels_                   | GET         | Retrieves the list of labels.                         |
-| GetPlatforms              | _api/v1/platform_                 | GET         | Retrieves phe list of platfrom types.                 |
-| GetPriority               | _api/v1/priority_                 | GET         | Retrieves the list of priority types.                 |
-| GetSquads                 | _api/v1/project/squads_           | GET         | Retrieves the list of squads in project.              |
-| GetTestCoveredBy          | _api/v1/test-covered-by_          | GET         | Retrieves the list of test covered by types.          |
-| GetTestDetails            | _api/v1/test/details_             | GET         | Retrieves details for a specific test.                |
-| GetRunTestStatus          | _api/v1/run/test-status_          | GET         | Retrieves the status of a test in a run.              |
-| GetTestStatusHistory      | _api/v1/test/test-status-history_ | GET         | Retrieves the history of a test's status across runs. |
-| GetTestStatusHistoryInRun | _api/v1/run/test-status-history_  | GET         | Retrieves the history of a test in a run.             |
-| GetType                   | _api/v1/type_                     | GET         | Retrieves the list of types list.                     |
-| GetOrgsList               | _api/v1/orgs_                     | GET         | Retrieves the list of organizations.                  |
-| GetOrgDetails             | _api/v1/org/detail_               | GET         | Retrieves details of a specific organization.         |
-| GetProjectDetail          | _api/v1/project/detail_           | GET         | Retrieves details of a specific project.              |
-| GetProjects               | _api/v1/projects_                 | GET         | Retrieves the list of projects.                       |
-| GetRunStateDetail         | _api/v1/run/state-detail_         | GET         | Retrieves details of a specific run state.            |
-| GetRuns                   | _api/v1/runs_                     | GET         | Retrieves a list of runs.                             |
-| GetRunTestsList           | _api/v1/run/tests_                | GET         | Retrieves the list of tests in a run.                 |
-| GetSections               | _api/v1/project/sections_         | GET         | Retrieves the list of sections in a project.          |
-| GetTests                  | _api/v1/project/tests_            | GET         | Retrieves a list of tests.                            |
-| GetTestsCount             | _api/v1/project/tests-count_      | GET         | Retrieves the count of tests.                         |
-| GetUserDetails            | _api/v1/user/details_             | GET         | Retrieves details of a self.                          |
-| RunDetail                 | _api/v1/run/detail_               | GET         | Retrieves details of a specific run.                  |
-| AddToken                  | _api/v1/token/generate_           | POST        | Adds a self token to the system.                      |
-| DeleteToken               | _api/v1/token/delete_             | DELETE      | Deletes a self token from the system.                 |
+| **Action** | **Reader** | **User** | **Admin** |
+|------------|:----------:|:--------:|:---------:|
+| View projects, tests, runs | ✅ | ✅ | ✅ |
+| Download reports | ✅ | ✅ | ✅ |
+| Generate API tokens | ✅ | ✅ | ✅ |
+| Create/edit tests | ❌ | ✅ | ✅ |
+| Create/edit runs | ❌ | ✅ | ✅ |
+| Update test statuses | ❌ | ✅ | ✅ |
+| Delete tests | ❌ | ✅ | ✅ |
+| Bulk operations | ❌ | ✅ | ✅ |
+| Create/edit/archive projects | ❌ | ❌ | ✅ |
+| Lock/unlock runs | ❌ | ❌ | ✅ |
+| Reset runs | ❌ | ❌ | ✅ |
+| Delete runs | ❌ | ❌ | ✅ |
+| Manage user roles | ❌ | ❌ | ✅ |
+| Access admin panel | ❌ | ❌ | ✅ |
 
-</div>
+## API Permissions
+
+Each role has access to specific API endpoints. See the [API Documentation](/guides/api) for detailed endpoint information.
+
+### Admin-Only APIs
+
+Admin users have exclusive access to these management endpoints:
+
+- **Project Management:** Create, edit, archive projects
+- **Run Management:** Delete runs, reset all test statuses, remove tests from runs, lock/unlock runs
+- **User Management:** Update user roles, view all users
+
+### User APIs
+
+User role can access these operational endpoints:
+
+- **Test Management:** Create, edit, delete tests (single and bulk)
+- **Run Management:** Create and edit runs
+- **Test Execution:** Update test statuses in runs
+- **Organization:** Add labels, squads, sections
+
+### Reader APIs
+
+Reader role has access to all read-only endpoints:
+
+- **Data Retrieval:** Get projects, tests, runs, users, organizations
+- **Reports:** Download test data and run reports
+- **Metadata:** Get labels, squads, sections, priorities, platforms
+- **Personal:** Generate/delete own API tokens
+
+## Best Practices
+
+- **Principle of Least Privilege:** Assign users the minimum role needed for their responsibilities
+- **Regular Reviews:** Periodically review user roles and permissions
+- **Admin Limitation:** Limit Admin role to trusted team leads and managers
+- **Token Security:** Treat API tokens as passwords - never share or commit them
+
+<Aside type="caution">
+  Admin users have full access to all projects and data. Only assign this role to trusted team members.
+</Aside>
+
+---
+
+## Next Steps
+
+- [User Settings](/guides/user-settings) - Manage your profile and tokens
+- [API Authentication](/guides/api/authentication) - Learn how to use your tokens
+- [API Reference](/guides/api/openapi) - Explore all available endpoints

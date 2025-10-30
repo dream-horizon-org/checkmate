@@ -100,7 +100,7 @@ export const AddResultDialog = ({
             width: 108,
             color: getStatusTextColor(currStatus as TestStatusType),
           }}
-          className="h-3 px-2 py-3">
+          className="px-2 py-3 h-3">
           {currStatus}
           <ChevronDown size={16} strokeWidth={2} className="ml-2" />
         </Button>
@@ -111,10 +111,11 @@ export const AddResultDialog = ({
       <Button
         disabled={!isAddResultEnabled}
         variant={isAddResultEnabled ? 'default' : 'outline'}
+        size="default"
         className={cn(
-          `${
-            shouldAnimate ? 'animate-bounce' : ''
-          } transition-all duration-300`,
+          'shadow-sm',
+          shouldAnimate ? 'animate-bounce' : '',
+          'transition-all duration-300',
         )}>
         Add Result
       </Button>
@@ -130,42 +131,64 @@ export const AddResultDialog = ({
       anchorComponent={
         <div className={containerClassName}>{triggerComponent(variant)}</div>
       }
-      headerComponent={<DialogTitle>Add Result</DialogTitle>}
+      headerComponent={
+        <DialogTitle className="text-lg font-semibold text-slate-900">
+          Add Test Result
+        </DialogTitle>
+      }
       contentComponent={
-        <div className="flex flex-col gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <label htmlFor="name" className="text-right text-sm">
-              Status :
+        <div className="pt-2 space-y-5">
+          <div className="space-y-2.5">
+            <label htmlFor="status" className="text-sm font-semibold text-slate-700">
+              Status <span className="text-red-600">*</span>
             </label>
+            
             <ComboboxDemo
               value={status}
               onChange={(value) => setStatus(value)}
               options={TEST_STATUS_OPTIONS}
             />
+            
+            {status === '' && (
+              <p className="pt-1 text-xs text-slate-500">Please select a test status</p>
+            )}
           </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="comment" className="text-left text-sm">
-              Comment :
+          <div className="space-y-2.5">
+            <label htmlFor="comment" className="text-sm font-semibold text-slate-700">
+              Comment
             </label>
             <Textarea
-              placeholder={'Your comment here'}
+              id="comment"
+              placeholder="Add optional notes about this test result..."
               onChange={(e) => setComment(e.target.value)}
+              className="min-h-[100px] resize-none"
             />
+            <p className="pt-1 text-xs text-slate-500">Optional: Add any relevant notes or observations</p>
           </div>
         </div>
       }
       footerComponent={
-        <updateStatusFetcher.Form method={'POST'}>
-          <DialogClose disabled={status === ''}>
-            <Button
-              type="button"
-              variant="default"
-              onClick={onAddResultSubmited}
-              className="w-full bg-blue-600"
-              disabled={updateStatusFetcher.state !== 'idle' || status === ''}>
-              {'Add Result'}
-            </Button>
-          </DialogClose>
+        <updateStatusFetcher.Form method="POST" className="w-full">
+          <div className="flex gap-3 pt-2">
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1">
+                Cancel
+              </Button>
+            </DialogClose>
+            <DialogClose disabled={status === ''} asChild>
+              <Button
+                type="button"
+                variant="default"
+                onClick={onAddResultSubmited}
+                className="flex-1 bg-slate-900 hover:bg-slate-800"
+                disabled={updateStatusFetcher.state !== 'idle' || status === ''}>
+                Submit Result
+              </Button>
+            </DialogClose>
+          </div>
         </updateStatusFetcher.Form>
       }
     />

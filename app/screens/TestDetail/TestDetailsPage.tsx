@@ -94,120 +94,136 @@ export default function TestDetailsPage({
     )
   }
 
-  const infoTextStyle = {
-    fontSize: 14,
-    color: 'rgb(31 41 55)',
-    paddingTop: 2,
-  }
-
   return (
-    <div className={cn('flex', 'flex-col', 'h-full', '')}>
-      <InputsSpacing />
-      <div className="flex flex-row flex-wrap gap-4 bg-gray-50 p-4 rounded-lg shadow-md">
-        <div className="flex flex-row gap-16">
-          <div className="w-full items-center">
-            <InputLabels labelName={'Id'} />
-            <div style={infoTextStyle}>{data?.testId}</div>
-          </div>
-        </div>
-        <div className="w-full items-center">
-          <InputLabels labelName={'Title'} />
-          <div style={infoTextStyle}>{data?.title}</div>
-        </div>
-        {data?.description && (
-          <div className="w-full items-center">
-            <InputLabels labelName={'Description'} />
-            <div style={infoTextStyle}>{data?.description}</div>
-          </div>
-        )}
-        <div className="w-full items-center">
-          <InputLabels labelName={'Section'} />
-          <div style={infoTextStyle}>
-            {getSectionHierarchy({
-              sectionId: data?.sectionId,
-              sectionsData,
-            })}
-          </div>
-        </div>
-        <div className="flex flex-row gap-12">
-          {data?.createdBy && (
-            <div className="w-full items-center text-nowrap">
-              <InputLabels labelName={'Created By'} />
-              <Tooltip
-                anchor={<div style={infoTextStyle}>{data?.createdBy}</div>}
-                content={shortDate2(data?.createdOn)}
-              />
+    <div className="flex flex-col h-full pt-6">
+      {/* Header Section */}
+      <div className="pb-6 mb-6 border-b border-slate-200">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold text-slate-900">{data?.title}</h1>
+              <span className="px-3 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-md">
+                ID: {data?.testId}
+              </span>
             </div>
-          )}
-          {data?.updatedBy && (
-            <div className="w-full items-center text-nowrap">
-              <InputLabels labelName={'Updated By'} />
-              <Tooltip
-                anchor={<div style={infoTextStyle}>{data?.updatedBy}</div>}
-                content={shortDate2(data?.updatedOn)}
+            {data?.description && (
+              <p className="text-sm text-slate-600 leading-relaxed max-w-4xl">
+                {data?.description}
+              </p>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-3">
+            {pageType === 'runTestDetail' ? (
+              testStatus?.data?.[0].runStatus === 'Active' ? (
+                <AddResultDialog
+                  getSelectedRows={() => {
+                    return [{testId: testId}]
+                  }}
+                  runId={runId}
+                  variant="detailPageUpdate"
+                  currStatus={testStatus?.data?.[0]?.status}
+                />
+              ) : null
+            ) : (
+              <Button size="default" onClick={editTestClicked}>Edit Test</Button>
+            )}
+            {testStatusHistory && (
+              <TestStatusHistroyDialog
+                data={testStatusHistory}
+                pageType={pageType}
               />
-            </div>
-          )}
+            )}
+            <Button
+              size="default"
+              variant="outline"
+              onClick={handleGoBack}>
+              Go Back
+            </Button>
+          </div>
         </div>
       </div>
-      <InputsSpacing />
-      <div className="flex flex-wrap gap-4 bg-gray-50 p-4 rounded-lg shadow-md">
-        <OptionContent data={data?.squad} heading="Squad" />
-        <OptionContent
-          data={data?.labelNames?.split(',')?.join(', ')}
-          heading="Labels"
-        />
-        <OptionContent data={data?.priority} heading="Priority" />
-        <OptionContent
-          data={data?.automationStatus}
-          heading="Automation Status"
-        />
-        <OptionContent data={data?.type} heading="Type" />
-        <OptionContent data={data?.platform} heading="Plaform" />
-        <OptionContent data={data?.testCoveredBy} heading="Test Covered By" />
-        <LinkContent heading="Jira Ticket" data={data?.jiraTicket} />
-        <OptionContent data={data?.defects} heading="Defects" />
-        <OptionContent data={data?.automationId} heading="Automation Id" />
-      </div>
-      <InputsSpacing />
-      <div className="flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-md max-h-fit">
-        <TextContent data={data?.preConditions} heading={'Preconditions'} />
-        <TextContent data={data?.steps} heading={'Steps'} />
-        <TextContent data={data?.expectedResult} heading={'Expected Result'} />
-        <TextContent
-          data={data?.additionalGroups}
-          heading={'Additional Groups'}
-        />
-      </div>
-      <div className="py-8 flex items-center justify-start gap-4 text-sm w-full max-h-28">
-        {pageType === 'runTestDetail' ? (
-          testStatus?.data?.[0].runStatus === 'Active' ? (
-            <AddResultDialog
-              getSelectedRows={() => {
-                return [{testId: testId}]
-              }}
-              runId={runId}
-              variant="detailPageUpdate"
-              currStatus={testStatus?.data?.[0]?.status}
+
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto space-y-6 pr-2">
+        {/* Basic Info Card */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Basic Information</h2>
+          <div className="grid grid-cols-4 gap-6">
+            <div>
+              <InputLabels labelName="Section" />
+              <p className="text-sm text-slate-700 mt-1.5">
+                {getSectionHierarchy({
+                  sectionId: data?.sectionId,
+                  sectionsData,
+                })}
+              </p>
+            </div>
+            {data?.createdBy && (
+              <div>
+                <InputLabels labelName="Created By" />
+                <Tooltip
+                  anchor={
+                    <p className="text-sm text-slate-700 mt-1.5 cursor-help">
+                      {data?.createdBy}
+                    </p>
+                  }
+                  content={shortDate2(data?.createdOn)}
+                />
+              </div>
+            )}
+            {data?.updatedBy && (
+              <div>
+                <InputLabels labelName="Updated By" />
+                <Tooltip
+                  anchor={
+                    <p className="text-sm text-slate-700 mt-1.5 cursor-help">
+                      {data?.updatedBy}
+                    </p>
+                  }
+                  content={shortDate2(data?.updatedOn)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Properties Card */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Test Properties</h2>
+          <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+            <OptionContent data={data?.squad} heading="Squad" />
+            <OptionContent
+              data={data?.labelNames?.split(',')?.join(', ')}
+              heading="Labels"
             />
-          ) : null
-        ) : (
-          <Button onClick={editTestClicked}>Edit Test</Button>
-        )}
-        {testStatusHistory && (
-          <TestStatusHistroyDialog
-            data={testStatusHistory}
-            pageType={pageType}
-          />
-        )}
-        <Button
-          asChild
-          className="border-2"
-          variant={'outline'}
-          onClick={handleGoBack}
-          style={{cursor: 'pointer'}}>
-          <span>Cancel</span>
-        </Button>
+            <OptionContent data={data?.priority} heading="Priority" />
+            <OptionContent
+              data={data?.automationStatus}
+              heading="Automation Status"
+            />
+            <OptionContent data={data?.type} heading="Type" />
+            <OptionContent data={data?.platform} heading="Platform" />
+            <OptionContent data={data?.testCoveredBy} heading="Test Covered By" />
+            <LinkContent heading="Jira Ticket" data={data?.jiraTicket} />
+            <OptionContent data={data?.defects} heading="Defects" />
+            <OptionContent data={data?.automationId} heading="Automation ID" />
+          </div>
+        </div>
+
+        {/* Test Details Card */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Test Details</h2>
+          <div className="space-y-5">
+            <TextContent data={data?.preConditions} heading="Preconditions" />
+            <TextContent data={data?.steps} heading="Steps" />
+            <TextContent data={data?.expectedResult} heading="Expected Result" />
+            <TextContent
+              data={data?.additionalGroups}
+              heading="Additional Groups"
+            />
+          </div>
+        </div>
       </div>
     </div>
   )

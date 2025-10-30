@@ -66,18 +66,20 @@ export default function RunList({}: IRunList) {
   }
 
   return (
-    <DataTable
-      key={'runtestlist'}
-      table={table}
-      onPageChange={onPageChange}
-      onPageSizeChange={onPageSizeChange}
-      onRowClick={(row, event) => {
-        navigate(
-          `/project/${row.original.projectId}/run/${row.original.runId}?pageSize=100&page=1&sortOrder=asc`,
-          {},
-          event,
-        )
-      }}
-    />
+    <div className="h-full">
+      <DataTable
+        key={'runtestlist'}
+        table={table}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        onRowClick={(row, event) => {
+          navigate(
+            `/project/${row.original.projectId}/run/${row.original.runId}?pageSize=100&page=1&sortOrder=asc`,
+            {},
+            event,
+          )
+        }}
+      />
+    </div>
   )
 }

@@ -21,8 +21,8 @@ export const ToggleColumns = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className={cn(containerClassName)}>
-          <SlidersHorizontal size={16} className="mr-1" />
+        <Button variant="outline" className={cn('shadow-sm', containerClassName)}>
+          <SlidersHorizontal size={16} className="mr-2" />
           Columns
         </Button>
       </DropdownMenuTrigger>

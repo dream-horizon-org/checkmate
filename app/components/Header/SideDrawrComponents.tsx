@@ -1,48 +1,61 @@
 import {useCustomNavigate} from '@hooks/useCustomNavigate'
-import {SMALL_PAGE_SIZE} from '@route/utils/constants'
 import {Button} from '@ui/button'
+import {cn} from '~/ui/utils'
+import {LucideIcon} from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/ui/tooltip'
+import {useLocation} from '@remix-run/react'
 
-export const FooterComponent = ({
-  setSideDrawerOpen,
-  href,
-  text,
-}: {
-  setSideDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>
-  href: string
-  text: string
-}) => {
-  return (
-    <a
-      onClick={() => setSideDrawerOpen(false)}
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-500 hover:text-pale-blue font-semibold hover:underline">
-      {text}
-    </a>
-  )
+interface NavItemProps {
+  icon: LucideIcon
+  label: string
+  to: string
+  isCollapsed: boolean
 }
 
-export const ContentComponent = ({
-  setSideDrawerOpen,
-  navigateTo,
-  text,
-}: {
-  setSideDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>
-  navigateTo: string
-  text: string
-}) => {
+export const NavItem = ({icon: Icon, label, to, isCollapsed}: NavItemProps) => {
   const navigate = useCustomNavigate()
-  return (
+  const location = useLocation()
+  
+  // Check if current route matches this nav item
+  const isActive = location.pathname.includes(to.split('?')[0])
+
+  const button = (
     <Button
-      onClick={(e) => {
-        setSideDrawerOpen(false)
-        navigate(navigateTo, {}, e)
-      }}
-      size={'lg'}
-      className="font-semibold p-0 "
-      variant={'link'}>
-      <text>{text}</text>
+      onClick={(e) => navigate(to, {}, e)}
+      variant="ghost"
+      size="sm"
+      className={cn(
+        'w-full transition-all font-medium',
+        isCollapsed
+          ? 'justify-center px-0'
+          : 'justify-start gap-3',
+        isActive
+          ? 'bg-slate-900 text-white hover:bg-slate-800'
+          : 'hover:bg-slate-100 text-slate-700',
+      )}>
+      <Icon className="h-5 w-5 shrink-0" />
+      {!isCollapsed && <span>{label}</span>}
     </Button>
   )
+
+  if (isCollapsed) {
+    return (
+      <TooltipProvider delayDuration={0}>
+        <Tooltip>
+          <TooltipTrigger asChild>{button}</TooltipTrigger>
+          <TooltipContent side="right" className="ml-2">
+            <p>{label}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    )
+  }
+
+  return button
 }
+
