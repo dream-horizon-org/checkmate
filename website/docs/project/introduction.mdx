@@ -1,0 +1,168 @@
+---
+title: Introduction
+description: A modern test case management system for teams
+---
+
+import { Card, CardGrid } from '@site/src/components/Card';
+
+## What is Checkmate?
+
+Checkmate is a **self-hosted test case management system** built for teams that need a reliable, scalable solution to organize, execute, and track software testing.
+
+Built with modern web technologies (Remix, TypeScript, MySQL), Checkmate provides an intuitive interface for managing test cases while offering powerful APIs for automation and CI/CD integration.
+
+---
+
+## Key Features
+
+<CardGrid>
+  <Card title="📦 Project Management" icon="seti:folder">
+    Organize tests into projects with role-based access control
+  </Card>
+  
+  <Card title="✅ Test Case Management" icon="approve-check">
+    Create, edit, and organize tests with flexible attributes and hierarchical sections
+  </Card>
+  
+  <Card title="🔄 Test Runs" icon="rocket">
+    Execute test runs, track progress in real-time, and generate comprehensive reports
+  </Card>
+  
+  <Card title="🏷️ Flexible Organization" icon="setting">
+    Use sections, labels, and squads to classify and filter tests your way
+  </Card>
+  
+  <Card title="🔌 API Integration" icon="puzzle">
+    RESTful APIs with OpenAPI 3.0 spec for automation and third-party tools
+  </Card>
+  
+  <Card title="🔐 Security & Access Control" icon="shield">
+    Google OAuth authentication with role-based permissions (Admin, User, Reader)
+  </Card>
+</CardGrid>
+
+---
+
+## Core Capabilities
+
+### Projects
+Organize your testing efforts by application, feature, or service. Each project maintains its own test cases, runs, and metadata.
+
+### Test Cases
+Comprehensive test documentation with:
+- **Classification** - Priority, platform, automation status, test type
+- **Organization** - Hierarchical sections, team squads, flexible labels
+- **Details** - Preconditions, steps, expected results, Jira links, defects
+- **Bulk Operations** - Import/export tests via CSV
+
+### Test Runs
+Execution tracking and reporting:
+- Create runs from filtered test sets
+- Update test statuses (Passed, Failed, Blocked, Retest, Skipped)
+- Real-time progress monitoring
+- Lock completed runs to preserve results
+- Download CSV reports
+
+### APIs
+Programmatic access for automation:
+- RESTful API design
+- Session cookie or token authentication
+- Complete OpenAPI 3.0 specification
+- Client library generation support
+
+---
+
+## Who Should Use Checkmate?
+
+<CardGrid stagger>
+  <Card title="QA Teams" icon="star">
+    Centralize test case documentation and execution tracking for manual and automated testing workflows.
+  </Card>
+  
+  <Card title="Development Teams" icon="rocket">
+    Integrate test management with CI/CD pipelines using APIs for automated test execution and reporting.
+  </Card>
+  
+  <Card title="Product Teams" icon="approve-check">
+    Track testing coverage, progress, and quality metrics across projects and releases.
+  </Card>
+</CardGrid>
+
+---
+
+## Why Checkmate?
+
+**Self-Hosted & Open Source**  
+Deploy on your infrastructure with full control over your data.
+
+**Modern Tech Stack**  
+Built with Remix, TypeScript, MySQL, and Docker for reliability and performance.
+
+**Developer-Friendly**  
+RESTful APIs, OpenAPI spec, and comprehensive documentation for easy integration.
+
+**Flexible Organization**  
+Hierarchical sections, dynamic labels, and team squads adapt to your workflow.
+
+**Simple Deployment**  
+Docker Compose setup gets you running in minutes.
+
+---
+
+## Quick Start
+
+:::tip
+  Ready to get started? Follow the setup guide to install Checkmate locally.
+:::
+
+<CardGrid>
+  <Card title="🚀 Setup Guide" icon="rocket">
+    Install and configure Checkmate
+    
+    [Get Started →](/project/setup)
+  </Card>
+  
+  <Card title="📖 User Guide" icon="open-book">
+    Learn how to use Checkmate
+    
+    [View Guide →](/guides/projects)
+  </Card>
+  
+  <Card title="🔌 API Documentation" icon="puzzle">
+    Integrate with your tools
+    
+    [View APIs →](/guides/api)
+  </Card>
+  
+  <Card title="🏗️ Architecture" icon="seti:config">
+    Understand the system design
+    
+    [Read Docs →](/tech/architecture)
+  </Card>
+</CardGrid>
+
+---
+
+## Technology Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| **Frontend** | Remix, React, TypeScript, shadcn/ui, TailwindCSS |
+| **Backend** | Node.js, Remix, Drizzle ORM |
+| **Database** | MySQL 8.0 |
+| **Authentication** | Google OAuth 2.0, Casbin RBAC |
+| **Infrastructure** | Docker, Docker Compose |
+
+---
+
+## Community & Support
+
+- **GitHub:** [dream-sports-labs/checkmate](https://github.com/dream-sports-labs/checkmate)
+- **Discord:** [Join our community](https://discord.gg/wBQXeYAKNc)
+- **Issues:** [Report bugs or request features](https://github.com/dream-sports-labs/checkmate/issues)
+
+---
+
+## License
+
+Checkmate is open source and available under the [MIT License](https://github.com/dream-sports-labs/checkmate/blob/master/LICENSE).
