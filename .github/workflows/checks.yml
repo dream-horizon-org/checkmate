@@ -17,14 +17,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
 
       - name: Set up Yarn v4 (Berry)
         run: |
           corepack enable
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Run unit tests
         run: yarn unit:test:coverage
