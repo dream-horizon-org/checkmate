@@ -24,7 +24,7 @@ jobs:
           corepack enable
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Run unit tests
         run: yarn unit:test:coverage
