@@ -2,7 +2,7 @@ name: Docs Deployment
 
 on:
   push:
-    branches: [master]
+    branches: [feat/docusaurus]
     paths:
       - 'website/**'
   workflow_dispatch:
@@ -36,6 +36,8 @@ jobs:
       - name: Build Docusaurus Website
         working-directory: ./website
         run: yarn build
+        env:
+          GOOGLE_ANALYTICS_TOKEN: ${{ secrets.GOOGLE_ANALYTICS_TOKEN }}
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
