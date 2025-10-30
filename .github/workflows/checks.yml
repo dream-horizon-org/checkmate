@@ -1,8 +1,8 @@
 name: Checks
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  push:
+    branches: ["fix/ci-build"]
 
 jobs:
   unit-test:
