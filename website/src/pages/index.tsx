@@ -51,16 +51,38 @@ function HeroSection() {
               <div className={styles.heroCardContent}>
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># Install Checkmate</span>
+                    <span className={styles.codeComment}># Clone the repository</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>git</span> clone checkmate
+                    <span className={styles.codeKeyword}>git</span> clone git@github.com:ds-horizon/checkmate.git
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>docker-compose</span> up
+                    <span className={styles.codeKeyword}>cd</span> checkmate
+                  </div>
+                  <div className={styles.codeLine}></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}># Create .env file from .env.example</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># Ready in minutes! 🚀</span>
+                    <span className={styles.codeKeyword}>cp</span> .env.example .env
+                  </div>
+                  <div className={styles.codeLine}></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}># Install dependencies</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeKeyword}>yarn</span> install
+                  </div>
+                  <div className={styles.codeLine}></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}># Setup application and database</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeKeyword}>yarn</span> docker:setup
+                  </div>
+                  <div className={styles.codeLine}></div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}># App will start on http://localhost:3000 🚀</span>
                   </div>
                 </div>
               </div>
