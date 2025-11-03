@@ -216,6 +216,9 @@ guide_oauth_setup() {
     echo -e "${YELLOW}╚═══════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
+    print_info "📖 Detailed documentation: ${BLUE}https://checkmate.dreamsportslabs.com/docs/project/setup#google-oauth-setup${NC}"
+    echo ""
+    
     print_info "Steps to create Google OAuth credentials:"
     echo ""
     echo "  1. Go to Google Cloud Console"
@@ -242,23 +245,40 @@ guide_oauth_setup() {
     echo "  7. Copy the Client ID and Client Secret"
     echo ""
     
-    # Ask if user wants to open Google Cloud Console
-    read -p "Would you like to open Google Cloud Console now? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        if [[ "$OS" == "macos" ]]; then
-            open "https://console.cloud.google.com/apis/credentials"
-        elif [[ "$OS" == "linux" ]]; then
-            if command_exists xdg-open; then
-                xdg-open "https://console.cloud.google.com/apis/credentials"
-            else
-                print_info "Please open: https://console.cloud.google.com/apis/credentials"
-            fi
+    # Automatically open both URLs
+    print_info "🌐 Opening documentation and Google Cloud Console in your browser..."
+    echo ""
+    sleep 1
+    
+    DOCS_URL="https://checkmate.dreamsportslabs.com/docs/project/setup#google-oauth-setup"
+    GOOGLE_CONSOLE_URL="https://console.cloud.google.com/apis/credentials"
+    
+    if [[ "$OS" == "macos" ]]; then
+        open "$DOCS_URL"
+        sleep 0.5  # Small delay between opening tabs
+        open "$GOOGLE_CONSOLE_URL"
+    elif [[ "$OS" == "linux" ]]; then
+        if command_exists xdg-open; then
+            xdg-open "$DOCS_URL" &>/dev/null &
+            sleep 0.5
+            xdg-open "$GOOGLE_CONSOLE_URL" &>/dev/null &
+        elif command_exists gnome-open; then
+            gnome-open "$DOCS_URL" &>/dev/null &
+            sleep 0.5
+            gnome-open "$GOOGLE_CONSOLE_URL" &>/dev/null &
+        else
+            print_warning "Could not open browser automatically."
+            print_info "Please open these URLs:"
+            print_info "  1. Documentation: $DOCS_URL"
+            print_info "  2. Google Console: $GOOGLE_CONSOLE_URL"
         fi
-        print_info "Browser opened. Please follow the steps above."
-        echo ""
-        read -p "Press Enter when you have your credentials ready..."
     fi
+    
+    print_success "✅ Opened documentation and Google Cloud Console"
+    echo ""
+    print_info "📋 Follow the steps above (or in the documentation) to create OAuth credentials."
+    echo ""
+    read -p "Press Enter when you have your credentials ready..."
 }
 
 # Function to setup environment file with interactive input
@@ -408,15 +428,18 @@ main() {
     # Install dependencies
     install_dependencies
     
-    # Setup Docker
-    print_info "\nReady to setup Docker containers?"
-    read -p "Continue with Docker setup? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        setup_docker
-    else
-        print_warning "Skipping Docker setup. You can run 'yarn docker:setup' later."
-    fi
+    # Setup Docker automatically
+    echo ""
+    print_header "Docker Container Setup"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    print_info "Setting up Docker containers and seeding the database..."
+    print_info "This step will create and start the MySQL database container."
+    echo ""
+    print_warning "⏳ This may take a few minutes. Please wait..."
+    echo ""
+    
+    setup_docker
+    DOCKER_SETUP_DONE=true
     
     # Final success message
     print_header "Installation Complete! 🎉"
@@ -430,18 +453,43 @@ main() {
     print_success "✅ Repository cloned"
     print_success "✅ Environment configured"
     print_success "✅ Dependencies installed"
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [ "$DOCKER_SETUP_DONE" = true ]; then
         print_success "✅ Docker containers ready"
     fi
     echo ""
-    print_info "🚀 Next steps:"
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    
+    # Open Checkmate in browser
+    if [ "$DOCKER_SETUP_DONE" = true ]; then
+        print_info "🌐 Opening Checkmate in your browser..."
+        echo ""
+        sleep 2  # Give Docker a moment to fully start
+        
+        CHECKMATE_URL="http://localhost:3000"
+        
+        if [[ "$OS" == "macos" ]]; then
+            open "$CHECKMATE_URL"
+        elif [[ "$OS" == "linux" ]]; then
+            if command_exists xdg-open; then
+                xdg-open "$CHECKMATE_URL" &>/dev/null &
+            elif command_exists gnome-open; then
+                gnome-open "$CHECKMATE_URL" &>/dev/null &
+            else
+                print_warning "Could not open browser automatically."
+                print_info "Please open: $CHECKMATE_URL"
+            fi
+        fi
+        
+        print_success "✅ Browser opened"
+        echo ""
+        print_info "🚀 Next steps:"
+        echo "  1. Sign in with your Google account"
+        echo "  2. Start managing your test cases!"
+    else
+        print_info "🚀 Next steps:"
         echo "  1. Run Docker setup: cd $REPO_DIR && yarn docker:setup"
         echo "  2. Access Checkmate at: http://localhost:3000"
-    else
-        echo "  1. Access Checkmate at: http://localhost:3000"
-        echo "  2. Sign in with your Google account"
     fi
+    
     echo ""
     print_info "📚 Resources:"
     echo "  • Documentation: https://checkmate.dreamsportslabs.com"
