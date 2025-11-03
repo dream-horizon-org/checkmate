@@ -2,7 +2,7 @@ name: Docs Deployment
 
 on:
   push:
-    branches: [feat/docusaurus]
+    branches: [master]
     paths:
       - 'website/**'
   workflow_dispatch:
@@ -22,9 +22,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
+<<<<<<< HEAD
           node-version: '20'
           cache: 'yarn'
           cache-dependency-path: website/yarn.lock
+=======
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack and Set up Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.10.3 --activate
+>>>>>>> 52b83d26f0eb8eff05a84e8d2cba25673de8cc47
 
       - name: Install Dependencies
         working-directory: ./website
@@ -33,6 +42,11 @@ jobs:
       - name: Build Docusaurus Website
         working-directory: ./website
         run: yarn build
+<<<<<<< HEAD
+=======
+        env:
+          GOOGLE_ANALYTICS_TOKEN: ${{ secrets.GOOGLE_ANALYTICS_TOKEN }}
+>>>>>>> 52b83d26f0eb8eff05a84e8d2cba25673de8cc47
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
