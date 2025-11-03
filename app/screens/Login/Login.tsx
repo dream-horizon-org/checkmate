@@ -17,11 +17,8 @@ export const Login = () => {
   }
 
   return (
-    <div
-      className={
-        'flex absolute flex-row justify-center items-center h-full -mx-20'
-      }>
-      <div className="relative w-screen bg-[#000000] h-full">
+    <div className="fixed inset-0 flex flex-row justify-center items-center overflow-hidden">
+      <div className="relative w-full h-full bg-[#000000]">
         <div
           className="absolute inset-0 transition-opacity duration-300"
           style={{
