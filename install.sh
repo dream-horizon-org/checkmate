@@ -3,7 +3,8 @@
 # Checkmate Installation Script
 # This script checks for prerequisites and installs Checkmate
 
-set -e  # Exit on error
+# Note: Not using 'set -e' to allow graceful error handling
+# We'll handle errors explicitly where needed
 
 # Color codes for output
 RED='\033[0;31m'
@@ -147,21 +148,38 @@ check_install_yarn() {
 check_install_docker() {
     print_header "Checking Docker"
     if command_exists docker; then
-        DOCKER_VERSION=$(docker --version | cut -d' ' -f3 | cut -d',' -f1)
+        DOCKER_VERSION=$(docker --version | cut -d' ' -f3 | cut -d',' -f1 2>/dev/null || echo "unknown")
         print_success "Docker is installed (version $DOCKER_VERSION)"
         
         # Check if Docker daemon is running
         if ! docker info >/dev/null 2>&1; then
             print_error "Docker is installed but not running."
-            print_info "Please start Docker Desktop and run this script again."
-            exit 1
+            print_warning "Please start Docker Desktop before continuing."
+            echo ""
+            read -p "Press Enter after starting Docker, or Ctrl+C to exit..."
+            
+            # Check again after user presses Enter
+            if ! docker info >/dev/null 2>&1; then
+                print_error "Docker is still not running. Please start Docker Desktop."
+                exit 1
+            else
+                print_success "Docker is now running!"
+            fi
         fi
     else
         print_warning "Docker is not installed."
         if [[ "$OS" == "macos" ]]; then
-            print_info "Please download and install Docker Desktop from:"
-            print_info "https://www.docker.com/products/docker-desktop/"
-            print_error "Install Docker Desktop, start it, and run this script again."
+            print_info "Docker Desktop needs to be installed manually on macOS."
+            print_info "Download from: https://www.docker.com/products/docker-desktop/"
+            echo ""
+            read -p "Would you like to open the download page now? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                open "https://www.docker.com/products/docker-desktop/"
+                print_success "Opened Docker Desktop download page"
+            fi
+            echo ""
+            print_error "Please install Docker Desktop, start it, and run this script again."
             exit 1
         elif [[ "$OS" == "linux" ]]; then
             print_info "Installing Docker..."
@@ -200,10 +218,15 @@ setup_repository() {
 # Function to generate random session secret
 generate_session_secret() {
     if command_exists openssl; then
-        openssl rand -base64 32
+        openssl rand -base64 32 2>/dev/null || echo "$(date +%s)$(echo $RANDOM | base64 | head -c 32)"
     else
         # Fallback to using date and random
-        echo "$(date +%s)-$(echo $RANDOM | md5sum | head -c 32)"
+        if command_exists md5sum; then
+            echo "$(date +%s)-$(echo $RANDOM | md5sum | head -c 32)" 2>/dev/null
+        else
+            # Fallback for systems without md5sum (like macOS)
+            echo "$(date +%s)$(echo $RANDOM | base64 | head -c 32)"
+        fi
     fi
 }
 
@@ -298,7 +321,9 @@ setup_env_file() {
     fi
     
     if [ ! -f ".env.example" ]; then
-        print_error ".env.example file not found"
+        print_error ".env.example file not found in $(pwd)"
+        print_error "This file should exist in the Checkmate repository."
+        print_info "Please ensure you're in the correct directory or the repository is not corrupted."
         exit 1
     fi
     
@@ -349,17 +374,22 @@ setup_env_file() {
     
     # For macOS (BSD sed)
     if [[ "$OS" == "macos" ]]; then
-        sed -i '' "s|GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID|g" .env
-        sed -i '' "s|GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET|g" .env
-        sed -i '' "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env
+        sed -i '' "s|GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID|g" .env 2>/dev/null || true
+        sed -i '' "s|GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET|g" .env 2>/dev/null || true
+        sed -i '' "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env 2>/dev/null || true
     else
         # For Linux (GNU sed)
-        sed -i "s|GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID|g" .env
-        sed -i "s|GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET|g" .env
-        sed -i "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env
+        sed -i "s|GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID|g" .env 2>/dev/null || true
+        sed -i "s|GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET|g" .env 2>/dev/null || true
+        sed -i "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env 2>/dev/null || true
     fi
     
-    print_success ".env file configured successfully!"
+    # Verify the credentials were written
+    if grep -q "$GOOGLE_CLIENT_ID" .env 2>/dev/null; then
+        print_success ".env file configured successfully!"
+    else
+        print_warning "Could not verify .env file update. Please check manually."
+    fi
     echo ""
     print_info "📝 Your credentials have been saved to .env"
     print_warning "⚠️  Keep your .env file secure and never commit it to version control"
