@@ -21,18 +21,76 @@ This Test Case Management Tool is designed to address the challenges faced by te
 
 ## 📦 Installation
 
-### Pre-requisites
+### 🚀 One-Line Install (Easiest)
+
+Install Checkmate with a single command:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/ds-horizon/checkmate/master/bootstrap.sh | bash
+```
+
+Or using wget:
+
+```sh
+wget -qO- https://raw.githubusercontent.com/ds-horizon/checkmate/master/bootstrap.sh | bash
+```
+
+This will download and run the interactive installer that walks you through everything.
+
+### Alternative: Direct Install Script
+
+If you prefer to download the script first:
+
+```sh
+# Download
+curl -fsSL https://raw.githubusercontent.com/ds-horizon/checkmate/master/install.sh -o install.sh
+chmod +x install.sh
+
+# Run
+./install.sh
+```
+
+Or clone the repository first:
+
+```sh
+git clone git@github.com:ds-horizon/checkmate.git
+cd checkmate
+./install.sh
+```
+
+**The script will:**
+- ✅ Check and install prerequisites (Git, Node.js v20, Yarn, Docker)
+- ✅ Clone the repository (if needed)
+- ✅ **Guide you through Google OAuth setup** with step-by-step instructions
+- ✅ Optionally open Google Cloud Console in your browser
+- ✅ Prompt for OAuth credentials interactively
+- ✅ Automatically configure your `.env` file
+- ✅ Generate secure session secrets
+- ✅ Install all dependencies
+- ✅ Set up Docker containers and seed database
+
+**No manual configuration needed!** The script walks you through each step.
+
+### Manual Installation
+
+#### Pre-requisites
 
 1. Docker Desktop
-2. Google OAuth Application
+2. Node.js (v18.x or higher)
+3. Yarn
+4. Google OAuth Application
 
-### Docker Setup
+#### Setup Steps
 
 1. Clone the repository:
    ```sh
    git clone git@github.com:ds-horizon/checkmate.git
+   cd checkmate
    ```
 2. Create an .env file at root level, based on .env.example.
+   ```sh
+   cp .env.example .env
+   ```
 3. Install dependencies
    ```sh
    yarn install

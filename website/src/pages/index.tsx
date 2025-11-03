@@ -51,38 +51,30 @@ function HeroSection() {
               <div className={styles.heroCardContent}>
                 <div className={styles.codeBlock}>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># Clone the repository</span>
+                    <span className={styles.codeComment}># Install Checkmate with one command</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>git</span> clone git@github.com:ds-horizon/checkmate.git
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>cd</span> checkmate
+                    <span className={styles.codeKeyword}>curl</span> -fsSL https://raw.githubusercontent.com/ds-horizon/checkmate/master/bootstrap.sh | <span className={styles.codeKeyword}>bash</span>
                   </div>
                   <div className={styles.codeLine}></div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># Create .env file from .env.example</span>
+                    <span className={styles.codeComment}># The installer will:</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>cp</span> .env.example .env
-                  </div>
-                  <div className={styles.codeLine}></div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># Install dependencies</span>
+                    <span className={styles.codeComment}># ✓ Check and install prerequisites</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>yarn</span> install
-                  </div>
-                  <div className={styles.codeLine}></div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># Setup application and database</span>
+                    <span className={styles.codeComment}># ✓ Guide you through OAuth setup</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>yarn</span> docker:setup
+                    <span className={styles.codeComment}># ✓ Configure everything automatically</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.codeComment}># ✓ Setup Docker containers</span>
                   </div>
                   <div className={styles.codeLine}></div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># App will start on http://localhost:3000 🚀</span>
+                    <span className={styles.codeComment}># Ready at http://localhost:3000 🚀</span>
                   </div>
                 </div>
               </div>
