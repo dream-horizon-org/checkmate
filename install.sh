@@ -216,6 +216,9 @@ guide_oauth_setup() {
     echo -e "${YELLOW}╚═══════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
+    print_info "📖 Detailed documentation: ${BLUE}https://checkmate.dreamsportslabs.com/docs/project/setup#google-oauth-setup${NC}"
+    echo ""
+    
     print_info "Steps to create Google OAuth credentials:"
     echo ""
     echo "  1. Go to Google Cloud Console"
@@ -242,29 +245,38 @@ guide_oauth_setup() {
     echo "  7. Copy the Client ID and Client Secret"
     echo ""
     
-    # Automatically open Google Cloud Console
-    print_info "🌐 Opening Google Cloud Console in your browser..."
+    # Automatically open both URLs
+    print_info "🌐 Opening documentation and Google Cloud Console in your browser..."
     echo ""
     sleep 1
     
+    DOCS_URL="https://checkmate.dreamsportslabs.com/docs/project/setup#google-oauth-setup"
     GOOGLE_CONSOLE_URL="https://console.cloud.google.com/apis/credentials"
     
     if [[ "$OS" == "macos" ]]; then
+        open "$DOCS_URL"
+        sleep 0.5  # Small delay between opening tabs
         open "$GOOGLE_CONSOLE_URL"
     elif [[ "$OS" == "linux" ]]; then
         if command_exists xdg-open; then
+            xdg-open "$DOCS_URL" &>/dev/null &
+            sleep 0.5
             xdg-open "$GOOGLE_CONSOLE_URL" &>/dev/null &
         elif command_exists gnome-open; then
+            gnome-open "$DOCS_URL" &>/dev/null &
+            sleep 0.5
             gnome-open "$GOOGLE_CONSOLE_URL" &>/dev/null &
         else
             print_warning "Could not open browser automatically."
-            print_info "Please open: $GOOGLE_CONSOLE_URL"
+            print_info "Please open these URLs:"
+            print_info "  1. Documentation: $DOCS_URL"
+            print_info "  2. Google Console: $GOOGLE_CONSOLE_URL"
         fi
     fi
     
-    print_success "✅ Browser opened to Google Cloud Console"
+    print_success "✅ Opened documentation and Google Cloud Console"
     echo ""
-    print_info "📋 Follow the steps above to create your OAuth credentials."
+    print_info "📋 Follow the steps above (or in the documentation) to create OAuth credentials."
     echo ""
     read -p "Press Enter when you have your credentials ready..."
 }
