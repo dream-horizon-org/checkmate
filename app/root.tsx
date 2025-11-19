@@ -60,6 +60,7 @@ export function Layout({children}: {children: React.ReactNode}) {
   const location = useLocation()
   const hideHeaderRoutes = ['/login']
   const showHeader = !hideHeaderRoutes.includes(location.pathname)
+  const isLoginPage = location.pathname === '/login'
 
   return (
     <html lang="en">
@@ -73,11 +74,17 @@ export function Layout({children}: {children: React.ReactNode}) {
         {showHeader && <AppHeader user={user} />}
         <GlobalLoading />
         <SearchModal />
-        <div className="h-[calc(100%-64px)] bg-slate-50">
-          <div className="px-8 py-0 h-full">
+        {isLoginPage ? (
+          <div className="h-screen bg-slate-50">
             {children}
           </div>
-        </div>
+        ) : (
+          <div className="h-[calc(100%-64px)] bg-slate-50">
+            <div className="px-8 py-0 h-full">
+              {children}
+            </div>
+          </div>
+        )}
         <Toaster />
         <ScrollRestoration />
         <Scripts />
