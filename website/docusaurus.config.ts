@@ -74,8 +74,8 @@ const config: Config = {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       defaultMode: 'light',
-      respectPrefersColorScheme: true,
-      disableSwitch: false,
+      respectPrefersColorScheme: false,
+      disableSwitch: true,
     },
     docs: {
       sidebar: {
@@ -110,7 +110,7 @@ const config: Config = {
       ],
     },
     footer: {
-      style: 'dark',
+      style: 'dark', /* Keep dark style for footer to match slate-900 background */
       links: [
         {
           title: 'Docs',
@@ -156,7 +156,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Dream Sports Labs. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Horizon`,
     },
     prism: {
       theme: prismThemes.github,
