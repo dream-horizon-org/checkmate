@@ -527,7 +527,8 @@ main() {
         
         # Check if this version is already installed
         # nvm list outputs versions, so we check if the version appears in the output
-        if nvm list | grep -E "(v|^)$NVMRC_VERSION" >/dev/null 2>&1; then
+        # Use word boundary to match exact version (e.g., "20.19.5" not "20.19.50")
+        if nvm list | grep -E "v?$NVMRC_VERSION\b" >/dev/null 2>&1; then
             print_success "Node.js $NVMRC_VERSION is already installed"
         else
             print_info "Installing Node.js $NVMRC_VERSION via nvm..."
