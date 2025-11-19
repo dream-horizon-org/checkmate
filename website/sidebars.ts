@@ -12,12 +12,12 @@ const sidebars: SidebarsConfig = {
         {
           type: 'category',
           label: 'Tests',
-          items: ['guides/tests/tests', 'guides/tests/bulk-addition'],
+          items: ['guides/tests/index', 'guides/tests/bulk-addition'],
         },
         {
           type: 'category',
           label: 'Runs',
-          items: ['guides/runs/runs', 'guides/runs/run-detail'],
+          items: ['guides/runs/index', 'guides/runs/run-detail'],
         },
         {
           type: 'category',
@@ -39,7 +39,7 @@ const sidebars: SidebarsConfig = {
           type: 'category',
           label: 'API Documentation',
           items: [
-            'guides/api',
+            'guides/api/index',
             'guides/api/authentication',
             'guides/api/examples',
             'guides/api/openapi',
