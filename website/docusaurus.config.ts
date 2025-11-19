@@ -152,7 +152,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Dream Sports Labs. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Horizon`,
     },
     prism: {
       theme: prismThemes.github,
