@@ -93,40 +93,105 @@ check_install_git() {
     fi
 }
 
-# Function to check and install Node.js
-check_install_node() {
-    print_header "Checking Node.js"
-    if command_exists node; then
-        NODE_VERSION=$(node --version | cut -d'v' -f2)
-        NODE_MAJOR=$(echo $NODE_VERSION | cut -d'.' -f1)
-        
-        if [ "$NODE_MAJOR" -ge 18 ]; then
-            print_success "Node.js is installed (version $NODE_VERSION)"
-        else
-            print_warning "Node.js version $NODE_VERSION is too old. Need v18.x or higher."
-            print_info "Installing latest Node.js LTS..."
-            install_nodejs
-        fi
+# Function to check and install nvm
+check_install_nvm() {
+    print_header "Checking nvm (Node Version Manager)"
+    
+    # Check if nvm is already loaded in the current shell
+    if [ -s "$HOME/.nvm/nvm.sh" ]; then
+        # Source nvm if it exists but isn't loaded
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    fi
+    
+    if command_exists nvm || [ -s "$HOME/.nvm/nvm.sh" ]; then
+        print_success "nvm is installed"
+        # Ensure nvm is loaded
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        return 0
     else
-        print_warning "Node.js is not installed. Installing..."
-        install_nodejs
+        print_warning "nvm is not installed. Installing..."
+        install_nvm
     fi
 }
 
-install_nodejs() {
-    if [[ "$OS" == "macos" ]]; then
-        brew install node@20
-    elif [[ "$OS" == "linux" ]]; then
-        # Install Node.js using NodeSource repository
-        print_info "Installing Node.js 20.x..."
-        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-        if [[ "$DISTRO" == "ubuntu" ]] || [[ "$DISTRO" == "debian" ]]; then
-            sudo apt-get install -y nodejs
-        elif [[ "$DISTRO" == "fedora" ]] || [[ "$DISTRO" == "rhel" ]] || [[ "$DISTRO" == "centos" ]]; then
-            sudo yum install -y nodejs
+# Function to install nvm
+install_nvm() {
+    print_info "Installing nvm..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+    
+    # Load nvm in current shell
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    
+    # Also add to shell profile for future sessions
+    if [ -f "$HOME/.zshrc" ]; then
+        if ! grep -q "NVM_DIR" "$HOME/.zshrc"; then
+            echo '' >> "$HOME/.zshrc"
+            echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.zshrc"
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> "$HOME/.zshrc"
+        fi
+    elif [ -f "$HOME/.bashrc" ]; then
+        if ! grep -q "NVM_DIR" "$HOME/.bashrc"; then
+            echo '' >> "$HOME/.bashrc"
+            echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.bashrc"
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> "$HOME/.bashrc"
         fi
     fi
-    print_success "Node.js installed successfully"
+    
+    print_success "nvm installed successfully"
+}
+
+# Function to check and install Node.js using nvm
+check_install_node() {
+    print_header "Checking Node.js"
+    
+    # Ensure nvm is loaded
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    
+    # Default to Node 20 if .nvmrc doesn't exist (we'll check .nvmrc later after repo is cloned)
+    REQUIRED_NODE_VERSION="20"
+    print_info "Installing Node.js 20.x (will use .nvmrc version after repository setup)"
+    
+    # Check if Node 20 is installed via nvm
+    # nvm list outputs versions, so we check if version 20 appears in the output
+    if nvm list | grep -E "v20\." >/dev/null 2>&1; then
+        print_success "Node.js 20.x is installed via nvm"
+        nvm use 20 >/dev/null 2>&1
+    elif command_exists node; then
+        CURRENT_VERSION=$(node --version | cut -d'v' -f2)
+        print_warning "Node.js is installed (version $CURRENT_VERSION) but not via nvm"
+        print_info "Installing Node.js 20.x via nvm..."
+        install_nodejs "20"
+    else
+        print_warning "Node.js is not installed. Installing via nvm..."
+        install_nodejs "20"
+    fi
+}
+
+# Function to install Node.js using nvm
+install_nodejs() {
+    local version=$1
+    if [ -z "$version" ]; then
+        version="20"
+    fi
+    
+    # Ensure nvm is loaded
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    
+    print_info "Installing Node.js $version via nvm..."
+    nvm install "$version"
+    
+    if [ $? -eq 0 ]; then
+        nvm use "$version"
+        print_success "Node.js $version installed and activated successfully"
+    else
+        print_error "Failed to install Node.js via nvm"
+        exit 1
+    fi
 }
 
 # Function to check and install Yarn
@@ -209,11 +274,40 @@ setup_repository() {
         if [ -d "checkmate" ]; then
             print_warning "Directory 'checkmate' already exists. Using existing directory..."
             REPO_DIR="$(pwd)/checkmate"
+            if [ ! -f "$REPO_DIR/package.json" ]; then
+                print_error "Directory 'checkmate' exists but doesn't appear to be a valid repository."
+                print_info "Please remove it and run this script again."
+                exit 1
+            fi
         else
-            git clone git@github.com:ds-horizon/checkmate.git
-            REPO_DIR="$(pwd)/checkmate"
-            print_success "Repository cloned successfully"
+            # Try SSH first, fallback to HTTPS if SSH fails
+            print_info "Attempting to clone via SSH..."
+            if git clone git@github.com:ds-horizon/checkmate.git 2>/dev/null; then
+                REPO_DIR="$(pwd)/checkmate"
+                print_success "Repository cloned successfully via SSH"
+            else
+                print_warning "SSH clone failed, trying HTTPS..."
+                if git clone https://github.com/ds-horizon/checkmate.git 2>/dev/null; then
+                    REPO_DIR="$(pwd)/checkmate"
+                    print_success "Repository cloned successfully via HTTPS"
+                else
+                    print_error "Failed to clone repository. Please check your internet connection and try again."
+                    exit 1
+                fi
+            fi
+            
+            # Verify the clone was successful
+            if [ ! -d "$REPO_DIR" ] || [ ! -f "$REPO_DIR/package.json" ]; then
+                print_error "Repository clone appears to have failed. Directory structure is invalid."
+                exit 1
+            fi
         fi
+    fi
+    
+    # Verify REPO_DIR is set and valid
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid."
+        exit 1
     fi
 }
 
@@ -264,7 +358,16 @@ show_oauth_instructions() {
 setup_env_file() {
     print_header "Setting up Environment File"
     
-    cd "$REPO_DIR"
+    # Verify REPO_DIR is set before using it
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid. Cannot setup environment file."
+        exit 1
+    fi
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        exit 1
+    }
     
     if [ -f ".env" ]; then
         print_warning ".env file already exists. Skipping creation."
@@ -287,11 +390,19 @@ setup_env_file() {
     print_info "Generating secure session secret..."
     SESSION_SECRET=$(generate_session_secret)
     
-    # Update SESSION_SECRET in .env file
-    if [[ "$OS" == "macos" ]]; then
-        sed -i '' "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env 2>/dev/null || true
+    # Update or add SESSION_SECRET in .env file
+    if grep -q "^SESSION_SECRET=" .env 2>/dev/null; then
+        # Update existing SESSION_SECRET
+        if [[ "$OS" == "macos" ]]; then
+            sed -i '' "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env 2>/dev/null || true
+        else
+            sed -i "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env 2>/dev/null || true
+        fi
     else
-        sed -i "s|SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|g" .env 2>/dev/null || true
+        # Add SESSION_SECRET if it doesn't exist
+        echo "" >> .env
+        echo "# Session secret for authentication" >> .env
+        echo "SESSION_SECRET=$SESSION_SECRET" >> .env
     fi
     
     print_success "Session secret generated and configured"
@@ -305,18 +416,40 @@ setup_env_file() {
 install_dependencies() {
     print_header "Installing Dependencies"
     
-    cd "$REPO_DIR"
+    # Verify REPO_DIR is set before using it
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid. Cannot install dependencies."
+        exit 1
+    fi
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        exit 1
+    }
     
     print_info "Installing Node.js dependencies..."
-    yarn install
-    print_success "Dependencies installed successfully"
+    if yarn install; then
+        print_success "Dependencies installed successfully"
+    else
+        print_error "Failed to install dependencies. Please check the error messages above."
+        exit 1
+    fi
 }
 
 # Function to verify Docker setup (without starting containers)
 verify_docker_setup() {
     print_header "Verifying Docker Configuration"
     
-    cd "$REPO_DIR"
+    # Verify REPO_DIR is set before using it
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid. Cannot verify Docker setup."
+        exit 1
+    fi
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        exit 1
+    }
     
     # Check if docker-compose.yml exists
     if [ ! -f "docker-compose.yml" ]; then
@@ -364,6 +497,7 @@ main() {
     
     # Check and install prerequisites
     check_install_git
+    check_install_nvm
     check_install_node
     check_install_yarn
     check_install_docker
@@ -373,6 +507,50 @@ main() {
     
     # Setup environment file
     setup_env_file
+    
+    # Ensure correct Node version from .nvmrc is installed and active
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        exit 1
+    }
+    
+    # Load nvm
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    
+    if [ -f ".nvmrc" ]; then
+        print_header "Setting up Node.js version from .nvmrc"
+        
+        # Read version from .nvmrc (remove 'v' prefix if present, and trim whitespace)
+        NVMRC_VERSION=$(cat .nvmrc | tr -d 'v' | tr -d '\n' | xargs)
+        print_info "Found .nvmrc with Node.js version: $NVMRC_VERSION"
+        
+        # Check if this version is already installed
+        # nvm list outputs versions, so we check if the version appears in the output
+        if nvm list | grep -E "(v|^)$NVMRC_VERSION" >/dev/null 2>&1; then
+            print_success "Node.js $NVMRC_VERSION is already installed"
+        else
+            print_info "Installing Node.js $NVMRC_VERSION via nvm..."
+            nvm install "$NVMRC_VERSION"
+            if [ $? -ne 0 ]; then
+                print_error "Failed to install Node.js $NVMRC_VERSION"
+                exit 1
+            fi
+        fi
+        
+        # Use the version from .nvmrc
+        print_info "Switching to Node.js version from .nvmrc..."
+        nvm use
+        if [ $? -ne 0 ]; then
+            print_error "Failed to switch to Node.js version from .nvmrc"
+            exit 1
+        fi
+        
+        ACTUAL_VERSION=$(node --version)
+        print_success "Using Node.js $ACTUAL_VERSION (from .nvmrc)"
+    else
+        print_warning ".nvmrc file not found. Using default Node.js version."
+    fi
     
     # Install dependencies
     install_dependencies
