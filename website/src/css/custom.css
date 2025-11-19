@@ -1,6 +1,7 @@
 /**
  * Checkmate Documentation Custom Theme
- * Matches the purple-blue gradient aesthetic from the homepage
+ * Matches the Checkmate header theme (slate-900)
+ * Light mode only - theme switcher disabled
  */
 
 /* Import Roboto Font from Google Fonts */
@@ -25,16 +26,16 @@
   --ifm-background-surface-color: #f8f9ff;
   --ifm-card-background-color: #ffffff;
   
-  /* Navbar */
-  --ifm-navbar-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Navbar - Using Checkmate header theme (slate-900) */
+  --ifm-navbar-background-color: #0f172a; /* slate-900 */
   --ifm-navbar-link-color: rgba(255, 255, 255, 0.95);
   --ifm-navbar-link-hover-color: #ffffff;
-  --ifm-navbar-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  --ifm-navbar-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   
-  /* Footer */
-  --ifm-footer-background-color: #1e1e2e;
-  --ifm-footer-link-color: #a0aec0;
-  --ifm-footer-link-hover-color: #667eea;
+  /* Footer - Using Checkmate header theme */
+  --ifm-footer-background-color: #0f172a; /* slate-900 */
+  --ifm-footer-link-color: #cbd5e0; /* slate-300 */
+  --ifm-footer-link-hover-color: #ffffff;
   
   /* Code blocks */
   --ifm-code-font-size: 95%;
@@ -72,68 +73,14 @@
   --ifm-global-shadow-tl: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== Dark Mode Theme ===== */
-[data-theme='dark'] {
-  /* Primary Colors - Lighter purple/blue for dark mode */
-  --ifm-color-primary: #8099ec;
-  --ifm-color-primary-dark: #6680e9;
-  --ifm-color-primary-darker: #5972e7;
-  --ifm-color-primary-darkest: #3250de;
-  --ifm-color-primary-light: #9ab2ef;
-  --ifm-color-primary-lighter: #a7bdf1;
-  --ifm-color-primary-lightest: #cdd7f6;
-  
-  /* Secondary accent */
-  --ifm-color-secondary: #9370b8;
-  
-  /* Background colors */
-  --ifm-background-color: #1a1a2e;
-  --ifm-background-surface-color: #16213e;
-  --ifm-card-background-color: #16213e;
-  
-  /* Navbar - darker in dark mode */
-  --ifm-navbar-background-color: #0f1419;
-  --ifm-navbar-link-color: rgba(255, 255, 255, 0.85);
-  --ifm-navbar-link-hover-color: #8099ec;
-  --ifm-navbar-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  
-  /* Footer */
-  --ifm-footer-background-color: #0f1419;
-  --ifm-footer-link-color: #a0aec0;
-  --ifm-footer-link-hover-color: #8099ec;
-  
-  /* Code blocks */
-  --ifm-code-background: #0f1419;
-  --docusaurus-highlighted-code-line-bg: rgba(128, 153, 236, 0.15);
-  
-  /* Typography */
-  --ifm-font-family-base: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --ifm-font-family-monospace: 'Roboto Mono', 'Courier New', Courier, monospace;
-  --ifm-font-size-base: 15px;
-  --ifm-line-height-base: 1.6;
-  --ifm-heading-color: #e2e8f0;
-  --ifm-font-color-base: #cbd5e0;
-  --ifm-font-color-secondary: #a0aec0;
-  --ifm-heading-font-weight: 600;
-  
-  /* Links */
-  --ifm-link-color: #8099ec;
-  --ifm-link-hover-color: #9ab2ef;
-  
-  /* Borders */
-  --ifm-border-color: #2d3748;
-  
-  /* Shadows */
-  --ifm-global-shadow-lw: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --ifm-global-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --ifm-global-shadow-tl: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
+/* ===== Dark Mode Theme - DISABLED ===== */
+/* Dark mode is disabled - website is light mode only */
 
-/* ===== Navbar Customization ===== */
+/* ===== Navbar Customization - Checkmate Header Theme ===== */
 .navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: #0f172a !important; /* slate-900 - matches Checkmate header */
   box-shadow: var(--ifm-navbar-shadow);
-  border-bottom: none;
+  border-bottom: 1px solid #1e293b; /* slate-800 - matches header border */
 }
 
 .navbar__title {
@@ -151,16 +98,12 @@
 .navbar__link:hover,
 .navbar__link--active {
   color: white !important;
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.1) !important; /* slate-800 hover - matches header */
   border-radius: 6px;
 }
 
 .navbar__item {
   transition: all 0.2s ease;
-}
-
-[data-theme='dark'] .navbar {
-  background: linear-gradient(135deg, #4c63e8 0%, #5f3d7a 100%) !important;
 }
 
 /* ===== Sidebar Customization ===== */
@@ -403,29 +346,29 @@ table tbody tr:hover {
   font-weight: 600;
 }
 
-/* ===== Footer ===== */
+/* ===== Footer - Checkmate Header Theme ===== */
 .footer {
   background: var(--ifm-footer-background-color);
-  border-top: 2px solid var(--ifm-color-primary);
+  border-top: 1px solid #1e293b; /* slate-800 - matches header border */
 }
 
 .footer__title {
-  color: white;
+  color: #ffffff; /* white - matches Checkmate header text */
   font-weight: 600;
 }
 
 .footer__link-item {
-  color: var(--ifm-footer-link-color);
+  color: #cbd5e0; /* slate-300 - matches header secondary text */
   transition: all 0.2s ease;
 }
 
 .footer__link-item:hover {
-  color: var(--ifm-footer-link-hover-color);
+  color: #ffffff; /* white on hover */
   text-decoration: none;
 }
 
 .footer__copyright {
-  color: var(--ifm-footer-link-color);
+  color: #94a3b8; /* slate-400 - matches header tertiary text */
 }
 
 /* ===== TOC (Table of Contents) ===== */
@@ -447,18 +390,18 @@ table tbody tr:hover {
 /* ===== Search Bar ===== */
 .navbar__search-input {
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid #334155; /* slate-700 - matches header separators */
+  background: rgba(255, 255, 255, 0.1);
   color: white;
 }
 
 .navbar__search-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6); /* slate-400 */
 }
 
 .navbar__search-input:focus {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #475569; /* slate-600 */
 }
 
 /* ===== Scrollbar Customization ===== */

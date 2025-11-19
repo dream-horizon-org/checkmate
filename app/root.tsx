@@ -20,7 +20,10 @@ import {APP_NAME} from './constants'
 import styles from './globals.css?url'
 import {GlobalLoading} from './screens/GlobalLoading'
 
-export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}]
+export const links: LinksFunction = () => [
+  {rel: 'stylesheet', href: styles},
+  {rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml'},
+]
 
 export {ErrorBoundary} from './components/ErrorBoundry/ErrorBoundry'
 

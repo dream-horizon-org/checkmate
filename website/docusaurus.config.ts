@@ -70,8 +70,8 @@ const config: Config = {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       defaultMode: 'light',
-      respectPrefersColorScheme: true,
-      disableSwitch: false,
+      respectPrefersColorScheme: false,
+      disableSwitch: true,
     },
     docs: {
       sidebar: {
@@ -106,7 +106,7 @@ const config: Config = {
       ],
     },
     footer: {
-      style: 'dark',
+      style: 'dark', /* Keep dark style for footer to match slate-900 background */
       links: [
         {
           title: 'Docs',

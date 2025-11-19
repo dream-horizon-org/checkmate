@@ -31,14 +31,21 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
         )}>
         {/* Left Section */}
         <div className="flex items-center gap-4">
-          {/* App Name - Clickable to go to projects */}
+          {/* App Logo - Clickable to go to projects */}
           <button
             onClick={(e) => {
               e.preventDefault()
               navigate(`/projects?orgId=${ORG_ID}&page=1&pageSize=${SMALL_PAGE_SIZE}`, {})
             }}
-            className="text-xl font-semibold text-white tracking-tight hover:text-slate-300 transition-colors cursor-pointer">
-            {APP_NAME}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
+            <img 
+              src="/logo.svg" 
+              alt={APP_NAME}
+              className="h-10 w-auto"
+            />
+            <span className="text-xl font-semibold text-white tracking-tight">
+              {APP_NAME}
+            </span>
           </button>
 
           {/* Project Switcher - Only show if in a project */}
