@@ -64,28 +64,25 @@ export const OptionsDropdown = ({
     <DropdownMenu onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          style={{minWidth: '40%'}}
-          className={cn(
-            'flex justify-between items-center focus-visible:ring-0 w-60',
-          )}
+          className="w-full justify-between h-10"
           variant="outline">
-          <span className="ml-4 truncate">
+          <span className="truncate text-left">
             {placeholder.includes('>')
               ? placeholder.split('>').pop()
               : placeholder}
           </span>
-          <CaretSortIcon className="h-4 w-4 opacity-50 flex-shrink-0 ml-auto mr-4" />
+          <CaretSortIcon className="h-4 w-4 opacity-50 flex-shrink-0 ml-2" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="ml-4 max-w-80 focus-visible:ring-0">
-        <div className="p-2 border-b bg-white sticky top-0 z-10">
+      <DropdownMenuContent className="w-[320px]">
+        <div className="p-2 border-b border-slate-200 bg-white sticky top-0 z-10">
           <Input
             ref={inputRef}
             placeholder="Search..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             key={'SelectFilter'}
-            className="w-full"
+            className="h-9"
           />
         </div>
         {searchFilter && createNewPropertyClicked && (
@@ -95,9 +92,9 @@ export const OptionsDropdown = ({
                 onClick={() => {
                   createNewPropertyClicked(searchFilter)
                 }}
-                className="border-2 border-green-200 flex items-start cursor-pointer">
-                <div className="">
-                  <span className="font-medium">{searchFilter}</span>
+                className="border-2 border-green-200 flex items-start cursor-pointer hover:bg-green-50">
+                <div>
+                  <span className="font-medium text-green-700">{searchFilter}</span>
                 </div>
               </DropdownMenuCheckboxItem>
             }
@@ -110,7 +107,7 @@ export const OptionsDropdown = ({
         )}
         <div
           className={cn(
-            'max-h-[50vh] overflow-y-auto select-text',
+            'max-h-[300px] overflow-y-auto',
             listClassName,
           )}>
           {filteredOptions.map((item, index) => (
@@ -135,10 +132,7 @@ export const OptionsDropdown = ({
                 e.preventDefault()
               }}
               id={item.id.toString()}
-              className={cn(
-                index % 2 === 0 ? 'bg-slate-100/80' : 'bg-white',
-                'select-text',
-              )}>
+              className="cursor-pointer">
               {item.name || 'None'}
             </DropdownMenuCheckboxItem>
           ))}

@@ -1,0 +1,122 @@
+---
+title: Managing Tests
+description: Create, organize, and manage test cases within your projects
+---
+
+Test cases are the building blocks of your testing strategy. Organize them into sections, filter by attributes, and execute them in test runs.
+
+## View & Filter Tests
+
+The tests page displays all test cases for a project. Use the powerful filtering and search tools to find specific tests.
+
+**Available Filters:**
+- Priority, Platform, Automation Status
+- Squad, Labels, Test Covered By
+- Sections (hierarchical organization)
+- Combined AND/OR logic
+
+**Search:** Filter tests by title using the search bar.
+
+## Create a Test
+
+Click **New** → **Add Test** and fill in the required fields:
+
+**Required Fields:**
+- **Title** - Test case name
+- **Section** - Organize tests hierarchically
+
+**Default Fields:**
+- Priority, Automation Status, Platform, Test Covered By
+
+**Optional Fields:**
+- Description, Pre-conditions, Steps, Expected Results
+- Squad, Labels, Custom fields
+
+**Actions:**
+- **Create Test** - Save and return to list
+- **Add & Create Another** - Save and create another test
+- **Cancel** - Discard changes
+
+:::tip
+  Create new Sections and Squads on-the-fly while adding tests.
+:::
+
+<details>
+  <summary>View Demo</summary>
+  ![Create Test](/assets/add-test.gif)
+</details>
+
+## Edit a Test
+
+Click the **menu icon** on any test row and select **Edit**. Update any field and click **Update Test** to save changes.
+
+<details>
+  <summary>View Demo</summary>
+  ![Edit Test](/assets/edit-test.gif)
+</details>
+
+## Delete Tests
+
+**Single Test:**
+Click the **menu icon** → **Delete** → Confirm
+
+**Multiple Tests:**
+Select tests using checkboxes → **Delete** → Confirm
+
+:::caution
+  Deleted tests cannot be recovered.
+:::
+
+<details>
+  <summary>View Demo - Single</summary>
+  ![Delete Test](/assets/delete-test.gif)
+</details>
+
+<details>
+  <summary>View Demo - Bulk</summary>
+  ![Delete Multiple Tests](/assets/delete-bulk-test.gif)
+</details>
+
+## Bulk Operations
+
+Select multiple tests and use **Add Property** to update attributes in bulk.
+
+**Behavior:**
+- **Labels** - Adds to existing labels
+- **Other Attributes** - Replaces current value
+
+<details>
+  <summary>View Demo</summary>
+  ![Bulk Update](/assets/multiple-test-cases-attribute.gif)
+</details>
+
+## Sections & Organization
+
+Organize tests into hierarchical sections for better management.
+
+**Create Sections:**
+Click **New** → **Add Section** or create while adding tests
+
+**Section Features:**
+- Hierarchical structure (parent/child)
+- Filter tests by section
+- Bulk select by section
+
+## Quick Actions
+
+- **Upload/Download** - Import/export tests in bulk
+- **View Runs** - Access test execution history
+- **Columns** - Customize table view
+- **Add Label/Squad/Run** - Quick creation from dropdown
+
+<details>
+  <summary>View Demo - Add Label</summary>
+  ![Add Label](/assets/add-label.gif)
+</details>
+
+---
+
+## Next Steps
+
+- [Bulk Addition](/docs/guides/tests/bulk-addition) - Import tests via CSV/JSON
+- [Execute Test Runs](/docs/guides/runs/) - Run and track test execution

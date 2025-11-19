@@ -18,13 +18,13 @@ interface DialogComponentProps {
   variant?: 'delete' | 'edit' | 'add'
 }
 
-const dialogVariants = cva('gap-0 border-t-4 border-x-0  border-b-0', {
+const dialogVariants = cva('gap-0 border-t-[3px] border-x-0 border-b-0', {
   variants: {
     variant: {
-      delete: 'border-red-600',
-      edit: 'border-blue-600',
-      add: 'border-green-600',
-      default: '',
+      delete: 'border-red-500',
+      edit: 'border-slate-700',
+      add: 'border-slate-700',
+      default: 'border-slate-700',
     },
     size: {
       default: 'sm:max-w-[425px]',

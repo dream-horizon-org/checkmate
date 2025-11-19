@@ -69,7 +69,7 @@ export const TestsFilters = ({
     <Button
       variant={'outline'}
       className={cn(
-        'flex flex-row rounded-lg border-neutral-200 p-0',
+        'flex flex-row rounded-lg border-slate-200 p-0 shadow-sm hover:bg-slate-50',
         containerClassName,
       )}>
       <Tooltip
@@ -82,7 +82,7 @@ export const TestsFilters = ({
         }
         content={searchParams.has('filterType') ? 'Reset Filters' : 'Filter'}
       />
-      <Separator orientation="vertical" className="my-2 h-5" />
+      <Separator orientation="vertical" className="my-2 h-5 bg-slate-200" />
       <MultipleUnifiedFilter
         filters={filter}
         onFilterApply={onFilterApply}

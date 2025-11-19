@@ -18,14 +18,14 @@ export const TextInputComponent = ({
   onChange,
 }: ITextInputComponent) => {
   return (
-    <div className="flex flex-col flex-grow">
+    <div className="flex flex-col">
       <InputLabels labelName={labelName} isMandatory={isMandatory} />
       <Textarea
-        placeholder={placeholder ?? `Put your ${labelName} here.`}
+        placeholder={placeholder ?? `Enter ${labelName.toLowerCase()}...`}
         id={id}
         value={value}
         onChange={onChange}
-        className="w-full flex-grow mt-2"
+        className="mt-2.5 min-h-[120px] resize-y"
       />
     </div>
   )
@@ -40,13 +40,14 @@ export const ShortTextInputComponent = ({
   onChange,
 }: IShortTextInputComponent) => {
   return (
-    <div className="flex flex-col min-w-60 flex-1  space-y-2">
-      <InputLabels labelName={labelName} isMandatory={isMandatory} />
+    <div className="flex gap-1 items-center">
+      <InputLabels labelName={labelName} isMandatory={isMandatory} className="min-w-[120px] whitespace-nowrap" />
       <Input
         id={id}
-        placeholder={placeholder ?? labelName}
+        placeholder={placeholder ?? `Enter ${labelName.toLowerCase()}...`}
         value={value}
         onChange={onChange}
+        className="flex-1"
       />
     </div>
   )
@@ -65,28 +66,30 @@ export const OptionsInputComponent = ({
   selectedItemId,
   listClassName,
 }: IOptionsInputComponent) => (
-  <div className="flex flex-col space-y-2 focus-visible:ring-0 truncate">
-    <InputLabels
-      labelName={labelName}
-      isMandatory={isMandatory}
-      className={cn('focus-visible:ring-0', labelClassName)}
-    />
-    <div>
-      <OptionsDropdown
-        selectedItemId={selectedItemId}
-        filterName={labelName}
-        list={list}
-        handleCheckboxChange={handleCheckboxChange}
-        placeholder={placeholder}
-        createNewPropertyClicked={createNewPropertyClicked}
-        createNewToolTipString={createNewToolTipString}
-        listClassName={listClassName}
+  <div className="flex flex-col">
+    <div className="flex gap-1 items-center">
+      <InputLabels
+        labelName={labelName}
+        isMandatory={isMandatory}
+        className={cn('whitespace-nowrap min-w-[140px]', labelClassName)}
       />
-      {addingNewValue && (
-        <p className="text-xs max-w-80 text-green-500 mt-1 ml-2 text-wrap">
-          *Adding {labelName}, {addingNewValue}
-        </p>
-      )}
+      <div className="w-40">
+        <OptionsDropdown
+          selectedItemId={selectedItemId}
+          filterName={labelName}
+          list={list}
+          handleCheckboxChange={handleCheckboxChange}
+          placeholder={placeholder}
+          createNewPropertyClicked={createNewPropertyClicked}
+          createNewToolTipString={createNewToolTipString}
+          listClassName={listClassName}
+        />
+      </div>
     </div>
+    {addingNewValue && (
+      <p className="text-xs text-green-600 font-medium mt-2 ml-[132px]">
+        Creating new {labelName.toLowerCase()}: {addingNewValue}
+      </p>
+    )}
   </div>
 )

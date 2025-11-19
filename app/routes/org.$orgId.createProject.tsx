@@ -85,34 +85,25 @@ export default function CreateProject() {
   const isCreatingProject = createProjectFetcher.state !== 'idle'
 
   const handleClick = () => {
-    navigate(-1)
+    navigate(`/projects?orgId=${orgId}&page=1&pageSize=10`, {
+      replace: true,
+    })
   }
 
   return (
-    <div
-      className={cn(
-        'flex',
-        'flex-col',
-        'justify-center',
-        'items-center',
-        'h-9/20',
-      )}>
-      <div
-        className={cn(
-          'w-1/3',
-          'mt-16',
-          'px-4',
-          'py-3',
-          'rounded-md',
-          'shadow-lg shadow-gray-200	',
-        )}>
-        <div className={cn('flex', 'items-center', 'py-4')}>
-          <text className={cn('flex', 'text-2xl', 'center')}>
-            {'Create Project'}
-          </text>
+    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-64px)] py-12">
+      <div className="w-full max-w-xl bg-white rounded-lg border border-slate-200 shadow-sm p-8">
+        {/* Header */}
+        <div className="pb-6 mb-6 border-b border-slate-200">
+          <h1 className="text-2xl font-bold text-slate-900">Create Project</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Add a new project to your organization
+          </p>
         </div>
+
+        {/* Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="projectName"
@@ -121,21 +112,18 @@ export default function CreateProject() {
                   <FormItem>
                     <FormLabel
                       htmlFor="project-name-input"
-                      className={cn('text-lg', 'text-black')}>
+                      className="text-sm font-medium text-slate-700">
                       Project Name
                     </FormLabel>
                     <FormControl id="project-name-input">
                       <>
                         <Input
                           type="text"
-                          placeholder="Project Name"
+                          placeholder="Enter project name"
                           {...field}
-                          className="border  rounded-md px-3 py-2 w-full"
-                          style={{
-                            backgroundColor: 'inherit',
-                          }}
+                          className="border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-lg"
                         />
-                        <FormMessage>
+                        <FormMessage className="text-xs text-red-600">
                           {form.formState.errors.projectName?.message}
                         </FormMessage>
                       </>
@@ -144,24 +132,25 @@ export default function CreateProject() {
                 )
               }}
             />
-            <InputsSpacing />
+            
             <FormField
               control={form.control}
               name="projectDescription"
               render={({field}) => {
                 return (
                   <FormItem>
-                    <FormLabel className={cn('text-lg')}>
+                    <FormLabel className="text-sm font-medium text-slate-700">
                       Project Description
                     </FormLabel>
                     <FormControl>
                       <>
                         <Textarea
                           style={{resize: 'none'}}
-                          placeholder="Project Description"
+                          placeholder="Enter project description (optional)"
                           {...field}
+                          className="border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-lg min-h-[100px]"
                         />
-                        <FormMessage>
+                        <FormMessage className="text-xs text-red-600">
                           {form.formState.errors.projectDescription?.message}
                         </FormMessage>
                       </>
@@ -170,28 +159,26 @@ export default function CreateProject() {
                 )
               }}
             />
-            <InputsSpacing />
-            <div className={cn('pt-4', 'flex', 'flex-row')}>
-              <div className="pr-2">
-                <Button type="submit" disabled={isCreatingProject}>
-                  {isCreatingProject ? 'Creating Project...' : 'Create'}
-                </Button>
-              </div>
-              <div>
-                <Button
-                  className="border-2"
-                  variant={'outline'}
-                  onClick={handleClick}
-                  type="button">
-                  Cancel
-                </Button>
-              </div>
+            
+            {/* Actions */}
+            <div className="flex items-center gap-3 pt-4">
+              <Button 
+                type="submit" 
+                disabled={isCreatingProject}
+                className="bg-slate-900 hover:bg-slate-800 text-white px-6 rounded-lg shadow-sm">
+                {isCreatingProject ? 'Creating Project...' : 'Create Project'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleClick}
+                type="button"
+                className="border-slate-300 hover:bg-slate-50 text-slate-700 px-6 rounded-lg">
+                Cancel
+              </Button>
             </div>
           </form>
         </Form>
       </div>
-      <div
-        className={`mt-20 w-full border-t-0 border-b-[1px] gradient-thin-line`}></div>
     </div>
   )
 }

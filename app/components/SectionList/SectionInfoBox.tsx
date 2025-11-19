@@ -36,14 +36,14 @@ export const SectionInfoBox = () => {
   return (
     <HoverCard>
       <HoverCardTrigger>
-        <Info size={16} className="self-center align-middle ml-2 mt-1" />
+        <Info size={16} className="self-center align-middle text-slate-400 hover:text-slate-600 transition-colors" />
       </HoverCardTrigger>
-      <HoverCardContent className="min-w-80 text-sm font-normal text-wrap mr-4">
-        <ul className="ml-6 list-disc [&>li]:mt-2">
+      <HoverCardContent className="min-w-80 text-sm font-normal text-wrap mr-4 bg-white border-slate-200">
+        <ul className="ml-6 list-disc [&>li]:mt-2 text-slate-600">
           {instructions.map((item, index) => (
             <li key={index}>
               {item.action && (
-                <span className={cn('font-semibold')}>{item.action} </span>
+                <span className={cn('font-semibold text-slate-700')}>{item.action} </span>
               )}
               {item.description}
             </li>

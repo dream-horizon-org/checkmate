@@ -59,14 +59,14 @@ export const SearchBar = (props: SearchBarProps) => {
 
   return (
     <div
-      className="flex items-center rounded-3xl w-full relative"
+      className="flex items-center rounded-lg w-full relative"
       id={'search-bar'}>
-      <MagnifyingGlassIcon className="h-4 w-4 shrink-0 opacity-50 absolute left-4" />
+      <MagnifyingGlassIcon className="h-4 w-4 shrink-0 text-slate-400 absolute left-3" />
       <Input
         type="text"
         ref={input}
         className={cn(
-          'h-8 border-zinc-200 rounded-3xl shadow-none file:font-medium pl-9',
+          'h-10 border-slate-200 bg-white rounded-lg shadow-sm hover:border-slate-300 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 file:font-medium pl-10 pr-10 text-sm',
         )}
         placeholder={props.placeholdertext || 'Search...'}
         onChange={handleChange}
@@ -74,12 +74,12 @@ export const SearchBar = (props: SearchBarProps) => {
       />
       {searchstring?.length > 0 && (
         <CrossCircledIcon
-          className={'absolute right-4 cursor-pointer size-5'}
+          className="absolute right-3 cursor-pointer size-4 text-slate-400 hover:text-slate-600 transition-colors"
           onClick={resetSearch}
         />
       )}
       {searchstring?.length === 0 && (
-        <kbd className=" absolute right-4 bg-gray-200 border-b-2 border-slate-500 rounded text-xs px-[8px] py-[2px] text-gray-500">
+        <kbd className="absolute right-3 bg-slate-100 border border-slate-200 rounded text-xs px-2 py-0.5 text-slate-500 font-mono">
           /
         </kbd>
       )}

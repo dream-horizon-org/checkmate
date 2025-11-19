@@ -13,11 +13,9 @@ export const InputLabels = ({
   className,
 }: IInputLabels) => {
   return (
-    <Label
-      style={{fontSize: 15}}
-      className={cn('font-semibold mt-0.5', className)}>
+    <Label className={cn('text-sm font-semibold text-slate-700', className)}>
       {labelName}
-      {isMandatory && <sup className="text-rose-500">*</sup>}
+      {isMandatory && <sup className="text-red-600 ml-0.5">*</sup>}
     </Label>
   )
 }

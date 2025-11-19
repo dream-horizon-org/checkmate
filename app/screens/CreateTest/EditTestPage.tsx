@@ -326,320 +326,364 @@ export default function EditTestPage({
   }, [])
 
   return (
-    <div className={cn('flex', 'flex-col', 'max-h-full')}>
-      <InputsSpacing />
-      <div className="bg-gray-50 p-4 rounded-lg shadow-md">
-        <ShortTextInputComponent
-          labelName={AddTestLabels.Title}
-          value={formData.title}
-          onChange={handleChange}
-          id={AddTestLabels.Title}
-          isMandatory={isMandatory(AddTestLabels.Title)}
-        />
-        <InputsSpacing />
-        <ShortTextInputComponent
-          labelName={AddTestLabels.Description}
-          id={AddTestLabels.Description}
-          value={formData?.description ?? ''}
-          onChange={handleChange}
-        />
-      </div>
-      <InputsSpacing />
-      <div className="flex flex-row flex-wrap gap-4 bg-gray-50 p-4 rounded-lg shadow-md">
-        {sectionFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.Section}
-            isMandatory={isMandatory('Section')}
-            placeholder={sectionListPlaceholder({
-              sectionId: formData.sectionId,
-              sectionData: sectionFetcher.data,
-              newProperty: formData.new_section,
-            })}
-            selectedItemId={formData.sectionId}
-            key={AddTestLabels.Section}
-            list={
-              sectionFetcher.data?.data
-                ? sectionFetcher.data?.data
-                    ?.map((section) => {
-                      return {
-                        id: section.sectionId,
-                        property: section.sectionName,
-                        name: getSectionHierarchy({
-                          sectionId: section.sectionId,
-                          sectionsData: sectionFetcher.data?.data,
-                        }),
-                      }
-                    })
-                    ?.sort((a, b) =>
-                      a.name.localeCompare(b.name, undefined, {
-                        sensitivity: 'base',
-                      }),
-                    )
-                : []
-            }
-            handleCheckboxChange={(param) => {
-              setFormData({
-                ...formData,
-                sectionId: param.id,
-                new_section: undefined,
-              })
-            }}
-            createNewPropertyClicked={(section: string) => {
-              setFormData({...formData, sectionId: 0, new_section: section})
-            }}
-            createNewToolTipString={`Select to create new section, use ' > ' for nested section`}
-            addingNewValue={formData.new_section}
-          />
-        )}
+    <div className="flex flex-col h-full pt-6">
+      {/* Header Section */}
+      <div className="pb-6 mb-6 border-b border-slate-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">
+              {source === 'addTest' ? 'Create Test Case' : 'Edit Test Case'}
+            </h1>
+            <p className="text-sm text-slate-600 mt-1">
+              {source === 'addTest'
+                ? 'Fill in the details below to create a new test case'
+                : 'Update the test case details below'}
+            </p>
+          </div>
 
-        {squadsFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.Squad}
-            placeholder={squadListPlaceholder({
-              squadId: formData.squadId,
-              squadData: squadsFetcher.data,
-              newProperty: formData.new_squad,
-            })}
-            key={AddTestLabels.Squad}
-            list={squadsFetcher.data?.data?.map((squad) => {
-              return {
-                id: squad.squadId,
-                name: squad.squadName,
-              }
-            })}
-            handleCheckboxChange={(param) => {
-              setFormData({
-                ...formData,
-                squadId: param.id,
-                new_squad: undefined,
-              })
-            }}
-            createNewPropertyClicked={(squad: string) => {
-              setFormData({...formData, squadId: 0, new_squad: squad})
-            }}
-            addingNewValue={formData.new_squad}
-          />
-        )}
-
-        {labelsFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.Labels}
-            key={AddTestLabels.Labels}
-            placeholder={
-              formData?.labelIds && formData?.labelIds?.length > 0
-                ? labelsFetcher.data?.data
-                    ?.filter((label) =>
-                      formData.labelIds?.includes(label.labelId),
-                    )
-                    .map((label) => label.labelName)
-                    .join(', ') ?? 'None'
-                : 'None'
-            }
-            list={labelsFetcher.data?.data?.map((labels) => {
-              return {
-                id: labels.labelId,
-                name: labels.labelName,
-              }
-            })}
-            handleCheckboxChange={(param) => {
-              setFormData((prevData) => {
-                const isSelected = prevData?.labelIds?.includes(param.id)
-                const updatedLabelIds = isSelected
-                  ? prevData?.labelIds?.filter((id) => id !== param.id)
-                  : [...prevData?.labelIds, param.id]
-                return {...prevData, labelIds: updatedLabelIds}
-              })
-            }}
-          />
-        )}
-
-        {priorityFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.Priority}
-            isMandatory={isMandatory(AddTestLabels.Priority)}
-            placeholder={
-              formData.priorityId
-                ? priorityFetcher.data?.data?.find(
-                    (priority) => priority.priorityId === formData.priorityId,
-                  )?.priorityName ?? 'None'
-                : 'None'
-            }
-            key={AddTestLabels.Priority}
-            list={priorityFetcher.data?.data?.map((priority) => {
-              return {
-                id: priority.priorityId,
-                name: priority.priorityName,
-              }
-            })}
-            handleCheckboxChange={(param) => {
-              setFormData({...formData, priorityId: param.id})
-            }}
-          />
-        )}
-
-        {automationStatusFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.AutomationStatus}
-            isMandatory={isMandatory(AddTestLabels.AutomationStatus)}
-            key={AddTestLabels.AutomationStatus}
-            placeholder={
-              formData.automationStatusId
-                ? automationStatusFetcher.data?.data?.find(
-                    (item) =>
-                      item.automationStatusId === formData.automationStatusId,
-                  )?.automationStatusName ?? 'None'
-                : 'None'
-            }
-            list={automationStatusFetcher.data?.data?.map(
-              (automationStatus) => {
-                return {
-                  id: automationStatus.automationStatusId,
-                  name: automationStatus.automationStatusName,
-                }
-              },
+          <div className="flex items-center gap-3">
+            {source === 'addTest' ? (
+              <>
+                <Button
+                  size="default"
+                  variant="outline"
+                  onClick={() => handleAddSubmit(true)}>
+                  Add & Create Another
+                </Button>
+                <Button size="default" onClick={() => handleAddSubmit(false)}>
+                  Create Test Case
+                </Button>
+              </>
+            ) : (
+              <Button size="default" onClick={() => handleEditSubmit()}>
+                Update Test
+              </Button>
             )}
-            handleCheckboxChange={(param) => {
-              setFormData({...formData, automationStatusId: param.id})
-            }}
-          />
-        )}
-
-        {typeFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.Type}
-            isMandatory={isMandatory('Type')}
-            key={AddTestLabels.Type}
-            placeholder={
-              formData.typeId
-                ? typeFetcher.data?.data?.find(
-                    (item) => item.typeId === formData.typeId,
-                  )?.typeName ?? 'None'
-                : 'None'
-            }
-            list={typeFetcher.data?.data?.map((type) => ({
-              id: type.typeId,
-              name: type.typeName || 'Unknown Type',
-            }))}
-            handleCheckboxChange={(selectedOption) => {
-              setFormData({...formData, typeId: selectedOption.id})
-            }}
-          />
-        )}
-
-        {platformFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.Platform}
-            isMandatory={isMandatory('Platform')}
-            key={AddTestLabels.Platform}
-            placeholder={
-              formData.platformId
-                ? platformFetcher.data?.data?.find(
-                    (item) => item.platformId === formData.platformId,
-                  )?.platformName ?? 'None'
-                : 'None'
-            }
-            list={platformFetcher.data?.data?.map((platform) => ({
-              id: platform.platformId,
-              name: platform.platformName || 'Unknown Platform',
-            }))}
-            handleCheckboxChange={(selectedOption) => {
-              setFormData({...formData, platformId: selectedOption.id})
-            }}
-          />
-        )}
-
-        {testCoveredByFetcher.data?.data && (
-          <OptionsInputComponent
-            labelName={AddTestLabels.TestCoveredBy}
-            isMandatory={isMandatory(AddTestLabels.TestCoveredBy)}
-            key={AddTestLabels.TestCoveredBy}
-            placeholder={
-              formData.testCoveredById
-                ? testCoveredByFetcher.data?.data?.find(
-                    (item) => item.testCoveredById === formData.testCoveredById,
-                  )?.testCoveredByName ?? 'None'
-                : 'None'
-            }
-            list={testCoveredByFetcher.data?.data?.map((testCoveredBy) => ({
-              id: testCoveredBy.testCoveredById,
-              name:
-                testCoveredBy.testCoveredByName || 'Unknown Test Covered By',
-            }))}
-            handleCheckboxChange={(selectedOption) => {
-              setFormData({...formData, testCoveredById: selectedOption.id})
-            }}
-          />
-        )}
-
-        <div className="flex flex-wrap w-full items-center gap-2">
-          <ShortTextInputComponent
-            labelName={AddTestLabels.JiraTicket}
-            id={AddTestLabels.JiraTicket}
-            value={formData?.jiraTicket ?? ''}
-            onChange={handleChange}
-          />
-          <ShortTextInputComponent
-            labelName={AddTestLabels.Defects}
-            id={AddTestLabels.Defects}
-            value={formData?.defects ?? ''}
-            onChange={handleChange}
-          />
-          <ShortTextInputComponent
-            labelName={AddTestLabels.AutomationId}
-            id={AddTestLabels.AutomationId}
-            value={formData?.automationId ?? ''}
-            onChange={handleChange}
-          />
+            <Button size="default" variant="outline" onClick={handleGoBack}>
+              Cancel
+            </Button>
+          </div>
         </div>
       </div>
-      <InputsSpacing />
-      <div className="flex flex-col gap-4 bg-gray-50 p-4 rounded-lg shadow-md h-screen">
-        <TextInputComponent
-          onChange={handleChange}
-          id={AddTestLabels.Preconditions}
-          labelName={AddTestLabels.Preconditions}
-          value={formData?.preConditions ?? ''}
-        />
-        <TextInputComponent
-          onChange={handleChange}
-          id={AddTestLabels.Steps}
-          labelName={AddTestLabels.Steps}
-          value={formData?.steps ?? ''}
-          isMandatory={isMandatory('Steps')}
-        />
-        <TextInputComponent
-          onChange={handleChange}
-          id={AddTestLabels.ExpectedResult}
-          labelName={AddTestLabels.ExpectedResult}
-          value={formData?.expectedResult ?? ''}
-          isMandatory={isMandatory('Expected Result')}
-        />
-        <TextInputComponent
-          onChange={handleChange}
-          id={AddTestLabels.AdditionalGroups}
-          labelName={AddTestLabels.AdditionalGroups}
-          value={formData?.additionalGroups ?? ''}
-        />
-      </div>
-      <InputsSpacing className="pt-8" />
-      <div className="flex h-5 pb-8 items-center space-x-4 text-sm">
-        {source === 'addTest' ? (
-          <>
-            <Button onClick={() => handleAddSubmit(false)}>
-              Add Test Case
-            </Button>
-            <Button onClick={() => handleAddSubmit(true)}>Add & Next</Button>
-          </>
-        ) : (
-          <Button onClick={() => handleEditSubmit()}>Update Test</Button>
-        )}
-        <Button
-          asChild
-          variant={'outline'}
-          style={{cursor: 'pointer'}}
-          onClick={handleGoBack}>
-          <span>Cancel</span>
-        </Button>
+
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto space-y-6 pr-2">
+        {/* Basic Information Card */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">
+            Basic Information
+          </h2>
+          <div className="space-y-5">
+            <ShortTextInputComponent
+              labelName={AddTestLabels.Title}
+              value={formData.title}
+              onChange={handleChange}
+              id={AddTestLabels.Title}
+              isMandatory={isMandatory(AddTestLabels.Title)}
+            />
+            <ShortTextInputComponent
+              labelName={AddTestLabels.Description}
+              id={AddTestLabels.Description}
+              value={formData?.description ?? ''}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* Test Properties Card */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">
+            Test Properties
+          </h2>
+          <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+            {sectionFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.Section}
+                isMandatory={isMandatory('Section')}
+                placeholder={sectionListPlaceholder({
+                  sectionId: formData.sectionId,
+                  sectionData: sectionFetcher.data,
+                  newProperty: formData.new_section,
+                })}
+                selectedItemId={formData.sectionId}
+                key={AddTestLabels.Section}
+                list={
+                  sectionFetcher.data?.data
+                    ? sectionFetcher.data?.data
+                        ?.map((section) => {
+                          return {
+                            id: section.sectionId,
+                            property: section.sectionName,
+                            name: getSectionHierarchy({
+                              sectionId: section.sectionId,
+                              sectionsData: sectionFetcher.data?.data,
+                            }),
+                          }
+                        })
+                        ?.sort((a, b) =>
+                          a.name.localeCompare(b.name, undefined, {
+                            sensitivity: 'base',
+                          }),
+                        )
+                    : []
+                }
+                handleCheckboxChange={(param) => {
+                  setFormData({
+                    ...formData,
+                    sectionId: param.id,
+                    new_section: undefined,
+                  })
+                }}
+                createNewPropertyClicked={(section: string) => {
+                  setFormData({...formData, sectionId: 0, new_section: section})
+                }}
+                createNewToolTipString={`Select to create new section, use ' > ' for nested section`}
+                addingNewValue={formData.new_section}
+              />
+            )}
+
+            {squadsFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.Squad}
+                placeholder={squadListPlaceholder({
+                  squadId: formData.squadId,
+                  squadData: squadsFetcher.data,
+                  newProperty: formData.new_squad,
+                })}
+                key={AddTestLabels.Squad}
+                list={squadsFetcher.data?.data?.map((squad) => {
+                  return {
+                    id: squad.squadId,
+                    name: squad.squadName,
+                  }
+                })}
+                handleCheckboxChange={(param) => {
+                  setFormData({
+                    ...formData,
+                    squadId: param.id,
+                    new_squad: undefined,
+                  })
+                }}
+                createNewPropertyClicked={(squad: string) => {
+                  setFormData({...formData, squadId: 0, new_squad: squad})
+                }}
+                addingNewValue={formData.new_squad}
+              />
+            )}
+
+            {labelsFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.Labels}
+                key={AddTestLabels.Labels}
+                placeholder={
+                  formData?.labelIds && formData?.labelIds?.length > 0
+                    ? labelsFetcher.data?.data
+                        ?.filter((label) =>
+                          formData.labelIds?.includes(label.labelId),
+                        )
+                        .map((label) => label.labelName)
+                        .join(', ') ?? 'None'
+                    : 'None'
+                }
+                list={labelsFetcher.data?.data?.map((labels) => {
+                  return {
+                    id: labels.labelId,
+                    name: labels.labelName,
+                  }
+                })}
+                handleCheckboxChange={(param) => {
+                  setFormData((prevData) => {
+                    const isSelected = prevData?.labelIds?.includes(param.id)
+                    const updatedLabelIds = isSelected
+                      ? prevData?.labelIds?.filter((id) => id !== param.id)
+                      : [...prevData?.labelIds, param.id]
+                    return {...prevData, labelIds: updatedLabelIds}
+                  })
+                }}
+              />
+            )}
+
+            {priorityFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.Priority}
+                isMandatory={isMandatory(AddTestLabels.Priority)}
+                placeholder={
+                  formData.priorityId
+                    ? priorityFetcher.data?.data?.find(
+                        (priority) => priority.priorityId === formData.priorityId,
+                      )?.priorityName ?? 'None'
+                    : 'None'
+                }
+                key={AddTestLabels.Priority}
+                list={priorityFetcher.data?.data?.map((priority) => {
+                  return {
+                    id: priority.priorityId,
+                    name: priority.priorityName,
+                  }
+                })}
+                handleCheckboxChange={(param) => {
+                  setFormData({...formData, priorityId: param.id})
+                }}
+              />
+            )}
+
+            {automationStatusFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.AutomationStatus}
+                isMandatory={isMandatory(AddTestLabels.AutomationStatus)}
+                key={AddTestLabels.AutomationStatus}
+                placeholder={
+                  formData.automationStatusId
+                    ? automationStatusFetcher.data?.data?.find(
+                        (item) =>
+                          item.automationStatusId === formData.automationStatusId,
+                      )?.automationStatusName ?? 'None'
+                    : 'None'
+                }
+                list={automationStatusFetcher.data?.data?.map(
+                  (automationStatus) => {
+                    return {
+                      id: automationStatus.automationStatusId,
+                      name: automationStatus.automationStatusName,
+                    }
+                  },
+                )}
+                handleCheckboxChange={(param) => {
+                  setFormData({...formData, automationStatusId: param.id})
+                }}
+              />
+            )}
+
+            {typeFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.Type}
+                isMandatory={isMandatory('Type')}
+                key={AddTestLabels.Type}
+                placeholder={
+                  formData.typeId
+                    ? typeFetcher.data?.data?.find(
+                        (item) => item.typeId === formData.typeId,
+                      )?.typeName ?? 'None'
+                    : 'None'
+                }
+                list={typeFetcher.data?.data?.map((type) => ({
+                  id: type.typeId,
+                  name: type.typeName || 'Unknown Type',
+                }))}
+                handleCheckboxChange={(selectedOption) => {
+                  setFormData({...formData, typeId: selectedOption.id})
+                }}
+              />
+            )}
+
+            {platformFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.Platform}
+                isMandatory={isMandatory('Platform')}
+                key={AddTestLabels.Platform}
+                placeholder={
+                  formData.platformId
+                    ? platformFetcher.data?.data?.find(
+                        (item) => item.platformId === formData.platformId,
+                      )?.platformName ?? 'None'
+                    : 'None'
+                }
+                list={platformFetcher.data?.data?.map((platform) => ({
+                  id: platform.platformId,
+                  name: platform.platformName || 'Unknown Platform',
+                }))}
+                handleCheckboxChange={(selectedOption) => {
+                  setFormData({...formData, platformId: selectedOption.id})
+                }}
+              />
+            )}
+
+            {testCoveredByFetcher.data?.data && (
+              <OptionsInputComponent
+                labelName={AddTestLabels.TestCoveredBy}
+                isMandatory={isMandatory(AddTestLabels.TestCoveredBy)}
+                key={AddTestLabels.TestCoveredBy}
+                placeholder={
+                  formData.testCoveredById
+                    ? testCoveredByFetcher.data?.data?.find(
+                        (item) => item.testCoveredById === formData.testCoveredById,
+                      )?.testCoveredByName ?? 'None'
+                    : 'None'
+                }
+                list={testCoveredByFetcher.data?.data?.map((testCoveredBy) => ({
+                  id: testCoveredBy.testCoveredById,
+                  name:
+                    testCoveredBy.testCoveredByName || 'Unknown Test Covered By',
+                }))}
+                handleCheckboxChange={(selectedOption) => {
+                  setFormData({...formData, testCoveredById: selectedOption.id})
+                }}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Additional Fields Card */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">
+            Additional Information
+          </h2>
+          <div className="grid grid-cols-3 gap-6">
+            <ShortTextInputComponent
+              labelName={AddTestLabels.JiraTicket}
+              id={AddTestLabels.JiraTicket}
+              value={formData?.jiraTicket ?? ''}
+              onChange={handleChange}
+            />
+            <ShortTextInputComponent
+              labelName={AddTestLabels.Defects}
+              id={AddTestLabels.Defects}
+              value={formData?.defects ?? ''}
+              onChange={handleChange}
+            />
+            <ShortTextInputComponent
+              labelName={AddTestLabels.AutomationId}
+              id={AddTestLabels.AutomationId}
+              value={formData?.automationId ?? ''}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* Test Details Card */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">
+            Test Details
+          </h2>
+          <div className="space-y-5">
+            <TextInputComponent
+              onChange={handleChange}
+              id={AddTestLabels.Preconditions}
+              labelName={AddTestLabels.Preconditions}
+              value={formData?.preConditions ?? ''}
+            />
+            <TextInputComponent
+              onChange={handleChange}
+              id={AddTestLabels.Steps}
+              labelName={AddTestLabels.Steps}
+              value={formData?.steps ?? ''}
+              isMandatory={isMandatory('Steps')}
+            />
+            <TextInputComponent
+              onChange={handleChange}
+              id={AddTestLabels.ExpectedResult}
+              labelName={AddTestLabels.ExpectedResult}
+              value={formData?.expectedResult ?? ''}
+              isMandatory={isMandatory('Expected Result')}
+            />
+            <TextInputComponent
+              onChange={handleChange}
+              id={AddTestLabels.AdditionalGroups}
+              labelName={AddTestLabels.AdditionalGroups}
+              value={formData?.additionalGroups ?? ''}
+            />
+          </div>
+        </div>
       </div>
     </div>
   )

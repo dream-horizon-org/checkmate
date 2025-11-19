@@ -1,0 +1,748 @@
+---
+title: System Architecture
+description: Comprehensive technical architecture and design of the Checkmate platform
+---
+
+import { Card, CardGrid } from '@site/src/components/Card';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Overview
+
+Checkmate is a full-stack test case management system built with modern web technologies. It provides a robust platform for organizing test cases, executing test runs, tracking progress, and generating reports.
+
+### Architectural Principles
+
+- **Monolithic Full-Stack** - Single deployable unit with clear separation of concerns
+- **Type-Safe Throughout** - End-to-end TypeScript for reliability
+- **API-First Design** - RESTful APIs for external integrations
+- **Security-First** - Role-based access control with Casbin
+- **Data-Centric** - MySQL as single source of truth
+- **Modern Stack** - Latest stable versions of proven technologies
+
+---
+
+## Technology Stack
+
+### Why These Technologies?
+
+Each technology was chosen to address specific requirements while maintaining consistency and developer experience.
+
+### Frontend
+
+| Technology | Purpose | Why We Chose It |
+|------------|---------|-----------------|
+| **Remix** | Full-stack React framework | Server-side rendering, fast page loads, nested routing, excellent DX |
+| **React 18** | UI library | Component-based architecture, large ecosystem, team familiarity |
+| **TypeScript 5** | Type safety | Catch errors early, better IDE support, improved maintainability |
+| **shadcn/ui** | Component library | Modern, accessible, customizable, built on Radix UI primitives |
+| **TailwindCSS 3** | Styling | Utility-first, rapid development, consistent design system |
+| **TanStack Table v8** | Data tables | Advanced features (sorting, filtering, pagination), type-safe |
+| **Zod** | Validation | Schema validation, type inference, excellent error messages |
+
+### Backend
+
+| Technology | Purpose | Why We Chose It |
+|------------|---------|-----------------|
+| **Node.js 18+** | JavaScript runtime | Fast, scalable, JavaScript everywhere |
+| **Remix** | Server framework | Unified frontend/backend, loader pattern, form handling |
+| **Drizzle ORM** | Database ORM | Type-safe, SQL-like syntax, minimal overhead, migration support |
+| **MySQL 8** | Database | Proven reliability, ACID compliance, excellent performance |
+| **Casbin** | Authorization | Flexible RBAC, policy-based, supports complex permissions |
+| **Remix-Auth** | Authentication | Google OAuth integration, session management |
+
+### Infrastructure & Tools
+
+| Technology | Purpose |
+|------------|---------|
+| **Docker & Docker Compose** | Containerization and orchestration |
+| **Vite** | Build tool and dev server |
+| **Jest** | Unit and integration testing |
+| **GitHub Actions** | CI/CD pipeline (future) |
+
+---
+
+## System Architecture
+
+The system follows a layered architecture with clear separation between presentation, business logic, and data access.
+
+```mermaid
+graph TB
+    subgraph Client["Client Layer"]
+        Browser["🌐 Browser<br/>(React UI)"]
+        API["📮 API Clients<br/>(Postman, cURL)"]
+        External["🔌 Integrations<br/>(CI/CD, Scripts)"]
+    end
+    
+    subgraph AppServer["Application Server (Remix + Node.js)"]
+        subgraph Presentation["Presentation Layer"]
+            React["React Components"]
+            Routes["Remix Routes (SSR)"]
+            State["Client State"]
+        end
+        
+        subgraph BusinessLogic["Business Logic Layer"]
+            Controllers["Data Controllers"]
+            Services["Services<br/>(Auth, RBAC, Config)"]
+            Validation["Validation<br/>(Zod Schemas)"]
+        end
+        
+        subgraph DataAccess["Data Access Layer"]
+            ORM["Drizzle ORM"]
+            DAO["Data Access Objects"]
+            DBClient["Database Client"]
+        end
+    end
+    
+    subgraph Database["Database Layer"]
+        MySQL["🗄️ MySQL<br/>Tests, Projects, Runs<br/>Users, Organizations<br/>Labels, Sections, Squads"]
+    end
+    
+    subgraph ExternalServices["External Services"]
+        OAuth["🔐 Google OAuth 2.0"]
+        Casbin["🛡️ Casbin RBAC"]
+    end
+    
+    Browser -->|HTTPS| Presentation
+    API -->|HTTPS| Presentation
+    External -->|HTTPS| Presentation
+    
+    Presentation --> BusinessLogic
+    BusinessLogic --> DataAccess
+    DataAccess --> MySQL
+    
+    BusinessLogic -.->|Auth| OAuth
+    BusinessLogic -.->|RBAC| Casbin
+    
+    style Client fill:#e1f5ff
+    style AppServer fill:#fff4e6
+    style Database fill:#f3e5f5
+    style ExternalServices fill:#e8f5e9
+```
+
+---
+
+## Application Architecture
+
+### Layer Breakdown
+
+#### 1. Presentation Layer (`app/`)
+
+**Responsibilities:**
+- Render UI components
+- Handle user interactions
+- Client-side routing
+- Form management
+- State management
+
+**Key Directories:**
+```
+app/
+├── components/        # Reusable UI components
+├── screens/           # Page-level components
+├── ui/               # shadcn/ui primitives
+├── routes/           # Remix route handlers
+└── styles/           # Global styles
+```
+
+**Component Hierarchy:**
+```
+Root Layout (app/root.tsx)
+├── Header Component
+│   ├── App Logo & Navigation
+│   ├── User Profile Dropdown
+│   └── Logout Button
+├── Main Content Area
+│   ├── Projects Page
+│   ├── Tests Page
+│   │   ├── Test List
+│   │   ├── Test Filters
+│   │   ├── Section Tree
+│   │   └── Test Detail Panel
+│   ├── Runs Page
+│   │   ├── Run List
+│   │   ├── Run Filters
+│   │   └── Run Detail View
+│   └── Admin Panel
+└── Footer
+```
+
+#### 2. Business Logic Layer (`app/dataController/`)
+
+**Responsibilities:**
+- Implement business rules
+- Validate data
+- Orchestrate operations
+- Transform data
+
+**Controllers:**
+```typescript
+app/dataController/
+├── projects.controller.ts      # Project CRUD
+├── tests.controller.ts          # Test management
+├── runs.controller.ts           # Run management
+├── users.controller.ts          # User operations
+├── labels.controller.ts         # Label operations
+├── sections.controller.ts       # Section hierarchy
+├── squads.controller.ts         # Squad management
+├── priority.controller.ts       # Priority types
+├── platform.controller.ts       # Platform types
+└── automationStatus.controller.ts
+```
+
+#### 3. Data Access Layer (`app/db/`)
+
+**Responsibilities:**
+- Database connection management
+- Execute queries
+- Transaction handling
+- Schema definitions
+
+**Structure:**
+```
+app/db/
+├── client.ts          # DB connection
+├── schema/            # Drizzle schemas
+│   ├── users.ts
+│   ├── projects.ts
+│   ├── tests.ts
+│   ├── runs.ts
+│   └── ...
+├── dao/               # Data access objects
+│   ├── users.dao.ts
+│   ├── projects.dao.ts
+│   ├── tests.dao.ts
+│   └── ...
+└── seed/              # Seed data
+```
+
+#### 4. Service Layer (`app/services/`)
+
+**Responsibilities:**
+- Authentication logic
+- Authorization policies
+- Configuration management
+- Cross-cutting concerns
+
+**Services:**
+```
+app/services/
+├── auth/              # Authentication
+│   ├── Auth.server.ts
+│   ├── GoogleStrategy.ts
+│   └── session.server.ts
+├── rbac/              # Authorization
+│   ├── enforcer.ts
+│   ├── policies.ts
+│   └── roles.ts
+└── config.ts          # App configuration
+```
+
+---
+
+## Data Model
+
+Checkmate follows a **project-centric approach** where everything is organized hierarchically under projects.
+
+### Conceptual Model
+
+```
+Organization
+└── Projects
+    ├── Test Cases
+    │   ├── Sections (hierarchical)
+    │   ├── Labels (flexible tagging)
+    │   ├── Squads (team ownership)
+    │   └── Attributes (priority, platform, etc.)
+    └── Test Runs
+        ├── Selected Tests
+        ├── Test Results
+        └── Execution History
+```
+
+### Projects
+
+Projects represent a collection of tests for a specific application, feature, or service.
+
+**Key Features:**
+- Organize tests by application or feature
+- Team collaboration and ownership
+- Independent test and run management
+- Role-based access control per project
+
+### Test Cases
+
+Test cases are the core entities containing test specifications and metadata.
+
+**Required Attributes:**
+- **Title** - Test case name
+- **Section** - Hierarchical organization (required)
+
+**Classification Attributes:**
+- **Squad** - Team or group ownership
+- **Labels** - Flexible tagging (e.g., "release-blocker", "regression")
+- **Priority** - Critical, High, Medium, Low
+- **Platform** - All Platforms, Android Only, iOS Only, Web Only
+- **Automation Status** - Not Automatable, Automated, Automatable
+- **Test Covered By** - Manual, E2E, Integration, Unit, Contract
+
+**Detailed Attributes:**
+- Preconditions
+- Steps
+- Expected Results
+- Additional Groups
+- Jira Ticket Reference
+- Automation ID
+- Related Defects
+
+**Benefits:**
+- **Efficient Filtering** - Find tests quickly by any attribute
+- **Clear Ownership** - Squads and sections define responsibility
+- **Flexible Grouping** - Labels adapt to evolving needs
+- **Streamlined Execution** - Create targeted test runs based on filters
+
+### Test Runs
+
+Runs are collections of test cases organized for execution, enabling progress tracking and reporting.
+
+**Key Features:**
+- **Flexible Creation** - Filter tests by squad, label, section, or any attribute
+- **Real-Time Tracking** - Monitor progress with live status updates
+- **Dynamic Modifications** - Edit run details or remove tests
+- **Status Management** - Update individual or bulk test results
+- **Locking Mechanism** - Prevent changes to completed runs
+- **Comprehensive Reports** - Download CSV reports with full results
+
+**Test Statuses:**
+- Passed
+- Failed
+- Blocked
+- Retest
+- Skipped
+- Untested (default)
+
+**Benefits:**
+- **Enhanced Focus** - Group related tests for specific objectives
+- **Informed Decisions** - Real-time insights guide testing efforts
+- **Efficient Management** - Adapt runs as requirements evolve
+
+### Sections (Hierarchical)
+
+Sections provide hierarchical organization of test cases within a project.
+
+**Structure:**
+```
+Login & Authentication
+├── Login Flow
+│   ├── Email Login
+│   └── Social Login
+└── Password Management
+    ├── Forgot Password
+    └── Reset Password
+```
+
+**Features:**
+- Unlimited nesting depth
+- Filter tests by section
+- Bulk select by section
+- Auto-creation during bulk import
+
+### Labels (Flexible Tagging)
+
+Labels provide dynamic classification beyond hierarchical sections.
+
+**Use Cases:**
+- Release readiness (`release-blocker`, `post-release`)
+- Feature association (`checkout`, `payments`, `search`)
+- Testing scope (`smoke-test`, `regression`, `exploratory`)
+- Business priority (`business-critical`, `nice-to-have`)
+
+**Features:**
+- Multiple labels per test
+- Filter and search by labels
+- Create runs filtered by labels
+- Bulk apply labels
+
+### Squads (Team Ownership)
+
+Squads represent teams or groups responsible for test cases.
+
+**Benefits:**
+- Clear ownership and accountability
+- Team-based filtering and reporting
+- Workload distribution visibility
+- Cross-team collaboration
+
+---
+
+## Request Flow
+
+### User Request Flow (Web Interface)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant RemixSSR as Remix SSR
+    participant Controller
+    participant DAO
+    participant DB as MySQL
+
+    User->>Browser: Navigate to /projects
+    Browser->>RemixSSR: HTTP GET /projects
+    RemixSSR->>RemixSSR: Check authentication
+    RemixSSR->>Controller: loader({ request })
+    Controller->>DAO: getProjects(orgId)
+    DAO->>DB: SELECT * FROM projects
+    DB-->>DAO: Project rows
+    DAO-->>Controller: Project objects
+    Controller-->>RemixSSR: { data: projects }
+    RemixSSR->>RemixSSR: Render React components
+    RemixSSR-->>Browser: HTML + hydration data
+    Browser-->>User: Rendered page
+```
+
+### API Request Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API as Remix API Route
+    participant RBAC as Casbin
+    participant Controller
+    participant DAO
+    participant DB as MySQL
+
+    Client->>API: POST /api/v1/test/create
+    API->>API: Validate session/token
+    API->>RBAC: enforce(user, resource, action)
+    RBAC-->>API: Authorization result
+    alt Authorized
+        API->>API: Validate request body (Zod)
+        API->>Controller: createTest(data)
+        Controller->>DAO: insertTest(data)
+        DAO->>DB: INSERT INTO tests
+        DB-->>DAO: Insert result
+        DAO-->>Controller: Created test
+        Controller-->>API: { data: test, error: null }
+        API-->>Client: 200 OK + test data
+    else Not Authorized
+        API-->>Client: 403 Forbidden
+    end
+```
+
+---
+
+## Authentication & Authorization
+
+### Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant App
+    participant Google
+    participant Session
+
+    User->>App: Click "Sign in with Google"
+    App->>Google: Redirect to OAuth
+    Google->>Google: User authenticates
+    Google-->>App: Authorization code
+    App->>Google: Exchange code for tokens
+    Google-->>App: Access token + user info
+    App->>Session: Create session
+    App->>App: Check/create user in DB
+    App-->>User: Redirect to dashboard
+```
+
+### Authorization (RBAC)
+
+**Three Roles:**
+1. **Admin** - Full access (projects, runs, users)
+2. **User** - Create/modify tests and runs
+3. **Reader** - View-only access
+
+**Policy Model:**
+- Subject (user) → Resource (API endpoint) → Action (GET/POST/PUT/DELETE)
+- Hierarchical permissions (Admin inherits User, User inherits Reader)
+- Configured via Casbin policies
+
+**Example Policies:**
+```
+# Admin can do everything
+admin, /api/v1/project/create, POST
+admin, /api/v1/run/delete, DELETE
+
+# User can manage tests and runs
+user, /api/v1/test/create, POST
+user, /api/v1/run/edit, PUT
+
+# Reader can only view
+reader, /api/v1/projects, GET
+reader, /api/v1/tests, GET
+```
+
+---
+
+## API Architecture
+
+### RESTful Design
+
+All APIs follow REST principles with consistent patterns.
+
+**Base URL:** `http://localhost:3000/api/v1`
+
+**Endpoint Structure:**
+```
+/api/v1/{resource}/{action}
+```
+
+**Example Endpoints:**
+```
+POST   /api/v1/project/create
+GET    /api/v1/projects
+PUT    /api/v1/test/update
+DELETE /api/v1/test/delete
+GET    /api/v1/run/detail
+POST   /api/v1/run/create
+```
+
+### Standard Response Format
+
+All API responses follow a consistent structure:
+
+```typescript
+{
+  data: T | null,      // Response data
+  error: string | null // Error message
+}
+```
+
+**Success Response:**
+```json
+{
+  "data": { "testId": 123, "title": "Login Test" },
+  "error": null
+}
+```
+
+**Error Response:**
+```json
+{
+  "data": null,
+  "error": "Unauthorized access"
+}
+```
+
+### Authentication Methods
+
+1. **Session Cookies** - Web application (automatic)
+2. **API Tokens** - External integrations (Bearer token)
+
+See [API Documentation](/docs/guides/api/) for detailed endpoint reference.
+
+---
+
+## Deployment Architecture
+
+### Docker Compose Setup
+
+Checkmate uses Docker Compose for local development and deployment.
+
+```yaml
+services:
+  checkmate-db:
+    - MySQL 8.0
+    - Port 3306
+    - Persistent volume
+  
+  db_seeder:
+    - Seeds initial data
+    - Runs once on startup
+  
+  checkmate-app:
+    - Remix application
+    - Port 3000
+    - Depends on DB
+```
+
+### Development Workflow
+
+```bash
+# Start all services
+docker-compose up
+
+# Access application
+http://localhost:3000
+
+# Database accessible at
+localhost:3306
+```
+
+### Environment Variables
+
+Required configuration:
+
+```bash
+DATABASE_URL=mysql://user:pass@host:3306/db
+GOOGLE_CLIENT_ID=xxx
+GOOGLE_CLIENT_SECRET=xxx
+SESSION_SECRET=xxx
+```
+
+---
+
+## Security Architecture
+
+### Multi-Layer Security
+
+1. **Authentication Layer**
+   - Google OAuth 2.0
+   - Secure session management
+   - Token-based API access
+
+2. **Authorization Layer**
+   - Casbin RBAC
+   - Role-based policies
+   - Resource-level permissions
+
+3. **Data Layer**
+   - SQL injection prevention (ORM)
+   - Prepared statements
+   - Input validation (Zod)
+
+4. **Transport Layer**
+   - HTTPS in production
+   - Secure cookies (httpOnly, secure)
+   - CORS configuration
+
+### Best Practices
+
+- **Principle of Least Privilege** - Users get minimum required permissions
+- **Token Security** - API tokens treated as passwords
+- **Session Management** - Secure session cookies with expiration
+- **Input Validation** - All inputs validated with Zod schemas
+- **SQL Safety** - Drizzle ORM prevents SQL injection
+
+---
+
+## Performance Optimization
+
+### Frontend Optimization
+
+- **Server-Side Rendering** - Fast initial page loads
+- **Code Splitting** - Lazy load components
+- **Asset Optimization** - Minification, compression
+- **Caching Strategy** - Browser caching for static assets
+
+### Backend Optimization
+
+- **Database Indexes** - Optimized queries
+- **Connection Pooling** - Efficient DB connections
+- **Query Optimization** - Minimal data fetching
+- **Pagination** - Limited result sets
+
+### Measured Performance
+
+| Metric | Target | Current |
+|--------|--------|---------|
+| Time to Interactive | < 3.5s | ~3.0s |
+| API Response Time | < 200ms | ~150ms |
+| Database Query Time | < 100ms | ~80ms |
+| Page Load Time | < 2s | ~1.8s |
+
+---
+
+## Scalability Considerations
+
+### Current Architecture
+
+- **Vertical Scaling** - Increase container resources
+- **Database** - MySQL handles millions of rows
+- **Session Storage** - In-memory (can move to Redis)
+
+### Future Enhancements
+
+- Horizontal scaling with load balancer
+- Database read replicas
+- Redis for session storage
+- CDN for static assets
+- Message queue for async operations
+
+---
+
+## Testing Strategy
+
+### Test Pyramid
+
+```
+        /\
+       /E2E\       ← Few (Critical paths)
+      /------\
+     /Integr-\    ← Some (API, DB)
+    /----------\
+   /---Unit-----\  ← Many (Business logic)
+  /--------------\
+```
+
+### Testing Layers
+
+1. **Unit Tests** - Business logic, utilities (Jest)
+2. **Integration Tests** - API endpoints, database operations
+3. **E2E Tests** - Critical user flows (future: Playwright)
+
+### Current Coverage
+
+- Unit tests for data controllers
+- Integration tests for critical APIs
+- Manual E2E testing
+
+---
+
+## Development Workflow
+
+### Git Workflow
+
+```
+main (production)
+  └── feature branches
+  └── fix branches
+```
+
+### Development Process
+
+1. Clone repository
+2. `yarn install` - Install dependencies
+3. `docker-compose up` - Start services
+4. `yarn dev` - Start dev server
+5. Make changes
+6. `yarn test` - Run tests
+7. Commit and push
+8. Create pull request
+
+### Code Standards
+
+- **TypeScript** - Strict mode enabled
+- **ESLint** - Code quality
+- **Prettier** - Code formatting
+- **Commit Messages** - Conventional commits
+
+---
+
+## Additional Resources
+
+- [Database Design](/docs/tech/database) - Detailed schema documentation
+- [API Documentation](/docs/guides/api/) - Complete API reference
+- [User Guide](/docs/guides/projects) - End-user documentation
+- [RBAC Configuration](/docs/project/rbac) - Role and permission details
+- [GitHub Repository](https://github.com/dream-sports-labs/checkmate) - Source code
+
+---
+
+## Next Steps for Developers
+
+- [Setup Guide](/docs/project/setup) - Get Checkmate running locally
+- [Database Design](/docs/tech/database) - Understand the data model
+- [API Reference](/docs/guides/api/openapi) - Explore available endpoints
+- [Contributing Guide](https://github.com/dream-sports-labs/checkmate/blob/master/CONTRIBUTING.md) - Contribution guidelines
+

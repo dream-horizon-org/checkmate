@@ -7,31 +7,17 @@ export const TextContent = ({
   data: string | undefined
   heading: string
 }) => {
-  const infoTextStyle = {fontSize: 14, color: 'rgb(31 41 55)', paddingTop: 2}
-
   const urlRegex = /(https?:\/\/[^\s]+)/g
   return (
     data && (
-      <div className="flex flex-col w-full gap-1.5 text-sm">
+      <div className="flex flex-col w-full">
         <InputLabels labelName={heading} />
-        <div
-          style={{
-            resize: 'vertical',
-            overflowY: 'auto',
-            border: '1px solid rgb(0 0 0 / 10%)',
-            padding: '8px',
-            borderRadius: '4px',
-            minHeight: '48px',
-            height: 'calc(100vh / 11)',
-            boxSizing: 'border-box',
-            ...infoTextStyle,
-          }}
-          className="custom-resizable">
+        <div className="mt-2 p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 leading-relaxed overflow-y-auto resize-y min-h-[120px] max-h-[400px]">
           {data
             .replace(/\\n/g, '\n')
             .split('\n')
             .map((line, index) => (
-              <p key={index}>
+              <p key={index} className="mb-2 last:mb-0">
                 {line.split(urlRegex).map((part, i) =>
                   urlRegex.test(part) ? (
                     <a
@@ -39,7 +25,7 @@ export const TextContent = ({
                       href={part}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 underline">
+                      className="text-blue-600 hover:text-blue-800 underline">
                       {part}
                     </a>
                   ) : (
@@ -61,12 +47,11 @@ export const OptionContent = ({
   data: string | undefined
   heading: string
 }) => {
-  const infoTextStyle = {fontSize: 14, color: 'rgb(31 41 55)', paddingTop: 2}
   return (
     data && (
-      <div className="min-w-60">
+      <div>
         <InputLabels labelName={heading} />
-        <div style={infoTextStyle}>{data}</div>
+        <p className="text-sm text-slate-700 mt-1.5">{data}</p>
       </div>
     )
   )
@@ -79,16 +64,15 @@ export const LinkContent = ({
   data: string | undefined
   heading: string
 }) => {
-  const infoTextStyle = {fontSize: 14, color: 'rgb(37 99 235)', paddingTop: 9}
   return (
     data && (
-      <div className="flex flex-col">
+      <div>
         <InputLabels labelName={heading} />
         <a
-          style={{...infoTextStyle}}
           href={data}
           target="_blank"
-          rel="noopener noreferrer">
+          rel="noopener noreferrer"
+          className="text-sm text-blue-600 hover:text-blue-800 mt-1.5 inline-block underline">
           {data}
         </a>
       </div>

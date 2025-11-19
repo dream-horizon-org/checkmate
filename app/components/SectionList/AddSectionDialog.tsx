@@ -78,7 +78,7 @@ export const AddSectionDialog = (param: {
             {param.sectionHierarchy ? (
               <div className="flex flex-col">
                 <span>{`SubSection will be added in section`}</span>
-                <span className="text-blue-600">{param.sectionHierarchy}</span>
+                <span className="text-slate-700 font-medium">{param.sectionHierarchy}</span>
               </div>
             ) : (
               <span>{ADDING_SECTION_AT_ROOT}</span>
