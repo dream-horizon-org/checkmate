@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { handleApiResponse } from '../utils.js';
 
 export default function registerGetSquads(
   server: McpServer,
@@ -12,12 +13,23 @@ export default function registerGetSquads(
       projectId: z.number().int().positive().describe('Project ID'),
     },
     async ({ projectId }) => {
-      const qs = new URLSearchParams({ projectId: String(projectId) });
-      const data = await makeRequest(`api/v1/project/squads?${qs.toString()}`);
-      if (!data) {
-        return { content: [{ type: 'text', text: 'Failed to retrieve squads list' }] };
+      try {
+        const qs = new URLSearchParams({ projectId: String(projectId) });
+        const data = await makeRequest(`api/v1/project/squads?${qs.toString()}`);
+        return handleApiResponse(
+          data,
+          `retrieve squads for project ${projectId}`,
+          ['projectId (number, required): Project ID']
+        );
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error retrieving squads: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+          }],
+          isError: true,
+        };
       }
-      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
     },
   );
 } 

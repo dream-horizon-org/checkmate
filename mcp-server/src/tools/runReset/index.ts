@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { handleApiResponse } from '../utils.js';
 
 export default function registerRunReset(
   server: McpServer,
@@ -12,16 +13,27 @@ export default function registerRunReset(
       runId: z.number().int().positive().describe('Run ID'),
     },
     async ({ runId }) => {
-      const body = { runId };
-      const data = await makeRequest('api/v1/run/reset', {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
+      try {
+        const body = { runId };
+        const data = await makeRequest('api/v1/run/reset', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
 
-      if (!data) {
-        return { content: [{ type: 'text', text: 'Failed to reset run' }] };
+        return handleApiResponse(
+          data,
+          `reset run ${runId}`,
+          ['runId (number, required): Run ID to reset']
+        );
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error resetting run: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs. This will mark all Passed tests as Retest.`,
+          }],
+          isError: true,
+        };
       }
-      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
     },
   );
-} 
+}

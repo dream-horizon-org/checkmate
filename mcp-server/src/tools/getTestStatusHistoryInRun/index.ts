@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { handleApiResponse } from '../utils.js';
 
 export default function registerGetTestStatusHistoryInRun(
   server: McpServer,
@@ -13,12 +14,26 @@ export default function registerGetTestStatusHistoryInRun(
       testId: z.number().int().positive().describe('Test ID'),
     },
     async ({ runId, testId }) => {
-      const qs = new URLSearchParams({ runId: String(runId), testId: String(testId) });
-      const data = await makeRequest(`api/v1/run/test-status-history?${qs.toString()}`);
-      if (!data) {
-        return { content: [{ type: 'text', text: 'Failed to retrieve test status history in run' }] };
+      try {
+        const qs = new URLSearchParams({ runId: String(runId), testId: String(testId) });
+        const data = await makeRequest(`api/v1/run/test-status-history?${qs.toString()}`);
+        return handleApiResponse(
+          data,
+          `retrieve status history for test ${testId} in run ${runId}`,
+          [
+            'runId (number, required): Run ID',
+            'testId (number, required): Test ID',
+          ]
+        );
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error retrieving test status history: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-run-tests-list to find tests in this run.`,
+          }],
+          isError: true,
+        };
       }
-      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
     },
   );
-} 
+}

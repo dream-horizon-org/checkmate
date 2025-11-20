@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { handleApiResponse } from '../utils.js';
 
 const TestStatusObject = z.object({
   testId: z.number().int().positive().optional().describe('Test ID'),
@@ -24,20 +25,35 @@ export default function registerRunUpdateTestStatus(
       comment: z.string().optional().describe('Overall comment (optional)'),
     },
     async ({ runId, testIdStatusArray, projectId, comment }) => {
-      const body: any = { runId, testIdStatusArray };
-      if (projectId) body.projectId = projectId;
-      if (comment) body.comment = comment;
+      try {
+        const body: any = { runId, testIdStatusArray };
+        if (projectId) body.projectId = projectId;
+        if (comment) body.comment = comment;
 
-      const data = await makeRequest('api/v1/run/update-test-status', {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
+        const data = await makeRequest('api/v1/run/update-test-status', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
 
-      if (!data) {
-        return { content: [{ type: 'text', text: 'Failed to update test status(es)' }] };
+        return handleApiResponse(
+          data,
+          `update status for ${testIdStatusArray.length} test(s) in run ${runId}`,
+          [
+            'runId (number, required): Run ID',
+            'testIdStatusArray (array, required): Array of {testId, status, comment}',
+            'projectId (number, optional): Project ID',
+            'comment (string, optional): Overall comment',
+          ]
+        );
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error updating test statuses: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-run-tests-list to find tests in this run.`,
+          }],
+          isError: true,
+        };
       }
-
-      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
     },
   );
-} 
+}

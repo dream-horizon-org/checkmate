@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { handleApiResponse } from '../utils.js';
 
 export default function registerGetType(
   server: McpServer,
@@ -10,11 +11,22 @@ export default function registerGetType(
     'Retrieve list of types for an organisation',
     { orgId: z.number().int().positive().describe('Organisation ID') },
     async ({ orgId }) => {
-      const data = await makeRequest(`api/v1/type?orgId=${orgId}`);
-      if (!data) {
-        return { content: [{ type: 'text', text: 'Failed to retrieve type list' }] };
+      try {
+        const data = await makeRequest(`api/v1/type?orgId=${orgId}`);
+        return handleApiResponse(
+          data,
+          `retrieve test types for organization ${orgId}`,
+          ['orgId (number, required): Organization ID']
+        );
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error retrieving types: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
+          }],
+          isError: true,
+        };
       }
-      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
     },
   );
-} 
+}

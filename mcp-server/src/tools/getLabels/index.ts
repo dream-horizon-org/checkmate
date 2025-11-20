@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { handleApiResponse } from '../utils.js';
 
 export default function registerGetLabels(
   server: McpServer,
@@ -10,11 +11,22 @@ export default function registerGetLabels(
     'Retrieve list of labels for a project',
     { projectId: z.number().int().positive().describe('Project ID') },
     async ({ projectId }) => {
-      const data = await makeRequest(`api/v1/labels?projectId=${projectId}`);
-      if (!data) {
-        return { content: [{ type: 'text', text: 'Failed to retrieve labels list' }] };
+      try {
+        const data = await makeRequest(`api/v1/labels?projectId=${projectId}`);
+        return handleApiResponse(
+          data,
+          `retrieve labels for project ${projectId}`,
+          ['projectId (number, required): Project ID']
+        );
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error retrieving labels: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+          }],
+          isError: true,
+        };
       }
-      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
     },
   );
 } 

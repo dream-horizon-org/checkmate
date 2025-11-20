@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { handleApiResponse } from '../utils.js';
 
 export default function registerGetTestsCount(
   server: McpServer,
@@ -17,18 +18,36 @@ export default function registerGetTestsCount(
       includeTestIds: z.boolean().optional().describe('Include test IDs in response'),
     },
     async ({ projectId, platformIds, squadIds, labelIds, filterType, includeTestIds }) => {
-      const qs = new URLSearchParams({ projectId: String(projectId) });
-      if (platformIds) qs.set('platformIds', JSON.stringify(platformIds));
-      if (squadIds) qs.set('squadIds', JSON.stringify(squadIds));
-      if (labelIds) qs.set('labelIds', JSON.stringify(labelIds));
-      if (filterType) qs.set('filterType', filterType);
-      if (includeTestIds !== undefined) qs.set('includeTestIds', String(includeTestIds));
+      try {
+        const qs = new URLSearchParams({ projectId: String(projectId) });
+        if (platformIds) qs.set('platformIds', JSON.stringify(platformIds));
+        if (squadIds) qs.set('squadIds', JSON.stringify(squadIds));
+        if (labelIds) qs.set('labelIds', JSON.stringify(labelIds));
+        if (filterType) qs.set('filterType', filterType);
+        if (includeTestIds !== undefined) qs.set('includeTestIds', String(includeTestIds));
 
-      const data = await makeRequest(`api/v1/project/tests-count?${qs.toString()}`);
-      if (!data) {
-        return { content: [{ type: 'text', text: 'Failed to retrieve tests count' }] };
+        const data = await makeRequest(`api/v1/project/tests-count?${qs.toString()}`);
+        return handleApiResponse(
+          data,
+          `retrieve test count for project ${projectId}`,
+          [
+            'projectId (number, required): Project ID',
+            'platformIds (array, optional): Filter by platform IDs',
+            'squadIds (array, optional): Filter by squad IDs',
+            'labelIds (array, optional): Filter by label IDs',
+            'filterType (enum, optional): "and" or "or" for filters',
+            'includeTestIds (boolean, optional): Include test IDs in response',
+          ]
+        );
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error retrieving test count: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+          }],
+          isError: true,
+        };
       }
-      return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
     },
   );
-} 
+}
