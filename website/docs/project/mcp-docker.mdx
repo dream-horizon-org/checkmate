@@ -1,0 +1,204 @@
+---
+sidebar_position: 3
+title: MCP Docker Setup  
+description: Deploy Checkmate MCP Server with Docker
+---
+
+# Docker Deployment for MCP Server
+
+Learn how to deploy the Checkmate MCP Server using Docker alongside the main Checkmate application.
+
+## Architecture
+
+The Docker setup includes three services:
+1. **checkmate-db** - MySQL database
+2. **checkmate-app** - Main Checkmate application
+3. **checkmate-mcp** - MCP Server
+
+All services communicate via a Docker bridge network.
+
+## Prerequisites
+
+- Docker (v20.10+)
+- Docker Compose (v2.0+)
+- Git
+
+## Quick Start
+
+### 1. Clone and Setup
+
+```bash
+git clone https://github.com/ds-horizon/checkmate.git
+cd checkmate
+
+# Create main app .env
+cp .env.example .env
+
+# Create MCP server .env  
+cd mcp-server
+cp .env.example .env
+cd ..
+```
+
+### 2. Configure Environment
+
+Edit `mcp-server/.env`:
+
+```bash
+# Use Docker service name for internal communication
+CHECKMATE_API_BASE=http://checkmate-app:3000
+
+# Get token from Checkmate UI
+CHECKMATE_API_TOKEN=your-api-token-here
+```
+
+### 3. Start Services
+
+```bash
+# Build and start
+docker-compose up -d
+
+# Check status
+docker-compose ps
+
+# View logs
+docker-compose logs -f checkmate-mcp
+```
+
+## Configuration
+
+### Main Application
+
+Configure the main Checkmate app normally (see main documentation).
+
+### MCP Server
+
+Required variables in `mcp-server/.env`:
+
+```bash
+# API Base URL (use Docker service name)
+CHECKMATE_API_BASE=http://checkmate-app:3000
+
+# Authentication token
+CHECKMATE_API_TOKEN=your-token
+
+# Optional: Rate limiting
+MCP_RATE_LIMIT_REQUESTS=100
+MCP_RATE_LIMIT_WINDOW_MS=60000
+
+# Optional: Cache settings
+MCP_CACHE_TTL=300
+MCP_CACHE_MAX_SIZE=100
+```
+
+## Management
+
+### Start Services
+```bash
+docker-compose up -d
+```
+
+### Stop Services
+```bash
+docker-compose down
+```
+
+### View Logs
+```bash
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f checkmate-mcp
+```
+
+### Rebuild
+```bash
+docker-compose up -d --build checkmate-mcp
+```
+
+### Health Check
+```bash
+# Check MCP server
+docker-compose exec checkmate-mcp node build/index.js --version
+
+# Check connectivity
+docker-compose exec checkmate-mcp curl http://checkmate-app:3000/api/v1/orgs
+```
+
+## Troubleshooting
+
+### MCP Server Can't Connect to API
+
+**Problem:** Connection refused errors
+
+**Solution:**
+```bash
+# 1. Check checkmate-app is running
+docker-compose ps checkmate-app
+
+# 2. Verify network
+docker network ls
+docker network inspect checkmate_default
+
+# 3. Check environment
+docker-compose exec checkmate-mcp env | grep CHECKMATE
+```
+
+### Authentication Failures
+
+**Problem:** 401 Unauthorized
+
+**Solution:**
+1. Verify token in `.env`
+2. Regenerate token in Checkmate UI
+3. Restart MCP service: `docker-compose restart checkmate-mcp`
+
+### Performance Issues
+
+**Problem:** Slow responses
+
+**Solution:**
+```bash
+# Check resource usage
+docker stats
+
+# Increase rate limits in mcp-server/.env
+MCP_RATE_LIMIT_REQUESTS=200
+```
+
+## Production Deployment
+
+### Security
+
+```bash
+# Use secrets for tokens
+docker-compose -f docker-compose.prod.yml up -d
+
+# Enable TLS
+# Configure reverse proxy (nginx/traefik)
+```
+
+### Monitoring
+
+```bash
+# View resource usage
+docker stats checkmate-mcp
+
+# Check logs
+docker-compose logs --tail=100 checkmate-mcp
+```
+
+### Scaling
+
+```bash
+# Run multiple MCP instances
+docker-compose up -d --scale checkmate-mcp=3
+```
+
+## Support
+
+For issues:
+- [GitHub Issues](https://github.com/ds-horizon/checkmate/issues)
+- [Documentation](https://ds-horizon.github.io/checkmate)
+

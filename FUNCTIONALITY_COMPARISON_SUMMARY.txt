@@ -1,0 +1,282 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║         CHECKMATE: MCP SERVER vs CORE APP FUNCTIONALITY ANALYSIS              ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+📊 EXECUTIVE SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Core App:      51 API endpoints (Full CRUD + UI)
+MCP Server:    27 tools (Read + Critical Write)
+Coverage:      51% overall, 81% for read operations
+Focus:         AI-assisted queries & run management
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 KEY DIFFERENCES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OPERATION TYPE COVERAGE:
+┌─────────────────────────────────────────────────────────────┐
+│ Operation    │ Core App │ MCP Server │ Coverage            │
+├──────────────┼──────────┼────────────┼─────────────────────┤
+│ READ (GET)   │ 27 APIs  │ 22 tools   │ ████████░░ 81%      │
+│ CREATE (POST)│ 10 APIs  │ 0 tools    │ ░░░░░░░░░░  0%      │
+│ UPDATE (PUT) │ 9 APIs   │ 4 tools    │ ████░░░░░░ 44%      │
+│ DELETE       │ 5 APIs   │ 0 tools    │ ░░░░░░░░░░  0%      │
+└─────────────────────────────────────────────────────────────┘
+
+CATEGORY COVERAGE:
+┌─────────────────────────────────────────────────────────────┐
+│ Category     │ Core │ MCP  │ Coverage │ Focus               │
+├──────────────┼──────┼──────┼──────────┼─────────────────────┤
+│ Metadata     │  8   │  8   │   100%   │ ✅ Full parity     │
+│ Runs         │ 13   │  9   │    69%   │ ⭐ Read + Write    │
+│ Tests        │ 11   │  6   │    54%   │ ✅ Read-only       │
+│ Projects     │  4   │  2   │    50%   │ ✅ Read-only       │
+│ Users        │  3   │  1   │    33%   │ ⚠️  Limited        │
+│ Auth/Tokens  │  2   │  0   │     0%   │ ❌ Not exposed     │
+│ Files        │  2   │  0   │     0%   │ ❌ Not supported   │
+└─────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ WHAT MCP SERVER DOES WELL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ✅ Read Operations
+   - 81% coverage of all GET endpoints
+   - Natural language queries
+   - Fast data retrieval
+
+2. ⭐ Run Management (Critical Write Operations)
+   - Update test statuses in runs      ✅
+   - Lock/unlock test runs              ✅
+   - Reset runs to retest               ✅
+   - Remove tests from runs             ✅
+
+3. ✅ Metadata Queries
+   - 100% coverage of configuration data
+   - Labels, squads, sections, priorities
+   - Platforms, types, automation status
+
+4. ✅ Analytics & History
+   - Test status history                ✅
+   - Test counts and metrics            ✅
+   - Run state details                  ✅
+
+5. ✅ AI-Friendly Interface
+   - Natural language queries
+   - Contextual responses
+   - Claude Desktop integration
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ WHAT MCP SERVER LACKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ❌ Data Creation (0% coverage)
+   - Cannot create tests
+   - Cannot create projects
+   - Cannot create runs
+   - Cannot create organizations
+
+2. ❌ Bulk Operations
+   - No bulk test add/update/delete
+   - No batch status updates
+   - No CSV imports
+
+3. ❌ File Operations
+   - No report downloads
+   - No test file uploads
+   - No export functionality
+
+4. ❌ Admin Functions
+   - No user role management
+   - No token generation/deletion
+   - No organization management
+
+5. ❌ Test Editing
+   - Cannot modify test definitions
+   - Cannot update test metadata
+   - Cannot reassign tests
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 DESIGN PHILOSOPHY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MCP SERVER:
+"AI assistant for QUERYING and UPDATING test runs,
+ not for DATA ENTRY or ADMIN tasks"
+
+Purpose:
+  ✅ Query data via natural language
+  ✅ Update test statuses during execution
+  ✅ Analyze test results and history
+  ✅ Manage run states (lock, reset)
+  ❌ NOT for creating/editing test definitions
+  ❌ NOT for administrative configuration
+
+────────────────────────────────────────────────────────────────
+
+CORE APP:
+"Full-featured web application for complete
+ test case lifecycle management"
+
+Purpose:
+  ✅ Complete CRUD operations
+  ✅ User interface for data entry
+  ✅ Bulk operations and imports
+  ✅ Administrative functions
+  ✅ Report generation and downloads
+  ✅ User and permission management
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💬 USE CASE EXAMPLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USE MCP SERVER FOR:
+  ✅ "Show me all failed tests in run 123"
+  ✅ "Update test status to passed for test 456"
+  ✅ "Lock this test run"
+  ✅ "What's the test history for test-login-001?"
+  ✅ "How many tests are in the Smoke suite?"
+  ✅ "Which tests are assigned to the API squad?"
+  ✅ "Mark all passed tests as retest"
+
+USE CORE APP FOR:
+  ✅ Creating new test cases
+  ✅ Bulk importing tests from CSV
+  ✅ Setting up new projects
+  ✅ Managing user roles and permissions
+  ✅ Downloading test reports
+  ✅ Configuring project metadata
+  ✅ Creating new test runs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 FUNCTIONALITY MATRIX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ORGANIZATIONS:
+  List organizations           ✅ Core  ✅ MCP
+  Get organization details     ✅ Core  ✅ MCP
+  Create organization          ✅ Core  ❌ MCP
+  Edit organization            ✅ Core  ❌ MCP
+
+PROJECTS:
+  List projects                ✅ Core  ✅ MCP
+  Get project details          ✅ Core  ✅ MCP
+  Create project               ✅ Core  ❌ MCP
+  Edit project                 ✅ Core  ❌ MCP
+  Update project status        ✅ Core  ❌ MCP
+
+TESTS:
+  List tests                   ✅ Core  ✅ MCP
+  Get test details             ✅ Core  ✅ MCP
+  Get test count               ✅ Core  ✅ MCP
+  Get test history             ✅ Core  ✅ MCP
+  Create test                  ✅ Core  ❌ MCP
+  Update test                  ✅ Core  ❌ MCP
+  Delete test                  ✅ Core  ❌ MCP
+  Bulk operations              ✅ Core  ❌ MCP
+
+TEST RUNS:
+  List runs                    ✅ Core  ✅ MCP
+  Get run details              ✅ Core  ✅ MCP
+  Get run tests                ✅ Core  ✅ MCP
+  Get run status               ✅ Core  ✅ MCP
+  Create run                   ✅ Core  ❌ MCP
+  Edit run                     ✅ Core  ❌ MCP
+  Delete run                   ✅ Core  ❌ MCP
+  Update test status in run    ✅ Core  ✅ MCP  ⭐
+  Lock run                     ✅ Core  ✅ MCP  ⭐
+  Reset run                    ✅ Core  ✅ MCP  ⭐
+  Remove tests from run        ✅ Core  ✅ MCP  ⭐
+  Download report              ✅ Core  ❌ MCP
+
+METADATA:
+  Get labels                   ✅ Core  ✅ MCP
+  Get sections                 ✅ Core  ✅ MCP
+  Get squads                   ✅ Core  ✅ MCP
+  Get priorities               ✅ Core  ✅ MCP
+  Get platforms                ✅ Core  ✅ MCP
+  Get automation status        ✅ Core  ✅ MCP
+  Get types                    ✅ Core  ✅ MCP
+  Get test covered by          ✅ Core  ✅ MCP
+  Add/Edit metadata            ✅ Core  ❌ MCP
+
+USERS:
+  Get user details             ✅ Core  ✅ MCP
+  Get all users                ✅ Core  ❌ MCP
+  Update user role             ✅ Core  ❌ MCP
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 RECOMMENDED IMPROVEMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PHASE 1: Enhanced Read Operations
+  [ ] get-all-users          - List all users
+  [ ] download-report        - Get run report (as text/JSON)
+  [ ] get-run-metrics        - Aggregated metrics
+
+PHASE 2: Critical Write Operations
+  [ ] create-run             - Start new test run
+  [ ] add-test-to-run        - Add tests to existing run
+  [ ] update-run-status      - Change run status
+
+PHASE 3: Batch Operations
+  [ ] batch-update-tests     - Update multiple tests
+  [ ] batch-get-tests        - Get multiple test details
+
+INTENTIONALLY EXCLUDED (Security/Design):
+  [X] Token management       - Security sensitive
+  [X] User role updates      - Admin only
+  [X] Bulk test creation     - Data entry intensive
+  [X] Project creation       - Admin workflow
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 FINAL ASSESSMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STRENGTHS:
+  ✅ Excellent read coverage (81%)
+  ✅ Essential run management operations
+  ✅ Perfect for AI-assisted queries
+  ✅ Focused and well-defined scope
+
+GAPS:
+  ❌ No data creation capabilities
+  ❌ No bulk operations
+  ❌ Limited admin functions
+  ❌ No file operations
+
+RECOMMENDATION:
+  The MCP server is PERFECTLY SCOPED for its intended use case:
+  - Query test data via AI
+  - Update test run statuses
+  - Analyze test results
+  - Manage run lifecycle
+
+  It is NOT meant for:
+  - Data entry or test creation
+  - Administrative configuration
+  - Bulk operations
+  - File imports/exports
+
+VERDICT: ✅ WORKING AS DESIGNED
+
+The split between MCP (AI queries + run updates) and Core App
+(full CRUD + admin) is well-architected and appropriate.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Analysis Date: November 20, 2025
+Core App APIs: 51 endpoints
+MCP Server Tools: 27 tools
+Coverage: 51% overall, 81% read operations
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

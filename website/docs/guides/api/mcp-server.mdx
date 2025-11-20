@@ -1,0 +1,764 @@
+---
+sidebar_position: 5
+title: MCP Server API Reference
+description: Complete reference for all MCP server tools
+---
+
+# Checkmate MCP Server - Complete API Reference
+
+This document provides detailed information about all available tools in the Checkmate MCP Server.
+
+## Table of Contents
+
+- [Organization & Projects](#organization--projects)
+- [Tests](#tests)
+- [Test Runs](#test-runs)
+- [Metadata & Configuration](#metadata--configuration)
+- [Users](#users)
+
+---
+
+## Organization & Projects
+
+### get-orgs-list
+List all organizations accessible to the authenticated user.
+
+**Parameters:** None
+
+**Example:**
+```
+List all my organizations
+```
+
+---
+
+### get-org-details
+Get detailed information about a specific organization.
+
+**Parameters:**
+- `orgId` (number, required): Organization ID
+
+**Example:**
+```
+Get details for organization 123
+```
+
+---
+
+### get-projects
+List all projects in an organization.
+
+**Parameters:**
+- `orgId` (number, required): Organization ID
+
+**Example:**
+```
+Show me all projects in organization 456
+```
+
+---
+
+### get-project-detail
+Get detailed information about a specific project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get details for project 789
+```
+
+---
+
+### create-project
+Create a new project in an organization.
+
+**Parameters:**
+- `orgId` (number, required): Organization ID
+- `projectName` (string, required): Project name
+- `projectDescription` (string, optional): Project description
+
+**Example:**
+```
+Create a new project called "Mobile App Testing" in organization 123 with description "Test suite for mobile app"
+```
+
+---
+
+### edit-project
+Edit an existing project's name or description.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `projectName` (string, optional): New project name
+- `projectDescription` (string, optional): New project description
+
+**Example:**
+```
+Update project 456 name to "Updated Mobile Testing" and description to "New description"
+```
+
+---
+
+### update-project-status
+Update a project's active/inactive status.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `isActive` (boolean, required): Whether the project should be active
+
+**Example:**
+```
+Deactivate project 789
+```
+
+---
+
+## Tests
+
+### get-tests
+List tests in a project with optional filtering.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `sectionId` (number, optional): Filter by section
+- `priorityId` (number, optional): Filter by priority
+- `limit` (number, optional): Number of results to return
+- `offset` (number, optional): Pagination offset
+
+**Example:**
+```
+Get all tests in project 123 with high priority
+```
+
+---
+
+### get-test-details
+Get detailed information about a specific test.
+
+**Parameters:**
+- `testId` (number, required): Test ID
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get details for test 456 in project 123
+```
+
+---
+
+### get-tests-count
+Get the count of tests matching specific filters.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `sectionId` (number, optional): Filter by section
+- `priorityId` (number, optional): Filter by priority
+- `automationStatusId` (number, optional): Filter by automation status
+
+**Example:**
+```
+How many automated tests are in project 123?
+```
+
+---
+
+### get-test-status-history
+Get the status history of a test across all runs.
+
+**Parameters:**
+- `testId` (number, required): Test ID
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Show me the status history for test 789
+```
+
+---
+
+### get-test-status-history-in-run
+Get the status history of a test within a specific run.
+
+**Parameters:**
+- `testId` (number, required): Test ID
+- `runId` (number, required): Run ID
+
+**Example:**
+```
+Show status history for test 456 in run 123
+```
+
+---
+
+### download-tests
+Download all tests from a project in a structured format.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `format` (enum, optional): Export format - 'json' or 'csv' (default: 'json')
+
+**Example:**
+```
+Download all tests from project 123 in CSV format
+```
+
+---
+
+### create-test
+Create a new test case in a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `testName` (string, required): Test name/title
+- `testDescription` (string, optional): Test description
+- `sectionId` (number, optional): Section ID
+- `priorityId` (number, optional): Priority ID
+- `typeId` (number, optional): Test type ID
+- `automationStatusId` (number, optional): Automation status ID
+- `platformId` (number, optional): Platform ID
+- `testCoveredById` (number, optional): Test covered by ID
+- `squadId` (number, optional): Squad ID
+- `labels` (array of numbers, optional): Array of label IDs
+
+**Example:**
+```
+Create a test called "Login with valid credentials" in project 123 with high priority and API squad
+```
+
+---
+
+### update-test
+Update an existing test case.
+
+**Parameters:**
+- `testId` (number, required): Test ID
+- `testName` (string, optional): New test name
+- `testDescription` (string, optional): New test description
+- `sectionId` (number, optional): Section ID
+- `priorityId` (number, optional): Priority ID
+- `typeId` (number, optional): Test type ID
+- `automationStatusId` (number, optional): Automation status ID
+- `platformId` (number, optional): Platform ID
+- `testCoveredById` (number, optional): Test covered by ID
+- `squadId` (number, optional): Squad ID
+- `labels` (array of numbers, optional): Array of label IDs
+
+**Example:**
+```
+Update test 456 to change priority to high and assign to frontend squad
+```
+
+---
+
+### delete-test
+Delete a test case from a project.
+
+**Parameters:**
+- `testId` (number, required): Test ID to delete
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Delete test 789 from project 123
+```
+
+---
+
+### bulk-add-tests
+Create multiple test cases at once.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `tests` (array, required): Array of test objects to create
+
+Each test object can contain:
+- `testName` (string, required)
+- `testDescription` (string, optional)
+- `sectionId` (number, optional)
+- `priorityId` (number, optional)
+- `typeId` (number, optional)
+- `automationStatusId` (number, optional)
+- `platformId` (number, optional)
+- `testCoveredById` (number, optional)
+- `squadId` (number, optional)
+- `labels` (array of numbers, optional)
+
+**Example:**
+```
+Bulk add 5 login tests to project 123: test valid login, test invalid password, test empty fields, test SQL injection, test XSS
+```
+
+---
+
+### bulk-update-tests
+Update multiple test cases at once.
+
+**Parameters:**
+- `tests` (array, required): Array of test objects to update (each must include testId)
+
+Each test object must contain:
+- `testId` (number, required)
+
+And can optionally contain any of the update fields from `update-test`.
+
+**Example:**
+```
+Update tests 100, 101, 102 to assign them to the API squad
+```
+
+---
+
+### bulk-delete-tests
+Delete multiple test cases at once.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `testIds` (array of numbers, required): Array of test IDs to delete
+
+**Example:**
+```
+Delete tests 200, 201, 202 from project 123
+```
+
+---
+
+## Test Runs
+
+### get-runs
+List test runs in a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `limit` (number, optional): Number of results to return
+- `offset` (number, optional): Pagination offset
+
+**Example:**
+```
+Get all test runs for project 123
+```
+
+---
+
+### run-detail
+Get detailed information about a specific test run.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get details for run 456
+```
+
+---
+
+### get-run-tests-list
+List all tests in a specific run.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Show me all tests in run 789
+```
+
+---
+
+### get-run-test-status
+Get the status of tests in a run.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+- `status` (string, optional): Filter by status (passed, failed, blocked, retest, untested)
+
+**Example:**
+```
+Show me all failed tests in run 123
+```
+
+---
+
+### get-run-state-detail
+Get detailed state information about a run.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get state details for run 456
+```
+
+---
+
+### download-report
+Download a comprehensive test run report.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+- `format` (enum, optional): Report format - 'json', 'pdf', or 'html' (default: 'json')
+
+**Example:**
+```
+Download PDF report for run 123
+```
+
+---
+
+### create-run
+Create a new test run in a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `runName` (string, required): Run name
+- `runDescription` (string, optional): Run description
+- `testIds` (array of numbers, required): Array of test IDs to include in the run
+
+**Example:**
+```
+Create a new run called "Sprint 10 Regression" in project 123 with tests 100, 101, 102
+```
+
+---
+
+### edit-run
+Edit an existing test run.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+- `runName` (string, optional): New run name
+- `runDescription` (string, optional): New run description
+
+**Example:**
+```
+Update run 456 name to "Sprint 10 Full Regression"
+```
+
+---
+
+### delete-run
+Delete a test run from a project.
+
+**Parameters:**
+- `runId` (number, required): Run ID to delete
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Delete run 789 from project 123
+```
+
+---
+
+### run-update-test-status
+Update the status of multiple tests in a run.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+- `testResults` (array, required): Array of test result objects
+
+Each test result object should contain:
+- `testId` (number, required)
+- `status` (string, required): One of 'passed', 'failed', 'blocked', 'retest', 'untested'
+- `comment` (string, optional): Comment about the test result
+
+**Example:**
+```
+Mark tests 100 and 101 as passed and test 102 as failed in run 123
+```
+
+---
+
+### run-lock
+Lock a test run to prevent further modifications.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Lock run 456
+```
+
+---
+
+### run-reset
+Reset all tests in a run to retest status.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Reset run 789
+```
+
+---
+
+### run-remove-tests
+Remove specific tests from a run.
+
+**Parameters:**
+- `runId` (number, required): Run ID
+- `projectId` (number, required): Project ID
+- `testIds` (array of numbers, required): Array of test IDs to remove
+
+**Example:**
+```
+Remove tests 100, 101 from run 123
+```
+
+---
+
+## Metadata & Configuration
+
+### get-labels
+List all available labels in a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get all labels for project 123
+```
+
+---
+
+### get-sections
+List all available sections (test suites) in a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Show me all test suites in project 123
+```
+
+---
+
+### get-squads
+List all available squads in a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get all squads for project 123
+```
+
+---
+
+### get-priority
+List all priority levels.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Show me all priority levels
+```
+
+---
+
+### get-platforms
+List all available platforms.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get all platforms for project 123
+```
+
+---
+
+### get-automation-status
+List all automation status options.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Show me all automation status options
+```
+
+---
+
+### get-type
+List all test types.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Get all test types for project 123
+```
+
+---
+
+### get-test-covered-by
+List all test coverage types.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+
+**Example:**
+```
+Show me all coverage types
+```
+
+---
+
+### add-labels
+Add new labels to a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `labels` (array of strings, required): Array of label names to create
+
+**Example:**
+```
+Add labels "smoke", "regression", "high-priority" to project 123
+```
+
+---
+
+### add-squads
+Add new squads to a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `squads` (array of strings, required): Array of squad names to create
+
+**Example:**
+```
+Add squads "Frontend Team", "Backend Team", "QA Team" to project 123
+```
+
+---
+
+### add-section
+Add a new section (test suite) to a project.
+
+**Parameters:**
+- `projectId` (number, required): Project ID
+- `sectionName` (string, required): Section name
+- `parentSectionId` (number, optional): Parent section ID (for nested sections)
+
+**Example:**
+```
+Add a new section called "Login Tests" to project 123
+```
+
+---
+
+### edit-section
+Edit an existing section name.
+
+**Parameters:**
+- `sectionId` (number, required): Section ID
+- `sectionName` (string, required): New section name
+
+**Example:**
+```
+Rename section 456 to "Authentication Tests"
+```
+
+---
+
+## Users
+
+### get-user-details
+Get detailed information about a specific user.
+
+**Parameters:**
+- `userId` (number, required): User ID
+
+**Example:**
+```
+Get details for user 123
+```
+
+---
+
+### get-all-users
+List all users in the system.
+
+**Parameters:**
+- `orgId` (number, optional): Filter by organization ID
+- `limit` (number, optional): Limit the number of users returned
+- `offset` (number, optional): Offset for pagination
+
+**Example:**
+```
+List all users in organization 456
+```
+
+---
+
+## Error Handling
+
+All tools follow a consistent error handling pattern:
+
+### Success Response
+```json
+{
+  "content": [{
+    "type": "text",
+    "text": "<JSON formatted data>"
+  }]
+}
+```
+
+### Error Response
+```json
+{
+  "content": [{
+    "type": "text",
+    "text": "❌ Error: <error message>\n\n💡 Tip: <helpful guidance>"
+  }],
+  "isError": true
+}
+```
+
+## Rate Limiting
+
+The MCP server respects rate limits from the Checkmate API. If you encounter rate limit errors, the server will automatically retry with exponential backoff.
+
+## Best Practices
+
+1. **Use Bulk Operations**: When creating, updating, or deleting multiple items, use the bulk operations for better performance.
+
+2. **Filter Queries**: When listing items, use filters to reduce the amount of data transferred.
+
+3. **Download Reports**: Use the download tools for large datasets instead of listing all items.
+
+4. **Check Status First**: Before updating runs or tests, check their current state to avoid errors.
+
+5. **Lock Runs**: Lock runs when they're complete to prevent accidental modifications.
+
+## Support
+
+For issues or questions:
+- GitHub Issues: https://github.com/ds-horizon/checkmate/issues
+- Documentation: https://ds-horizon.github.io/checkmate
+

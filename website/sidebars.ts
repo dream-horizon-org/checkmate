@@ -33,7 +33,7 @@ const sidebars: SidebarsConfig = {
         {
           type: 'category',
           label: 'Application',
-          items: ['tech/architecture', 'tech/database'],
+          items: ['tech/architecture', 'tech/database', 'project/mcp-docker'],
         },
         {
           type: 'category',
@@ -43,6 +43,14 @@ const sidebars: SidebarsConfig = {
             'guides/api/authentication',
             'guides/api/examples',
             'guides/api/openapi',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'MCP Server',
+          items: [
+            'guides/api/mcp-tools',
+            'guides/api/mcp-server',
           ],
         },
       ],

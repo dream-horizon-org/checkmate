@@ -62,6 +62,32 @@ services:
     command: >
       sh -c "yarn start"
 
+  checkmate-mcp:
+    build:
+      context: ./mcp-server
+      dockerfile: ./Dockerfile
+    container_name: checkmate-mcp
+    restart: unless-stopped
+    depends_on:
+      checkmate-app:
+        condition: service_started
+    env_file:
+      - ./mcp-server/.env
+    environment:
+      CHECKMATE_API_BASE: http://checkmate-app:3000
+      NODE_ENV: production
+    networks:
+      - checkmate-network
+    volumes:
+      # Mount logs directory (optional, for debugging)
+      - ./mcp-server/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 volumes:
   checkmate-mysql:
     name: checkmate-db

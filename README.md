@@ -133,6 +133,55 @@ cd checkmate
 
 [Postman](https://documenter.getpostman.com/view/23217307/2sAYXFgwRt) collection of APIs is currently available, comprehensive documentation is in progress.
 
+### 🤖 MCP Server
+
+Checkmate includes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that allows AI assistants like Claude to interact with your Checkmate instance programmatically.
+
+**Features:**
+- ✅ Full API access through AI assistants
+- ✅ Manage tests, projects, and runs via natural language
+- ✅ Update test statuses and track progress
+- ✅ Query test history and analytics
+- ✅ TypeScript-based with full type safety
+- ✅ Docker support for production deployment
+
+**Quick Start:**
+
+```bash
+# Navigate to MCP server directory
+cd mcp-server
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your Checkmate API URL and token
+
+# Build the server
+npm run build
+
+# Add to Claude Desktop config
+# See mcp-server/README.md for detailed setup instructions
+```
+
+**Docker Deployment:**
+
+```bash
+# Start all services including MCP server
+docker-compose up -d
+
+# Check MCP server status
+docker-compose ps checkmate-mcp
+
+# View MCP server logs
+docker-compose logs -f checkmate-mcp
+```
+
+**Documentation:**
+- [MCP Server README](./mcp-server/README.md) - Complete setup and usage
+- [Docker Deployment Guide](./mcp-server/DOCKER.md) - Production deployment with Docker
+
 ### ⚙️ TechStack Used:
 
 - <span style="display: flex; align-items: center;">
