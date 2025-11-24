@@ -17,6 +17,10 @@ module.exports = {
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       useESM: true,
+      tsconfig: {
+        module: 'Node16',
+        moduleResolution: 'Node16',
+      },
     }],
   },
   extensionsToTreatAsEsm: ['.ts'],

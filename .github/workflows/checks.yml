@@ -91,3 +91,55 @@ jobs:
                 body: coverageMessage
               });
             }
+
+  mcp-server-test:
+    name: MCP Server Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp-server
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Set up Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.19 --activate
+
+      - name: Install dependencies
+        working-directory: mcp-server
+        run: yarn install --frozen-lockfile
+
+      - name: Run type check
+        working-directory: mcp-server
+        run: yarn typecheck
+
+      - name: Run linter
+        working-directory: mcp-server
+        run: yarn lint
+
+      - name: Check formatting
+        working-directory: mcp-server
+        run: yarn format:check
+
+      - name: Run tests
+        working-directory: mcp-server
+        run: yarn test
+        env:
+          NODE_ENV: test
+
+      - name: Run tests with coverage
+        working-directory: mcp-server
+        run: yarn test:coverage
+        env:
+          NODE_ENV: test
