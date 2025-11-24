@@ -4,26 +4,31 @@
 # Stage 1: Build
 FROM node:20.17.0-alpine AS builder
 
+# Install yarn
+RUN corepack enable && corepack prepare yarn@1.22.19 --activate
+
 # Set working directory
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
-# Install dependencies
-RUN npm ci --only=production && \
-    npm cache clean --force
+# Install all dependencies (including dev for build)
+RUN yarn install --frozen-lockfile && \
+    yarn cache clean
 
 # Copy source code
 COPY src ./src
 COPY tsconfig.json ./
 
-# Install dev dependencies for build
-RUN npm install --save-dev typescript && \
-    npm run build
+# Build the application
+RUN yarn build
 
 # Stage 2: Production
 FROM node:20.17.0-alpine
+
+# Install yarn
+RUN corepack enable && corepack prepare yarn@1.22.19 --activate
 
 # Add labels for better container management
 LABEL maintainer="DreamSportsLabs"
@@ -34,11 +39,11 @@ LABEL version="1.0.0"
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
 # Install only production dependencies
-RUN npm ci --only=production && \
-    npm cache clean --force
+RUN yarn install --frozen-lockfile --production && \
+    yarn cache clean
 
 # Copy built application from builder stage
 COPY --from=builder /app/build ./build

@@ -2,7 +2,7 @@
 node_modules/
 npm-debug.log
 yarn-error.log
-package-lock.json
+# Note: package-lock.json is excluded, but yarn.lock is needed
 
 # Build output
 build/
@@ -55,5 +55,5 @@ temp/
 .prettierignore
 .editorconfig
 jest.config.cjs
-tsconfig.json
+# Note: tsconfig.json is needed for the build, so don't exclude it
 

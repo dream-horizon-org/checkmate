@@ -67,7 +67,9 @@ services:
       context: ./mcp-server
       dockerfile: ./Dockerfile
     container_name: checkmate-mcp
-    restart: unless-stopped
+    restart: on-failure
+    stdin_open: true
+    tty: true
     depends_on:
       checkmate-app:
         condition: service_started
