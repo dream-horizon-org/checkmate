@@ -19,12 +19,13 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
-      - name: Set up Yarn v4 (Berry)
+      - name: Set up Yarn
         run: |
           corepack enable
+          corepack prepare yarn@1.22.19 --activate
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Run unit tests
         run: yarn unit:test:coverage
