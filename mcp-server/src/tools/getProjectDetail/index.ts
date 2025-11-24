@@ -16,7 +16,7 @@ export default function registerGetProjectDetail(
         
         // Check if project was found
         if (data && typeof data === 'object' && 'data' in data) {
-          const projectData = (data as any).data;
+          const projectData = (data as Record<string, unknown>).data;
           if (!projectData || (Array.isArray(projectData) && projectData.length === 0)) {
             return {
               content: [{

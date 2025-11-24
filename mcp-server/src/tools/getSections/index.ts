@@ -16,7 +16,9 @@ export default function registerGetSections(
     async ({ projectId, runId }) => {
       try {
         const qs = new URLSearchParams({ projectId: String(projectId) });
-        if (runId) qs.set('runId', String(runId));
+        if (runId) {
+          qs.set('runId', String(runId));
+        }
 
         const data = await makeRequest(`api/v1/project/sections?${qs.toString()}`);
         return handleApiResponse(

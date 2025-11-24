@@ -20,11 +20,21 @@ export default function registerGetTestsCount(
     async ({ projectId, platformIds, squadIds, labelIds, filterType, includeTestIds }) => {
       try {
         const qs = new URLSearchParams({ projectId: String(projectId) });
-        if (platformIds) qs.set('platformIds', JSON.stringify(platformIds));
-        if (squadIds) qs.set('squadIds', JSON.stringify(squadIds));
-        if (labelIds) qs.set('labelIds', JSON.stringify(labelIds));
-        if (filterType) qs.set('filterType', filterType);
-        if (includeTestIds !== undefined) qs.set('includeTestIds', String(includeTestIds));
+        if (platformIds) {
+          qs.set('platformIds', JSON.stringify(platformIds));
+        }
+        if (squadIds) {
+          qs.set('squadIds', JSON.stringify(squadIds));
+        }
+        if (labelIds) {
+          qs.set('labelIds', JSON.stringify(labelIds));
+        }
+        if (filterType) {
+          qs.set('filterType', filterType);
+        }
+        if (includeTestIds !== undefined) {
+          qs.set('includeTestIds', String(includeTestIds));
+        }
 
         const data = await makeRequest(`api/v1/project/tests-count?${qs.toString()}`);
         return handleApiResponse(

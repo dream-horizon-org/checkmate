@@ -17,8 +17,12 @@ export default function registerGetRunStateDetail(
     async ({ runId, projectId, groupBy }) => {
       try {
         const qs = new URLSearchParams({ runId: String(runId) });
-        if (projectId) qs.set('projectId', String(projectId));
-        if (groupBy) qs.set('groupBy', groupBy);
+        if (projectId) {
+          qs.set('projectId', String(projectId));
+        }
+        if (groupBy) {
+          qs.set('groupBy', groupBy);
+        }
 
         const data = await makeRequest(`api/v1/run/state-detail?${qs.toString()}`);
         return handleApiResponse(

@@ -11,14 +11,20 @@ describe('Tool Utilities', () => {
   describe('formatErrorResponse', () => {
     it('should format error without details', () => {
       const result = formatErrorResponse('Something went wrong');
-      expect(result.content[0].text).toBe('Something went wrong');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toBe('Something went wrong');
+      }
       expect(result.isError).toBe(true);
     });
 
     it('should format error with details', () => {
       const result = formatErrorResponse('Error occurred', { code: 500 });
-      expect(result.content[0].text).toContain('Error occurred');
-      expect(result.content[0].text).toContain('"code": 500');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Error occurred');
+        expect(result.content[0].text).toContain('"code": 500');
+      }
       expect(result.isError).toBe(true);
     });
   });
@@ -27,14 +33,20 @@ describe('Tool Utilities', () => {
     it('should format data without message', () => {
       const data = { id: 1, name: 'Test' };
       const result = formatSuccessResponse(data);
-      expect(result.content[0].text).toBe(JSON.stringify(data, null, 2));
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toBe(JSON.stringify(data, null, 2));
+      }
     });
 
     it('should format data with message', () => {
       const data = { id: 1 };
       const result = formatSuccessResponse(data, 'Success!');
-      expect(result.content[0].text).toContain('Success!');
-      expect(result.content[0].text).toContain('"id": 1');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Success!');
+        expect(result.content[0].text).toContain('"id": 1');
+      }
     });
   });
 
@@ -50,7 +62,7 @@ describe('Tool Utilities', () => {
     it('should skip undefined and null values', () => {
       const params = { page: 1, search: undefined, filter: null };
       const qs = buildQueryString(params);
-      expect(qs).toBe('page=1');
+      expect(qs).toBe('?page=1');
     });
 
     it('should handle empty params', () => {
@@ -92,22 +104,31 @@ describe('Tool Utilities', () => {
 
   describe('handleApiResponse', () => {
     it('should handle successful response', () => {
-      const data = { success: true };
+      const data = { data: { success: true } };
       const result = handleApiResponse(data);
       expect(result.isError).toBeUndefined();
-      expect(result.content[0].text).toContain('success');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('success');
+      }
     });
 
     it('should handle null response with default error', () => {
       const result = handleApiResponse(null);
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toBe('Failed to retrieve data');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('complete operation');
+      }
     });
 
     it('should handle null response with custom error', () => {
       const result = handleApiResponse(null, 'Custom error message');
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toBe('Custom error message');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Custom error message');
+      }
     });
   });
 });

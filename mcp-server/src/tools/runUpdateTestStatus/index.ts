@@ -26,9 +26,13 @@ export default function registerRunUpdateTestStatus(
     },
     async ({ runId, testIdStatusArray, projectId, comment }) => {
       try {
-        const body: any = { runId, testIdStatusArray };
-        if (projectId) body.projectId = projectId;
-        if (comment) body.comment = comment;
+        const body: Record<string, unknown> = { runId, testIdStatusArray };
+        if (projectId) {
+          body.projectId = projectId;
+        }
+        if (comment) {
+          body.comment = comment;
+        }
 
         const data = await makeRequest('api/v1/run/update-test-status', {
           method: 'POST',

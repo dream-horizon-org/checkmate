@@ -67,7 +67,7 @@ export default function registerUpdateTest(
     },
     async (params) => {
       try {
-        const body: any = { ...params };
+        const body: Record<string, unknown> = { ...params };
 
         const data = await makeRequest('api/v1/test/update', {
           method: 'PUT',

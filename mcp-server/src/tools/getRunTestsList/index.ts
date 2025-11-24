@@ -19,9 +19,15 @@ export default function registerGetRunTestsList(
     async ({ projectId, runId, page, pageSize, textSearch }) => {
       try {
         const qs = new URLSearchParams({ projectId: String(projectId), runId: String(runId) });
-        if (page) qs.set('page', String(page));
-        if (pageSize) qs.set('pageSize', String(pageSize));
-        if (textSearch) qs.set('textSearch', textSearch);
+        if (page) {
+          qs.set('page', String(page));
+        }
+        if (pageSize) {
+          qs.set('pageSize', String(pageSize));
+        }
+        if (textSearch) {
+          qs.set('textSearch', textSearch);
+        }
 
         const data = await makeRequest(`api/v1/run/tests?${qs.toString()}`);
         return handleApiResponse(

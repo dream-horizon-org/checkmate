@@ -33,9 +33,13 @@ export default function registerEditRun(
     },
     async ({ runId, projectId, runName, runDescription }) => {
       try {
-        const body: any = { runId, projectId };
-        if (runName) body.runName = runName;
-        if (runDescription !== undefined) body.runDescription = runDescription;
+        const body: Record<string, unknown> = { runId, projectId };
+        if (runName) {
+          body.runName = runName;
+        }
+        if (runDescription !== undefined) {
+          body.runDescription = runDescription;
+        }
 
         const data = await makeRequest('api/v1/run/edit', {
           method: 'PUT',

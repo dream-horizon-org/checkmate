@@ -97,7 +97,7 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
-export class ResponseCache<T = any> {
+export class ResponseCache<T = unknown> {
   private cache: Map<string, CacheEntry<T>>;
   private ttl: number;
   private maxSize: number;

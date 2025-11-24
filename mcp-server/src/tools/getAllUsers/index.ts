@@ -33,10 +33,16 @@ export default function registerGetAllUsers(
     },
     async ({ orgId, limit, offset }) => {
       try {
-        const queryParams: any = {};
-        if (orgId) queryParams.orgId = orgId;
-        if (limit) queryParams.limit = limit;
-        if (offset !== undefined) queryParams.offset = offset;
+        const queryParams: Record<string, string | number | boolean | null | undefined> = {};
+        if (orgId) {
+          queryParams.orgId = orgId;
+        }
+        if (limit) {
+          queryParams.limit = limit;
+        }
+        if (offset !== undefined) {
+          queryParams.offset = offset;
+        }
 
         const query = buildQueryString(queryParams);
         const data = await makeRequest(`api/v1/users${query}`, {

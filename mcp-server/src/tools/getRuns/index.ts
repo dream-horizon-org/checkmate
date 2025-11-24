@@ -19,10 +19,18 @@ export default function registerGetRuns(
     async ({ projectId, page, pageSize, search, status }) => {
       try {
         const qs = new URLSearchParams({ projectId: String(projectId) });
-        if (page) qs.set('page', String(page));
-        if (pageSize) qs.set('pageSize', String(pageSize));
-        if (search) qs.set('search', search);
-        if (status) qs.set('status', status);
+        if (page) {
+          qs.set('page', String(page));
+        }
+        if (pageSize) {
+          qs.set('pageSize', String(pageSize));
+        }
+        if (search) {
+          qs.set('search', search);
+        }
+        if (status) {
+          qs.set('status', status);
+        }
 
         const data = await makeRequest(`api/v1/runs?${qs.toString()}`);
         return handleApiResponse(

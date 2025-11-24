@@ -30,8 +30,10 @@ export default function registerAddSection(
     },
     async ({ projectId, sectionName, parentSectionId }) => {
       try {
-        const body: any = { projectId, sectionName };
-        if (parentSectionId) body.parentSectionId = parentSectionId;
+        const body: Record<string, unknown> = { projectId, sectionName };
+        if (parentSectionId) {
+          body.parentSectionId = parentSectionId;
+        }
 
         const data = await makeRequest('api/v1/section/add', {
           method: 'POST',

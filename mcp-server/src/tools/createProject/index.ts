@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { handleApiResponse, buildQueryString } from '../utils.js';
+import { handleApiResponse } from '../utils.js';
 
 /**
  * Create a new project

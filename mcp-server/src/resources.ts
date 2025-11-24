@@ -33,7 +33,7 @@ export function registerServerInfoResource(
   server.resource(
     'server-info',
     'checkmate://server-info',
-    async () => {
+    () => {
       const info: ServerInfo = {
         name: 'checkmate-mcp',
         version: '1.0.0',
@@ -102,7 +102,7 @@ export function registerApiDocsResource(server: McpServer) {
   server.resource(
     'api-docs',
     'checkmate://api-docs',
-    async () => {
+    () => {
       const docs = `# Checkmate API Documentation
 
 ## Official Documentation

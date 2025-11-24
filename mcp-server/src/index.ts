@@ -6,6 +6,7 @@ import 'dotenv/config';
 import fg from 'fast-glob';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { ToolModule, LogLevel } from './types/mcp.js';
 
 // =====================
 // CONFIGURATION & VALIDATION
@@ -14,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 const ConfigSchema = z.object({
   CHECKMATE_API_BASE: z.string().url('Invalid CHECKMATE_API_BASE URL'),
   CHECKMATE_API_TOKEN: z.string().min(1, 'CHECKMATE_API_TOKEN is required'),
-  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug'] as const).default('info'),
   REQUEST_TIMEOUT: z.coerce.number().int().positive().default(30000),
   ENABLE_RETRY: z.coerce.boolean().default(false),
   MAX_RETRIES: z.coerce.number().int().positive().default(3),
@@ -50,16 +51,16 @@ try {
 // LOGGING UTILITY
 // =====================
 
-const LOG_LEVELS = { error: 0, warn: 1, info: 2, debug: 3 };
+const LOG_LEVELS: Record<LogLevel, number> = { error: 0, warn: 1, info: 2, debug: 3 };
 
 class Logger {
   private level: number;
 
-  constructor(level: keyof typeof LOG_LEVELS) {
+  constructor(level: LogLevel) {
     this.level = LOG_LEVELS[level];
   }
 
-  private log(level: keyof typeof LOG_LEVELS, ...args: any[]) {
+  private log(level: LogLevel, ...args: unknown[]) {
     if (LOG_LEVELS[level] <= this.level) {
       const timestamp = new Date().toISOString();
       const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
@@ -67,10 +68,10 @@ class Logger {
     }
   }
 
-  error(...args: any[]) { this.log('error', ...args); }
-  warn(...args: any[]) { this.log('warn', ...args); }
-  info(...args: any[]) { this.log('info', ...args); }
-  debug(...args: any[]) { this.log('debug', ...args); }
+  error(...args: unknown[]) { this.log('error', ...args); }
+  warn(...args: unknown[]) { this.log('warn', ...args); }
+  info(...args: unknown[]) { this.log('info', ...args); }
+  debug(...args: unknown[]) { this.log('debug', ...args); }
 }
 
 const logger = new Logger(config.LOG_LEVEL);
@@ -83,7 +84,7 @@ class CheckmateAPIError extends Error {
   constructor(
     message: string,
     public statusCode?: number,
-    public responseBody?: any
+    public responseBody?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'CheckmateAPIError';
@@ -117,7 +118,7 @@ interface RequestOptions extends RequestInit {
 async function makeRequestWithRetry<T>(
   path: string,
   options: RequestOptions = {}
-): Promise<T | null> {
+): Promise<T> {
   const {
     timeout = config.REQUEST_TIMEOUT,
     retry = config.ENABLE_RETRY,
@@ -151,19 +152,26 @@ async function makeRequestWithRetry<T>(
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const errorBody = await response.text().catch(() => '(no response body)');
+        const errorBody: string = await response.text().catch(() => '(no response body)');
         logger.error(`HTTP ${response.status} ${response.statusText}:`, errorBody);
+        
+        let parsedBody: Record<string, unknown> | undefined;
+        try {
+          parsedBody = JSON.parse(errorBody) as Record<string, unknown>;
+        } catch {
+          // Not JSON, leave as undefined
+        }
         
         throw new CheckmateAPIError(
           `HTTP error! status: ${response.status}`,
           response.status,
-          errorBody
+          parsedBody
         );
       }
 
-      const data = await response.json();
+      const data = await response.json() as T;
       logger.info(`✓ Request successful: ${fetchOptions.method ?? 'GET'} ${path}`);
-      return data as T;
+      return data;
 
     } catch (error) {
       clearTimeout(timeoutId);
@@ -199,10 +207,14 @@ async function makeRequestWithRetry<T>(
   };
 
   try {
-    return await attemptRequest(1);
+    const result = await attemptRequest(1);
+    if (result === null) {
+      throw new Error('No response from server');
+    }
+    return result;
   } catch (error) {
     logger.error('Final error after all retry attempts:', error);
-    return null;
+    throw error;
   }
 }
 
@@ -215,10 +227,6 @@ import { registerAllResources } from './resources.js';
 const server = new McpServer({
   name: "checkmate-mcp",
   version: "1.0.0",
-  capabilities: {
-    resources: {},
-    tools: {},
-  },
 });
 
 // =====================
@@ -248,7 +256,7 @@ logger.info(`📦 Loading ${toolFiles.length} tool(s)...`);
 let loadedTools = 0;
 for (const file of toolFiles) {
   try {
-    const mod = await import(path.resolve(file));
+    const mod = await import(path.resolve(file)) as ToolModule;
     if (typeof mod.default === 'function') {
       const toolName = path.basename(path.dirname(file));
       mod.default(server, makeRequestWithRetry);

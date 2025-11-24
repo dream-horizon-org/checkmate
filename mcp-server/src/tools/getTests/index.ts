@@ -18,9 +18,15 @@ export default function registerGetTests(
     async ({ projectId, page, pageSize, textSearch }) => {
       try {
         const qs = new URLSearchParams({ projectId: String(projectId) });
-        if (page) qs.set('page', String(page));
-        if (pageSize) qs.set('pageSize', String(pageSize));
-        if (textSearch) qs.set('textSearch', textSearch);
+        if (page) {
+          qs.set('page', String(page));
+        }
+        if (pageSize) {
+          qs.set('pageSize', String(pageSize));
+        }
+        if (textSearch) {
+          qs.set('textSearch', textSearch);
+        }
 
         const data = await makeRequest(`api/v1/project/tests?${qs.toString()}`);
         return handleApiResponse(

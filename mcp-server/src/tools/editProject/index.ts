@@ -29,9 +29,13 @@ export default function registerEditProject(
     },
     async ({ projectId, projectName, projectDescription }) => {
       try {
-        const body: any = { projectId };
-        if (projectName) body.projectName = projectName;
-        if (projectDescription !== undefined) body.projectDescription = projectDescription;
+        const body: Record<string, unknown> = { projectId };
+        if (projectName) {
+          body.projectName = projectName;
+        }
+        if (projectDescription !== undefined) {
+          body.projectDescription = projectDescription;
+        }
 
         const data = await makeRequest('api/v1/project/edit', {
           method: 'PUT',
