@@ -1,7 +1,11 @@
 /**
  * MCP Tool Types
  */
-import type { TextContent, ImageContent, EmbeddedResource } from '@modelcontextprotocol/sdk/types.js';
+import type {
+  TextContent,
+  ImageContent,
+  EmbeddedResource,
+} from '@modelcontextprotocol/sdk/types.js';
 
 // Re-export SDK types
 export type ToolContent = TextContent | ImageContent | EmbeddedResource;
@@ -61,7 +65,10 @@ export interface RateLimitConfig {
 
 // Module loader types
 export interface ToolModule {
-  default: (server: import('@modelcontextprotocol/sdk/server/mcp.js').McpServer, makeRequest: <T>(path: string, options?: RequestOptions) => Promise<T>) => void;
+  default: (
+    server: import('@modelcontextprotocol/sdk/server/mcp.js').McpServer,
+    makeRequest: <T>(path: string, options?: RequestOptions) => Promise<T>,
+  ) => void;
 }
 
 // HTTP Response type
@@ -72,4 +79,3 @@ export interface HttpResponse<T = unknown> {
   data?: T;
   error?: string;
 }
-

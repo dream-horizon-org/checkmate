@@ -17,29 +17,27 @@ export default function registerGetTestDetails(
       try {
         const qs = new URLSearchParams({ projectId: String(projectId), testId: String(testId) });
         const data = await makeRequest(`api/v1/test/details?${qs.toString()}`);
-        
+
         // Check for empty data
         if (isEmptyData(data)) {
           return formatNotFoundError('Test', testId, 'get-tests');
         }
-        
-        return handleApiResponse(
-          data,
-          `retrieve test ${testId} details`,
-          [
-            'projectId (number, required): Project ID',
-            'testId (number, required): Test ID',
-          ]
-        );
+
+        return handleApiResponse(data, `retrieve test ${testId} details`, [
+          'projectId (number, required): Project ID',
+          'testId (number, required): Test ID',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving test details: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-tests to find valid test IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving test details: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-tests to find valid test IDs.`,
+            },
+          ],
           isError: true,
         };
       }
-    }
+    },
   );
-} 
+}

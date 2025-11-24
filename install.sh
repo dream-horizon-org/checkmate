@@ -412,6 +412,56 @@ setup_env_file() {
     show_oauth_instructions
 }
 
+# Function to setup MCP server environment file
+setup_mcp_env_file() {
+    print_header "Setting up MCP Server Environment File"
+    
+    # Verify REPO_DIR is set before using it
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid. Cannot setup MCP server environment file."
+        exit 1
+    fi
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        exit 1
+    }
+    
+    MCP_ENV_FILE="$REPO_DIR/mcp-server/.env"
+    
+    if [ -f "$MCP_ENV_FILE" ]; then
+        print_warning "MCP server .env file already exists. Skipping creation."
+        print_info "If you need to reconfigure, edit $MCP_ENV_FILE manually."
+        return
+    fi
+    
+    if [ ! -f "$REPO_DIR/mcp-server/.env.example" ]; then
+        print_warning ".env.example not found in mcp-server directory."
+        print_info "Creating basic .env file..."
+        
+        # Create basic .env file
+        cat > "$MCP_ENV_FILE" << EOF
+# Checkmate MCP Server Configuration
+CHECKMATE_API_BASE=http://localhost:3000
+CHECKMATE_API_TOKEN=your-api-token-here
+LOG_LEVEL=info
+REQUEST_TIMEOUT=30000
+ENABLE_RETRY=false
+MAX_RETRIES=3
+EOF
+        print_success "MCP server .env file created with default values"
+    else
+        # Copy .env.example to .env
+        cp "$REPO_DIR/mcp-server/.env.example" "$MCP_ENV_FILE"
+        print_success "MCP server .env file created from .env.example"
+    fi
+    
+    print_warning "⚠️  Action Required: Update CHECKMATE_API_TOKEN in $MCP_ENV_FILE"
+    print_info "   Get your API token from: http://localhost:3000 (after starting Checkmate)"
+    print_info "   Navigate to: User Settings → API Tokens → Generate Token"
+    echo ""
+}
+
 # Function to install dependencies
 install_dependencies() {
     print_header "Installing Dependencies"
@@ -508,6 +558,9 @@ main() {
     # Setup environment file
     setup_env_file
     
+    # Setup MCP server environment file
+    setup_mcp_env_file
+    
     # Ensure correct Node version from .nvmrc is installed and active
     cd "$REPO_DIR" || {
         print_error "Failed to change to repository directory: $REPO_DIR"
@@ -578,6 +631,7 @@ main() {
     echo -e "  ${GREEN}✓${NC} All prerequisites installed"
     echo -e "  ${GREEN}✓${NC} Repository cloned"
     echo -e "  ${GREEN}✓${NC} Environment file created"
+    echo -e "  ${GREEN}✓${NC} MCP server environment file created"
     echo -e "  ${GREEN}✓${NC} Dependencies installed"
     echo -e "  ${GREEN}✓${NC} Docker configuration verified"
     echo ""
@@ -602,6 +656,29 @@ main() {
     echo ""
     echo -e "  ${BLUE}🔗 Google Cloud Console:${NC}"
     echo -e "     ${BLUE}https://console.cloud.google.com/apis/credentials${NC}"
+    echo ""
+    
+    # Show MCP server configuration status
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}  ⚠️  MCP Server Configuration${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "  ${BLUE}📝 Edit the MCP server .env file:${NC}"
+    echo -e "     ${BLUE}$REPO_DIR/mcp-server/.env${NC}"
+    echo ""
+    echo -e "  ${BLUE}➕ Update this variable:${NC}"
+    echo ""
+    echo -e "     ${GREEN}CHECKMATE_API_TOKEN${NC}=your_api_token_here"
+    echo ""
+    echo -e "  ${BLUE}📖 How to get API token:${NC}"
+    echo -e "     1. Start Checkmate: ${BLUE}yarn docker:setup${NC}"
+    echo -e "     2. Login at: ${BLUE}http://localhost:3000${NC}"
+    echo -e "     3. Go to: ${BLUE}User Settings → API Tokens${NC}"
+    echo -e "     4. Click: ${BLUE}Generate Token${NC}"
+    echo -e "     5. Copy token to ${BLUE}mcp-server/.env${NC}"
+    echo ""
+    echo -e "  ${BLUE}📚 MCP Server Documentation:${NC}"
+    echo -e "     ${BLUE}$REPO_DIR/mcp-server/README.md${NC}"
     echo ""
     
     # Show ports information
@@ -662,6 +739,11 @@ main() {
     echo -e "     ${BLUE}http://localhost:3000${NC}"
     echo ""
     echo -e "  ${GREEN}4.${NC} Sign in with your Google account"
+    echo ""
+    echo -e "  ${GREEN}5.${NC} Configure MCP Server (optional):"
+    echo -e "     ${BLUE}Get API token from Checkmate UI${NC}"
+    echo -e "     ${BLUE}Update mcp-server/.env with token${NC}"
+    echo -e "     ${BLUE}MCP server starts automatically with Docker${NC}"
     echo ""
     
     # Resources

@@ -4,7 +4,7 @@ import { handleApiResponse } from '../utils.js';
 
 /**
  * Create a new run
- * 
+ *
  * Creates a new test run in a project with specified tests.
  */
 export default function registerCreateRun(
@@ -15,17 +15,11 @@ export default function registerCreateRun(
     'create-run',
     'Create a new test run in a project',
     {
-      projectId: z.number()
-        .int()
-        .positive()
-        .describe('Project ID'),
-      runName: z.string()
-        .min(1)
-        .describe('Run name'),
-      runDescription: z.string()
-        .optional()
-        .describe('Run description'),
-      testIds: z.array(z.number().int().positive())
+      projectId: z.number().int().positive().describe('Project ID'),
+      runName: z.string().min(1).describe('Run name'),
+      runDescription: z.string().optional().describe('Run description'),
+      testIds: z
+        .array(z.number().int().positive())
         .min(1)
         .describe('Array of test IDs to include in the run'),
     },
@@ -43,26 +37,23 @@ export default function registerCreateRun(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `create run "${runName}"`,
-          [
-            'projectId (number, required): Project ID',
-            'runName (string, required): Name of the run',
-            'runDescription (string, optional): Description of the run',
-            'testIds (array, required): Array of test IDs to include in run',
-          ]
-        );
+        return handleApiResponse(data, `create run "${runName}"`, [
+          'projectId (number, required): Project ID',
+          'runName (string, required): Name of the run',
+          'runDescription (string, optional): Description of the run',
+          'testIds (array, required): Array of test IDs to include in run',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error creating run: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-tests to find valid test IDs to include in the run.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error creating run: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-tests to find valid test IDs to include in the run.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

@@ -5,6 +5,7 @@ A Model Context Protocol (MCP) server that provides AI assistants with programma
 ## 🎯 Overview
 
 This MCP server allows AI assistants (like Claude, ChatGPT, etc.) to interact with your Checkmate instance to:
+
 - Manage test cases, projects, and test runs
 - Update test statuses and track progress
 - Retrieve test details, history, and analytics
@@ -148,12 +149,14 @@ The MCP server provides the following tools. For detailed input requirements, va
 ### Organization & Projects
 
 #### Read Operations
+
 - `get-orgs-list` - List all organizations
 - `get-org-details` - Get details of a specific organization
 - `get-projects` - List projects in an organization
 - `get-project-detail` - Get details of a specific project
 
 #### Write Operations
+
 - `create-project` - Create a new project in an organization
 - `edit-project` - Edit an existing project (name, description)
 - `update-project-status` - Update project status (active/inactive)
@@ -161,6 +164,7 @@ The MCP server provides the following tools. For detailed input requirements, va
 ### Tests
 
 #### Read Operations
+
 - `get-tests` - List tests in a project
 - `get-test-details` - Get details of a specific test
 - `get-tests-count` - Get test count with filters
@@ -169,11 +173,13 @@ The MCP server provides the following tools. For detailed input requirements, va
 - `download-tests` - Download all tests in structured format (JSON/CSV)
 
 #### Write Operations
+
 - `create-test` - Create a new test case
 - `update-test` - Update an existing test case
 - `delete-test` - Delete a test case
 
 #### Bulk Operations
+
 - `bulk-add-tests` - Create multiple test cases at once
 - `bulk-update-tests` - Update multiple test cases at once
 - `bulk-delete-tests` - Delete multiple test cases at once
@@ -181,6 +187,7 @@ The MCP server provides the following tools. For detailed input requirements, va
 ### Test Runs
 
 #### Read Operations
+
 - `get-runs` - List test runs in a project
 - `run-detail` - Get details of a specific run
 - `get-run-tests-list` - List tests in a run
@@ -189,6 +196,7 @@ The MCP server provides the following tools. For detailed input requirements, va
 - `download-report` - Download comprehensive test run report (JSON/PDF/HTML)
 
 #### Write Operations
+
 - `create-run` - Create a new test run
 - `edit-run` - Edit an existing run (name, description)
 - `delete-run` - Delete a test run
@@ -200,6 +208,7 @@ The MCP server provides the following tools. For detailed input requirements, va
 ### Metadata & Configuration
 
 #### Read Operations
+
 - `get-labels` - List available labels
 - `get-sections` - List available sections
 - `get-squads` - List available squads
@@ -210,12 +219,14 @@ The MCP server provides the following tools. For detailed input requirements, va
 - `get-test-covered-by` - List coverage types
 
 #### Write Operations
+
 - `add-labels` - Add new labels to a project
 - `add-squads` - Add new squads to a project
 - `add-section` - Add a new section (test suite) to a project
 - `edit-section` - Edit an existing section name
 
 ### Users
+
 - `get-user-details` - Get user information
 - `get-all-users` - List all users (with optional filters)
 
@@ -277,21 +288,25 @@ export default function registerMyNewTool(
     async ({ param1, param2 }) => {
       // Make API request
       const data = await makeRequest(`api/v1/your-endpoint?param1=${param1}`);
-      
+
       if (!data) {
-        return { 
-          content: [{ 
-            type: 'text', 
-            text: 'Failed to retrieve data' 
-          }] 
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Failed to retrieve data',
+            },
+          ],
         };
       }
-      
-      return { 
-        content: [{ 
-          type: 'text', 
-          text: JSON.stringify(data, null, 2) 
-        }] 
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(data, null, 2),
+          },
+        ],
       };
     },
   );
@@ -318,6 +333,7 @@ npm run test:coverage
 #### "Cannot find module 'dotenv/config'"
 
 **Solution:** Install dotenv dependency:
+
 ```bash
 cd mcp-server
 npm install dotenv
@@ -326,11 +342,13 @@ npm install dotenv
 #### "Failed to retrieve [resource]"
 
 **Possible causes:**
+
 1. Checkmate API is not running - Ensure your Checkmate instance is accessible
 2. Invalid API token - Verify your `CHECKMATE_API_TOKEN` is correct
 3. Wrong API base URL - Check that `CHECKMATE_API_BASE` points to the correct server
 
 **Debug steps:**
+
 ```bash
 # Check if Checkmate API is accessible
 curl http://localhost:3000/api/v1/orgs
@@ -342,6 +360,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/api/v1/orgs
 #### "MCP Server not showing in Claude Desktop"
 
 **Solution:**
+
 1. Verify config file path is correct for your OS
 2. Check JSON syntax is valid (use a JSON validator)
 3. Restart Claude Desktop completely
@@ -350,6 +369,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/api/v1/orgs
 #### "Permission denied" when running the server
 
 **Solution:**
+
 ```bash
 # Make the built file executable
 chmod +x build/index.js
@@ -406,4 +426,3 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE) f
 ---
 
 **Need help?** Join our [Discord community](https://discord.gg/wBQXeYAKNc) or [open an issue](https://github.com/ds-horizon/checkmate/issues).
-

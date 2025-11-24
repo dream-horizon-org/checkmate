@@ -4,7 +4,7 @@ import { handleApiResponse } from '../utils.js';
 
 /**
  * Edit section
- * 
+ *
  * Updates a section name in a project.
  */
 export default function registerEditSection(
@@ -15,13 +15,8 @@ export default function registerEditSection(
     'edit-section',
     'Edit an existing section name',
     {
-      sectionId: z.number()
-        .int()
-        .positive()
-        .describe('Section ID'),
-      sectionName: z.string()
-        .min(1)
-        .describe('New section name'),
+      sectionId: z.number().int().positive().describe('Section ID'),
+      sectionName: z.string().min(1).describe('New section name'),
     },
     async ({ sectionId, sectionName }) => {
       try {
@@ -32,24 +27,21 @@ export default function registerEditSection(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `edit section ${sectionId} name to "${sectionName}"`,
-          [
-            'sectionId (number, required): Section ID to edit',
-            'sectionName (string, required): New section name',
-          ]
-        );
+        return handleApiResponse(data, `edit section ${sectionId} name to "${sectionName}"`, [
+          'sectionId (number, required): Section ID to edit',
+          'sectionName (string, required): New section name',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error editing section: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-sections to find valid section IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error editing section: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-sections to find valid section IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

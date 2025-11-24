@@ -37,24 +37,22 @@ export default function registerGetTestsCount(
         }
 
         const data = await makeRequest(`api/v1/project/tests-count?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve test count for project ${projectId}`,
-          [
-            'projectId (number, required): Project ID',
-            'platformIds (array, optional): Filter by platform IDs',
-            'squadIds (array, optional): Filter by squad IDs',
-            'labelIds (array, optional): Filter by label IDs',
-            'filterType (enum, optional): "and" or "or" for filters',
-            'includeTestIds (boolean, optional): Include test IDs in response',
-          ]
-        );
+        return handleApiResponse(data, `retrieve test count for project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'platformIds (array, optional): Filter by platform IDs',
+          'squadIds (array, optional): Filter by squad IDs',
+          'labelIds (array, optional): Filter by label IDs',
+          'filterType (enum, optional): "and" or "or" for filters',
+          'includeTestIds (boolean, optional): Include test IDs in response',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving test count: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving test count: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }

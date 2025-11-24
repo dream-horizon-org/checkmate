@@ -4,7 +4,7 @@ import { handleApiResponse } from '../utils.js';
 
 /**
  * Add squads
- * 
+ *
  * Creates new squads in a project.
  */
 export default function registerAddSquads(
@@ -15,13 +15,8 @@ export default function registerAddSquads(
     'add-squads',
     'Add new squads to a project',
     {
-      projectId: z.number()
-        .int()
-        .positive()
-        .describe('Project ID'),
-      squads: z.array(z.string().min(1))
-        .min(1)
-        .describe('Array of squad names to create'),
+      projectId: z.number().int().positive().describe('Project ID'),
+      squads: z.array(z.string().min(1)).min(1).describe('Array of squad names to create'),
     },
     async ({ projectId, squads }) => {
       try {
@@ -32,24 +27,21 @@ export default function registerAddSquads(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `add ${squads.length} squads to project ${projectId}`,
-          [
-            'projectId (number, required): Project ID',
-            'squads (array, required): Array of squad names (strings)',
-          ]
-        );
+        return handleApiResponse(data, `add ${squads.length} squads to project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'squads (array, required): Array of squad names (strings)',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error adding squads: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error adding squads: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

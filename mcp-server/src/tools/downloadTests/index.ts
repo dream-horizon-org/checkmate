@@ -4,7 +4,7 @@ import { handleApiResponse, buildQueryString } from '../utils.js';
 
 /**
  * Download tests
- * 
+ *
  * Gets all tests from a project in a structured format for export/download.
  */
 export default function registerDownloadTests(
@@ -15,11 +15,9 @@ export default function registerDownloadTests(
     'download-tests',
     'Download all tests from a project in a structured format',
     {
-      projectId: z.number()
-        .int()
-        .positive()
-        .describe('Project ID'),
-      format: z.enum(['json', 'csv'])
+      projectId: z.number().int().positive().describe('Project ID'),
+      format: z
+        .enum(['json', 'csv'])
         .optional()
         .default('json')
         .describe('Export format (json or csv)'),
@@ -37,18 +35,19 @@ export default function registerDownloadTests(
           [
             'projectId (number, required): Project ID',
             'format (enum, optional): Export format - "json" or "csv" (default: json)',
-          ]
+          ],
         );
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error downloading tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error downloading tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

@@ -13,17 +13,17 @@ export default function registerGetPriority(
     async ({ orgId }) => {
       try {
         const data = await makeRequest(`api/v1/priority?orgId=${orgId}`);
-        return handleApiResponse(
-          data,
-          `retrieve priority levels for organization ${orgId}`,
-          ['orgId (number, required): Organization ID']
-        );
+        return handleApiResponse(data, `retrieve priority levels for organization ${orgId}`, [
+          'orgId (number, required): Organization ID',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving priorities: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving priorities: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
+            },
+          ],
           isError: true,
         };
       }

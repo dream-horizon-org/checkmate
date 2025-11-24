@@ -25,24 +25,22 @@ export default function registerGetRunStateDetail(
         }
 
         const data = await makeRequest(`api/v1/run/state-detail?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve state details for run ${runId}`,
-          [
-            'runId (number, required): Run ID',
-            'projectId (number, optional): Project ID',
-            'groupBy (enum, optional): Group results by "squads"',
-          ]
-        );
+        return handleApiResponse(data, `retrieve state details for run ${runId}`, [
+          'runId (number, required): Run ID',
+          'projectId (number, optional): Project ID',
+          'groupBy (enum, optional): Group results by "squads"',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving run state: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving run state: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs.`,
+            },
+          ],
           isError: true,
         };
       }
-    }
+    },
   );
 }

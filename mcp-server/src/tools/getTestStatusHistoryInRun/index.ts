@@ -20,17 +20,16 @@ export default function registerGetTestStatusHistoryInRun(
         return handleApiResponse(
           data,
           `retrieve status history for test ${testId} in run ${runId}`,
-          [
-            'runId (number, required): Run ID',
-            'testId (number, required): Test ID',
-          ]
+          ['runId (number, required): Run ID', 'testId (number, required): Test ID'],
         );
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving test status history: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-run-tests-list to find tests in this run.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving test status history: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-run-tests-list to find tests in this run.`,
+            },
+          ],
           isError: true,
         };
       }

@@ -93,7 +93,14 @@ export interface RunTestStatus {
   updatedOn?: string;
 }
 
-export type TestStatus = 'passed' | 'failed' | 'blocked' | 'retest' | 'skipped' | 'untested' | 'inProgress';
+export type TestStatus =
+  | 'passed'
+  | 'failed'
+  | 'blocked'
+  | 'retest'
+  | 'skipped'
+  | 'untested'
+  | 'inProgress';
 
 // Organization types
 export interface Organization {
@@ -187,4 +194,3 @@ export interface BulkOperationResponse {
     error: string;
   }>;
 }
-

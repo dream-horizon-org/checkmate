@@ -63,7 +63,7 @@ export class RateLimiter {
       const intervalsNeeded = Math.ceil(tokensNeeded / this.tokensPerInterval);
       const waitTime = intervalsNeeded * this.interval;
 
-      await new Promise(resolve => setTimeout(resolve, Math.min(waitTime, 1000)));
+      await new Promise((resolve) => setTimeout(resolve, Math.min(waitTime, 1000)));
     }
   }
 
@@ -172,4 +172,3 @@ export class ResponseCache<T = unknown> {
     }
   }
 }
-

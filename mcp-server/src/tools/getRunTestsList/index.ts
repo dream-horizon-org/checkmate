@@ -30,26 +30,24 @@ export default function registerGetRunTestsList(
         }
 
         const data = await makeRequest(`api/v1/run/tests?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve tests for run ${runId}`,
-          [
-            'projectId (number, required): Project ID',
-            'runId (number, required): Run ID',
-            'page (number, optional): Page number',
-            'pageSize (number, optional): Items per page',
-            'textSearch (string, optional): Search filter',
-          ]
-        );
+        return handleApiResponse(data, `retrieve tests for run ${runId}`, [
+          'projectId (number, required): Project ID',
+          'runId (number, required): Run ID',
+          'page (number, optional): Page number',
+          'pageSize (number, optional): Items per page',
+          'textSearch (string, optional): Search filter',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving run tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving run tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs.`,
+            },
+          ],
           isError: true,
         };
       }
-    }
+    },
   );
 }

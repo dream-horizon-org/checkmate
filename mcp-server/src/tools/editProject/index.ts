@@ -4,7 +4,7 @@ import { handleApiResponse } from '../utils.js';
 
 /**
  * Edit an existing project
- * 
+ *
  * Updates project details like name and description.
  */
 export default function registerEditProject(
@@ -15,17 +15,9 @@ export default function registerEditProject(
     'edit-project',
     'Edit an existing project',
     {
-      projectId: z.number()
-        .int()
-        .positive()
-        .describe('Project ID'),
-      projectName: z.string()
-        .min(1)
-        .optional()
-        .describe('New project name'),
-      projectDescription: z.string()
-        .optional()
-        .describe('New project description'),
+      projectId: z.number().int().positive().describe('Project ID'),
+      projectName: z.string().min(1).optional().describe('New project name'),
+      projectDescription: z.string().optional().describe('New project description'),
     },
     async ({ projectId, projectName, projectDescription }) => {
       try {
@@ -42,25 +34,22 @@ export default function registerEditProject(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `edit project ${projectId}`,
-          [
-            'projectId (number, required): Project ID to edit',
-            'projectName (string, optional): New project name',
-            'projectDescription (string, optional): New description',
-          ]
-        );
+        return handleApiResponse(data, `edit project ${projectId}`, [
+          'projectId (number, required): Project ID to edit',
+          'projectName (string, optional): New project name',
+          'projectDescription (string, optional): New description',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error editing project: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error editing project: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

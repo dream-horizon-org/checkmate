@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { z } from 'zod';
 import 'dotenv/config';
 import fg from 'fast-glob';
 import path from 'node:path';
@@ -68,10 +68,18 @@ class Logger {
     }
   }
 
-  error(...args: unknown[]) { this.log('error', ...args); }
-  warn(...args: unknown[]) { this.log('warn', ...args); }
-  info(...args: unknown[]) { this.log('info', ...args); }
-  debug(...args: unknown[]) { this.log('debug', ...args); }
+  error(...args: unknown[]) {
+    this.log('error', ...args);
+  }
+  warn(...args: unknown[]) {
+    this.log('warn', ...args);
+  }
+  info(...args: unknown[]) {
+    this.log('info', ...args);
+  }
+  debug(...args: unknown[]) {
+    this.log('debug', ...args);
+  }
 }
 
 const logger = new Logger(config.LOG_LEVEL);
@@ -84,7 +92,7 @@ class CheckmateAPIError extends Error {
   constructor(
     message: string,
     public statusCode?: number,
-    public responseBody?: Record<string, unknown>
+    public responseBody?: Record<string, unknown>,
   ) {
     super(message);
     this.name = 'CheckmateAPIError';
@@ -92,7 +100,10 @@ class CheckmateAPIError extends Error {
 }
 
 class NetworkError extends Error {
-  constructor(message: string, public originalError?: Error) {
+  constructor(
+    message: string,
+    public originalError?: Error,
+  ) {
     super(message);
     this.name = 'NetworkError';
   }
@@ -115,10 +126,7 @@ interface RequestOptions extends RequestInit {
   maxRetries?: number;
 }
 
-async function makeRequestWithRetry<T>(
-  path: string,
-  options: RequestOptions = {}
-): Promise<T> {
+async function makeRequestWithRetry<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const {
     timeout = config.REQUEST_TIMEOUT,
     retry = config.ENABLE_RETRY,
@@ -129,21 +137,21 @@ async function makeRequestWithRetry<T>(
   const attemptRequest = async (attemptNumber: number): Promise<T | null> => {
     // Ensure proper URL construction without double slashes
     const url = `${config.CHECKMATE_API_BASE}/${path}`.replace(/([^:]?)\/\/+/g, '$1/');
-    
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
       logger.debug(`Fetch attempt ${attemptNumber}/${maxRetries + 1}:`, url);
-      
+
       const response = await fetch(url, {
         ...fetchOptions,
         method: fetchOptions.method ?? 'GET',
         signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${config.CHECKMATE_API_TOKEN}`,
+          Accept: 'application/json',
+          Authorization: `Bearer ${config.CHECKMATE_API_TOKEN}`,
           'User-Agent': 'Checkmate-MCP-Server/1.0.0',
           ...(fetchOptions.headers ?? {}),
         },
@@ -154,25 +162,24 @@ async function makeRequestWithRetry<T>(
       if (!response.ok) {
         const errorBody: string = await response.text().catch(() => '(no response body)');
         logger.error(`HTTP ${response.status} ${response.statusText}:`, errorBody);
-        
+
         let parsedBody: Record<string, unknown> | undefined;
         try {
           parsedBody = JSON.parse(errorBody) as Record<string, unknown>;
         } catch {
           // Not JSON, leave as undefined
         }
-        
+
         throw new CheckmateAPIError(
           `HTTP error! status: ${response.status}`,
           response.status,
-          parsedBody
+          parsedBody,
         );
       }
 
-      const data = await response.json() as T;
+      const data = (await response.json()) as T;
       logger.info(`✓ Request successful: ${fetchOptions.method ?? 'GET'} ${path}`);
       return data;
-
     } catch (error) {
       clearTimeout(timeoutId);
 
@@ -192,16 +199,16 @@ async function makeRequestWithRetry<T>(
       if (retry && attemptNumber < maxRetries) {
         const delay = Math.min(1000 * Math.pow(2, attemptNumber), 10000); // Exponential backoff
         logger.warn(`Retrying after ${delay}ms (attempt ${attemptNumber + 1}/${maxRetries})...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return attemptRequest(attemptNumber + 1);
       }
 
       logger.error('Request failed:', error);
-      
+
       if (error instanceof CheckmateAPIError || error instanceof TimeoutError) {
         throw error;
       }
-      
+
       throw new NetworkError('Network request failed', error as Error);
     }
   };
@@ -225,8 +232,8 @@ import { registerAllResources } from './resources.js';
 // =====================
 
 const server = new McpServer({
-  name: "checkmate-mcp",
-  version: "1.0.0",
+  name: 'checkmate-mcp',
+  version: '1.0.0',
 });
 
 // =====================
@@ -256,7 +263,7 @@ logger.info(`📦 Loading ${toolFiles.length} tool(s)...`);
 let loadedTools = 0;
 for (const file of toolFiles) {
   try {
-    const mod = await import(path.resolve(file)) as ToolModule;
+    const mod = (await import(path.resolve(file))) as ToolModule;
     if (typeof mod.default === 'function') {
       const toolName = path.basename(path.dirname(file));
       mod.default(server, makeRequestWithRetry);

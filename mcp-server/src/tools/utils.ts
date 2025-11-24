@@ -4,7 +4,11 @@
 
 import type { ApiResponse } from '../types/api.js';
 import type { QueryParams } from '../types/mcp.js';
-import type { TextContent, ImageContent, EmbeddedResource } from '@modelcontextprotocol/sdk/types.js';
+import type {
+  TextContent,
+  ImageContent,
+  EmbeddedResource,
+} from '@modelcontextprotocol/sdk/types.js';
 
 // Type guard to safely check if value is an object
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -29,15 +33,17 @@ export interface ToolResponse {
  * Format error response for tools
  */
 export function formatErrorResponse(message: string, details?: unknown): ToolResponse {
-  const errorMessage = details 
+  const errorMessage = details
     ? `${message}\n\nDetails: ${JSON.stringify(details, null, 2)}`
     : message;
-  
+
   return {
-    content: [{
-      type: 'text',
-      text: errorMessage,
-    }],
+    content: [
+      {
+        type: 'text',
+        text: errorMessage,
+      },
+    ],
     isError: true,
   };
 }
@@ -46,15 +52,17 @@ export function formatErrorResponse(message: string, details?: unknown): ToolRes
  * Format success response for tools
  */
 export function formatSuccessResponse<T = unknown>(data: T, message?: string): ToolResponse {
-  const text = message 
+  const text = message
     ? `${message}\n\n${JSON.stringify(data, null, 2)}`
     : JSON.stringify(data, null, 2);
-  
+
   return {
-    content: [{
-      type: 'text',
-      text,
-    }],
+    content: [
+      {
+        type: 'text',
+        text,
+      },
+    ],
   };
 }
 
@@ -63,13 +71,13 @@ export function formatSuccessResponse<T = unknown>(data: T, message?: string): T
  */
 export function buildQueryString(params: QueryParams): string {
   const qs = new URLSearchParams();
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       qs.set(key, String(value));
     }
   });
-  
+
   const queryString = qs.toString();
   return queryString ? `?${queryString}` : '';
 }
@@ -101,7 +109,11 @@ export function isEmptyData(data: unknown): boolean {
   }
   if (data.data !== undefined) {
     const d = data.data;
-    return !d || (Array.isArray(d) && d.length === 0) || (isObject(d) && Object.keys(d).every(k => d[k] === null));
+    return (
+      !d ||
+      (Array.isArray(d) && d.length === 0) ||
+      (isObject(d) && Object.keys(d).every((k) => d[k] === null))
+    );
   }
   return false;
 }
@@ -109,7 +121,11 @@ export function isEmptyData(data: unknown): boolean {
 /**
  * Create a "not found" error response
  */
-export function formatNotFoundError(resourceType: string, identifier: string | number, helperTool?: string): ToolResponse {
+export function formatNotFoundError(
+  resourceType: string,
+  identifier: string | number,
+  helperTool?: string,
+): ToolResponse {
   let message = `❌ ${resourceType} not found\n\n`;
   message += `${resourceType} ${identifier} does not exist or you don't have access to it.\n\n`;
   message += `💡 Solution:\n`;
@@ -118,12 +134,14 @@ export function formatNotFoundError(resourceType: string, identifier: string | n
   }
   message += `- Verify the ${resourceType.toLowerCase()} ID is correct\n`;
   message += `- Ensure you have access to this resource\n`;
-  
+
   return {
-    content: [{
-      type: 'text',
-      text: message,
-    }],
+    content: [
+      {
+        type: 'text',
+        text: message,
+      },
+    ],
     isError: true,
   };
 }
@@ -152,7 +170,7 @@ export function extractApiError(data: unknown): string {
   if (!data || !isApiResponse(data)) {
     return 'No response received from server';
   }
-  
+
   // Check for error field in response
   if (data.error) {
     if (typeof data.error === 'string') {
@@ -162,17 +180,17 @@ export function extractApiError(data: unknown): string {
       return JSON.stringify(data.error, null, 2);
     }
   }
-  
+
   // Check for message field
   if (data.message) {
     return data.message;
   }
-  
+
   // Check for validation errors
   if (data.validationErrors) {
     return `Validation errors:\n${JSON.stringify(data.validationErrors, null, 2)}`;
   }
-  
+
   // Check for status-based errors
   if (typeof data.status === 'number' && data.status >= 400) {
     const statusMessages: Record<number, string> = {
@@ -186,11 +204,13 @@ export function extractApiError(data: unknown): string {
       500: 'Internal Server Error - Please try again',
       503: 'Service Unavailable - Server is temporarily unavailable',
     };
-    
+
     const statusMessage = statusMessages[data.status] || `HTTP Error ${data.status}`;
-    return data.error ? `${statusMessage}: ${typeof data.error === 'string' ? data.error : JSON.stringify(data.error)}` : statusMessage;
+    return data.error
+      ? `${statusMessage}: ${typeof data.error === 'string' ? data.error : JSON.stringify(data.error)}`
+      : statusMessage;
   }
-  
+
   return 'Unknown error occurred';
 }
 
@@ -200,13 +220,13 @@ export function extractApiError(data: unknown): string {
 export function formatUserFriendlyError(
   operation: string,
   data: unknown,
-  requiredFields?: string[]
+  requiredFields?: string[],
 ): ToolResponse {
   const errorDetails = extractApiError(data);
-  
+
   let message = `❌ Failed to ${operation}\n\n`;
   message += `Error: ${errorDetails}\n\n`;
-  
+
   // Add guidance based on error type
   if (errorDetails.includes('Unauthorized') || errorDetails.includes('Authentication')) {
     message += `💡 Solution:\n`;
@@ -216,7 +236,7 @@ export function formatUserFriendlyError(
   } else if (errorDetails.includes('validation') || errorDetails.includes('Required')) {
     message += `💡 Required Information:\n`;
     if (requiredFields && requiredFields.length > 0) {
-      requiredFields.forEach(field => {
+      requiredFields.forEach((field) => {
         message += `- ${field}\n`;
       });
     } else {
@@ -238,18 +258,20 @@ export function formatUserFriendlyError(
     message += `- Resource already exists with this name/identifier\n`;
     message += `- Choose a different name or update the existing resource\n`;
   }
-  
+
   // Add response data if available for debugging
   if (isObject(data) && Object.keys(data).length > 0) {
     message += `\n📋 Response Data:\n`;
     message += `${JSON.stringify(data, null, 2)}\n`;
   }
-  
+
   return {
-    content: [{
-      type: 'text',
-      text: message,
-    }],
+    content: [
+      {
+        type: 'text',
+        text: message,
+      },
+    ],
     isError: true,
   };
 }
@@ -260,27 +282,28 @@ export function formatUserFriendlyError(
 export function handleApiResponse(
   data: unknown,
   operation: string = 'complete operation',
-  requiredFields?: string[]
+  requiredFields?: string[],
 ): ToolResponse {
   // Check if response indicates an error
   if (!validateResponse(data)) {
     return formatUserFriendlyError(operation, { error: 'No response from server' }, requiredFields);
   }
-  
+
   // Check for error status codes
   if (isApiResponse(data) && ((data.status !== undefined && data.status >= 400) || data.error)) {
     return formatUserFriendlyError(operation, data, requiredFields);
   }
-  
+
   // Success response
   let message = `✅ Successfully completed: ${operation}\n\n`;
   message += `${JSON.stringify(data, null, 2)}`;
-  
+
   return {
-    content: [{
-      type: 'text',
-      text: message,
-    }],
+    content: [
+      {
+        type: 'text',
+        text: message,
+      },
+    ],
   };
 }
-

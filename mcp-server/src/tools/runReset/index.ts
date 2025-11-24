@@ -20,17 +20,17 @@ export default function registerRunReset(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `reset run ${runId}`,
-          ['runId (number, required): Run ID to reset']
-        );
+        return handleApiResponse(data, `reset run ${runId}`, [
+          'runId (number, required): Run ID to reset',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error resetting run: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs. This will mark all Passed tests as Retest.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error resetting run: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs. This will mark all Passed tests as Retest.`,
+            },
+          ],
           isError: true,
         };
       }

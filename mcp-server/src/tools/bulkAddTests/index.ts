@@ -24,7 +24,7 @@ const TestObject = z.object({
 
 /**
  * Bulk add tests
- * 
+ *
  * Creates multiple test cases at once in a project.
  */
 export default function registerBulkAddTests(
@@ -35,20 +35,13 @@ export default function registerBulkAddTests(
     'bulk-add-tests',
     'Create multiple test cases at once',
     {
-      projectId: z.number()
-        .int()
-        .positive()
-        .describe('Project ID'),
-      orgId: z.number()
-        .int()
-        .positive()
-        .describe('Organization ID'),
-      labelIds: z.array(z.number().int().positive())
+      projectId: z.number().int().positive().describe('Project ID'),
+      orgId: z.number().int().positive().describe('Organization ID'),
+      labelIds: z
+        .array(z.number().int().positive())
         .optional()
         .describe('Array of label IDs to assign to all tests'),
-      tests: z.array(TestObject)
-        .min(1)
-        .describe('Array of test objects to create'),
+      tests: z.array(TestObject).min(1).describe('Array of test objects to create'),
     },
     async ({ projectId, orgId, labelIds, tests }) => {
       try {
@@ -59,33 +52,30 @@ export default function registerBulkAddTests(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `bulk add ${tests.length} tests`,
-          [
-            'projectId (number): ID of the project',
-            'orgId (number): ID of the organization',
-            'tests (array): Array of test objects with the following fields:',
-            '  - title (string, required): Test title',
-            '  - section (string, required): Section name',
-            '  - priority (string, optional): Priority name',
-            '  - type (string, optional): Test type name',
-            '  - squad (string, optional): Squad name',
-            '  - steps (string, optional): Test steps',
-            '  - expectedResult (string, optional): Expected result',
-            '  - description (string, optional): Test description',
-          ]
-        );
+        return handleApiResponse(data, `bulk add ${tests.length} tests`, [
+          'projectId (number): ID of the project',
+          'orgId (number): ID of the organization',
+          'tests (array): Array of test objects with the following fields:',
+          '  - title (string, required): Test title',
+          '  - section (string, required): Section name',
+          '  - priority (string, optional): Priority name',
+          '  - type (string, optional): Test type name',
+          '  - squad (string, optional): Squad name',
+          '  - steps (string, optional): Test steps',
+          '  - expectedResult (string, optional): Expected result',
+          '  - description (string, optional): Test description',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error bulk adding tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Make sure the server is running and accessible.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error bulk adding tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Make sure the server is running and accessible.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

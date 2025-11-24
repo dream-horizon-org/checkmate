@@ -120,20 +120,26 @@ Checkmate includes an [MCP (Model Context Protocol)](https://modelcontextprotoco
 - ✅ TypeScript-based with full type safety
 - ✅ Docker support for production deployment
 
+**Setup:**
+
+The MCP server is automatically configured during installation. After starting Checkmate:
+
+1. Get your API token from Checkmate UI (User Settings → API Tokens)
+2. Update `mcp-server/.env` with your token
+3. MCP server starts automatically with Docker, or run locally
+
 **Quick Start:**
 
 ```bash
 # Navigate to MCP server directory
 cd mcp-server
 
-# Install dependencies
-npm install
-
-# Configure environment
+# Configure (if not done during install)
 cp .env.example .env
 # Edit .env with your Checkmate API URL and token
 
-# Build the server
+# Build the server (if running locally)
+npm install
 npm run build
 
 # Add to Claude Desktop config
@@ -155,7 +161,8 @@ docker-compose logs -f checkmate-mcp
 
 **Documentation:**
 - [MCP Server README](./mcp-server/README.md) - Complete setup and usage
-- [Docker Deployment Guide](./mcp-server/DOCKER.md) - Production deployment with Docker
+- [MCP Tools Guide](./website/docs/guides/api/mcp-tools.mdx) - Tool usage examples
+- [Docker Deployment](./website/docs/project/mcp-docker.mdx) - Production deployment with Docker
 
 ### ⚙️ TechStack Used:
 

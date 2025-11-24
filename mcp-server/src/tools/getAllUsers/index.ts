@@ -4,7 +4,7 @@ import { handleApiResponse, buildQueryString } from '../utils.js';
 
 /**
  * Get all users
- * 
+ *
  * Retrieves a list of all users in the system.
  */
 export default function registerGetAllUsers(
@@ -15,21 +15,14 @@ export default function registerGetAllUsers(
     'get-all-users',
     'Get a list of all users in the system',
     {
-      orgId: z.number()
-        .int()
-        .positive()
-        .optional()
-        .describe('Optional: Filter by organization ID'),
-      limit: z.number()
+      orgId: z.number().int().positive().optional().describe('Optional: Filter by organization ID'),
+      limit: z
+        .number()
         .int()
         .positive()
         .optional()
         .describe('Optional: Limit the number of users returned'),
-      offset: z.number()
-        .int()
-        .min(0)
-        .optional()
-        .describe('Optional: Offset for pagination'),
+      offset: z.number().int().min(0).optional().describe('Optional: Offset for pagination'),
     },
     async ({ orgId, limit, offset }) => {
       try {
@@ -49,25 +42,22 @@ export default function registerGetAllUsers(
           method: 'GET',
         });
 
-        return handleApiResponse(
-          data,
-          'retrieve users list',
-          [
-            'orgId (number, optional): Filter by organization ID',
-            'limit (number, optional): Limit number of users returned',
-            'offset (number, optional): Offset for pagination',
-          ]
-        );
+        return handleApiResponse(data, 'retrieve users list', [
+          'orgId (number, optional): Filter by organization ID',
+          'limit (number, optional): Limit number of users returned',
+          'offset (number, optional): Offset for pagination',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error getting users: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error getting users: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

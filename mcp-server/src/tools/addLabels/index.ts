@@ -4,7 +4,7 @@ import { handleApiResponse } from '../utils.js';
 
 /**
  * Add labels
- * 
+ *
  * Creates new labels in a project.
  */
 export default function registerAddLabels(
@@ -15,13 +15,8 @@ export default function registerAddLabels(
     'add-labels',
     'Add new labels to a project',
     {
-      projectId: z.number()
-        .int()
-        .positive()
-        .describe('Project ID'),
-      labels: z.array(z.string().min(1))
-        .min(1)
-        .describe('Array of label names to create'),
+      projectId: z.number().int().positive().describe('Project ID'),
+      labels: z.array(z.string().min(1)).min(1).describe('Array of label names to create'),
     },
     async ({ projectId, labels }) => {
       try {
@@ -32,24 +27,21 @@ export default function registerAddLabels(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `add ${labels.length} labels to project ${projectId}`,
-          [
-            'projectId (number, required): Project ID',
-            'labels (array, required): Array of label names (strings)',
-          ]
-        );
+        return handleApiResponse(data, `add ${labels.length} labels to project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'labels (array, required): Array of label names (strings)',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error adding labels: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error adding labels: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

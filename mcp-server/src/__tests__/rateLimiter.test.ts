@@ -75,7 +75,7 @@ describe('ResponseCache', () => {
 
     cache.set('key1', { data: 'value1' });
     jest.advanceTimersByTime(1001);
-    
+
     expect(cache.get('key1')).toBeNull();
     jest.useRealTimers();
   });
@@ -97,9 +97,9 @@ describe('ResponseCache', () => {
 
     cache.set('key1', 'value1');
     cache.set('key2', 'value2');
-    
+
     cache.clear();
-    
+
     expect(cache.size()).toBe(0);
     expect(cache.get('key1')).toBeNull();
   });
@@ -110,12 +110,11 @@ describe('ResponseCache', () => {
 
     cache.set('key1', 'value1');
     cache.set('key2', 'value2');
-    
+
     jest.advanceTimersByTime(1001);
     cache.cleanup();
-    
+
     expect(cache.size()).toBe(0);
     jest.useRealTimers();
   });
 });
-

@@ -29,25 +29,23 @@ export default function registerGetTests(
         }
 
         const data = await makeRequest(`api/v1/project/tests?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve tests for project ${projectId}`,
-          [
-            'projectId (number, required): Project ID',
-            'page (number, optional): Page number',
-            'pageSize (number, optional): Items per page',
-            'textSearch (string, optional): Search filter',
-          ]
-        );
+        return handleApiResponse(data, `retrieve tests for project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'page (number, optional): Page number',
+          'pageSize (number, optional): Items per page',
+          'textSearch (string, optional): Search filter',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
-    }
+    },
   );
 }

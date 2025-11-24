@@ -116,7 +116,7 @@ import { handleApiResponse, buildQueryString } from '../utils.js';
 
 /**
  * My new tool description
- * 
+ *
  * Detailed explanation of what this tool does,
  * including use cases and examples.
  */
@@ -136,21 +136,20 @@ export default function registerMyNewTool(
       try {
         // Build query string or request body
         const queryParams = buildQueryString({ param1, param2 });
-        
+
         // Make API request
         const data = await makeRequest(`api/v1/your-endpoint?${queryParams}`);
-        
+
         // Return formatted response
-        return handleApiResponse(
-          data,
-          'Failed to retrieve data from my-new-tool'
-        );
+        return handleApiResponse(data, 'Failed to retrieve data from my-new-tool');
       } catch (error) {
         return {
-          content: [{
-            type: 'text' as const,
-            text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          }],
+          content: [
+            {
+              type: 'text' as const,
+              text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            },
+          ],
           isError: true,
         };
       }
@@ -199,10 +198,12 @@ try {
   return handleApiResponse(data, 'Specific error message');
 } catch (error) {
   return {
-    content: [{
-      type: 'text' as const,
-      text: `Error: ${error instanceof Error ? error.message : 'Unknown'}`,
-    }],
+    content: [
+      {
+        type: 'text' as const,
+        text: `Error: ${error instanceof Error ? error.message : 'Unknown'}`,
+      },
+    ],
     isError: true,
   };
 }
@@ -267,4 +268,3 @@ By contributing, you agree that your contributions will be licensed under the MI
 - Check the [main README](../README.md)
 
 Thank you for contributing! 🎉
-

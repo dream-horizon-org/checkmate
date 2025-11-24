@@ -309,6 +309,89 @@ When modifying the database schema:
 
 ---
 
+## MCP Server Setup (Optional)
+
+Checkmate includes an MCP (Model Context Protocol) server that allows AI assistants like Claude to interact with your Checkmate instance programmatically.
+
+### Quick Setup
+
+<Steps>
+
+1. **Create MCP Server Environment File**
+   
+   Copy the example file:
+   ```bash
+   cd mcp-server
+   cp .env.example .env
+   ```
+
+2. **Get Your API Token**
+   
+   - Start Checkmate: `yarn docker:setup`
+   - Login at http://localhost:3000
+   - Navigate to **User Settings → API Tokens**
+   - Click **Generate Token**
+   - Copy the token
+
+3. **Configure MCP Server**
+   
+   Edit `mcp-server/.env`:
+   ```env
+   CHECKMATE_API_BASE=http://localhost:3000
+   CHECKMATE_API_TOKEN=your-api-token-here
+   ```
+
+4. **Start MCP Server**
+   
+   The MCP server starts automatically with Docker:
+   ```bash
+   docker-compose up -d
+   ```
+   
+   Or run locally:
+   ```bash
+   cd mcp-server
+   npm install
+   npm run build
+   node build/index.js
+   ```
+
+</Steps>
+
+### Docker Deployment
+
+When using Docker, the MCP server is included in `docker-compose.yml`:
+
+- **Service name:** `checkmate-mcp`
+- **Container name:** `checkmate-mcp`
+- **Auto-starts:** Yes, with `docker-compose up -d`
+- **Configuration:** Uses `mcp-server/.env`
+
+### Verify MCP Server
+
+Check if the MCP server is running:
+
+```bash
+# Check Docker container
+docker-compose ps checkmate-mcp
+
+# View logs
+docker-compose logs -f checkmate-mcp
+```
+
+### Connect to AI Assistants
+
+See the [MCP Server README](../../../mcp-server/README.md) for detailed instructions on connecting to:
+- Claude Desktop
+- Cursor IDE
+- Other MCP-compatible clients
+
+:::tip
+**For Docker deployments**, use `http://checkmate-app:3000` as `CHECKMATE_API_BASE` in `mcp-server/.env` (internal Docker network).
+:::
+
+---
+
 ## Troubleshooting
 
 ### Cannot connect to database

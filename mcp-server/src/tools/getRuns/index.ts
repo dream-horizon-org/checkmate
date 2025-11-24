@@ -33,26 +33,24 @@ export default function registerGetRuns(
         }
 
         const data = await makeRequest(`api/v1/runs?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve runs for project ${projectId}`,
-          [
-            'projectId (number, required): Project ID',
-            'page (number, optional): Page number',
-            'pageSize (number, optional): Items per page',
-            'search (string, optional): Search filter',
-            'status (enum, optional): Filter by status (Active, Locked, Archived, Deleted)',
-          ]
-        );
+        return handleApiResponse(data, `retrieve runs for project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'page (number, optional): Page number',
+          'pageSize (number, optional): Items per page',
+          'search (string, optional): Search filter',
+          'status (enum, optional): Filter by status (Active, Locked, Archived, Deleted)',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving runs: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving runs: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
-    }
+    },
   );
 }

@@ -18,7 +18,7 @@ const TestUpdateObject = z.object({
 
 /**
  * Bulk update tests
- * 
+ *
  * Updates multiple test cases at once.
  */
 export default function registerBulkUpdateTests(
@@ -29,7 +29,8 @@ export default function registerBulkUpdateTests(
     'bulk-update-tests',
     'Update multiple test cases at once',
     {
-      tests: z.array(TestUpdateObject)
+      tests: z
+        .array(TestUpdateObject)
         .min(1)
         .describe('Array of test objects to update (each must include testId)'),
     },
@@ -42,28 +43,25 @@ export default function registerBulkUpdateTests(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `bulk update ${tests.length} tests`,
-          [
-            'tests (array, required): Array of test objects to update',
-            '  Each test object must include:',
-            '  - testId (number, required): Test ID',
-            '  - testName (string, optional): New name',
-            '  - testDescription (string, optional): New description',
-            '  - sectionId, priorityId, typeId, etc. (optional): Metadata IDs',
-          ]
-        );
+        return handleApiResponse(data, `bulk update ${tests.length} tests`, [
+          'tests (array, required): Array of test objects to update',
+          '  Each test object must include:',
+          '  - testId (number, required): Test ID',
+          '  - testName (string, optional): New name',
+          '  - testDescription (string, optional): New description',
+          '  - sectionId, priorityId, typeId, etc. (optional): Metadata IDs',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error bulk updating tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Ensure all testIds exist using get-tests.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error bulk updating tests: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Ensure all testIds exist using get-tests.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

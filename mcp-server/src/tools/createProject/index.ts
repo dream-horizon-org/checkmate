@@ -4,7 +4,7 @@ import { handleApiResponse } from '../utils.js';
 
 /**
  * Create a new project
- * 
+ *
  * Creates a new project in an organization with specified configuration.
  */
 export default function registerCreateProject(
@@ -15,16 +15,9 @@ export default function registerCreateProject(
     'create-project',
     'Create a new project in an organization',
     {
-      orgId: z.number()
-        .int()
-        .positive()
-        .describe('Organization ID'),
-      projectName: z.string()
-        .min(1)
-        .describe('Project name'),
-      projectDescription: z.string()
-        .optional()
-        .describe('Project description'),
+      orgId: z.number().int().positive().describe('Organization ID'),
+      projectName: z.string().min(1).describe('Project name'),
+      projectDescription: z.string().optional().describe('Project description'),
     },
     async ({ orgId, projectName, projectDescription }) => {
       try {
@@ -39,25 +32,22 @@ export default function registerCreateProject(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `create project "${projectName}"`,
-          [
-            'orgId (number, required): Organization ID',
-            'projectName (string, required): Name of the project',
-            'projectDescription (string, optional): Description of the project',
-          ]
-        );
+        return handleApiResponse(data, `create project "${projectName}"`, [
+          'orgId (number, required): Organization ID',
+          'projectName (string, required): Name of the project',
+          'projectDescription (string, optional): Description of the project',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error creating project: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error creating project: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

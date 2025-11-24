@@ -47,14 +47,16 @@ export default function registerRunUpdateTestStatus(
             'testIdStatusArray (array, required): Array of {testId, status, comment}',
             'projectId (number, optional): Project ID',
             'comment (string, optional): Overall comment',
-          ]
+          ],
         );
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error updating test statuses: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-run-tests-list to find tests in this run.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error updating test statuses: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-run-tests-list to find tests in this run.`,
+            },
+          ],
           isError: true,
         };
       }

@@ -4,7 +4,7 @@ import { handleApiResponse } from '../utils.js';
 
 /**
  * Add section
- * 
+ *
  * Creates a new section (test suite) in a project.
  */
 export default function registerAddSection(
@@ -15,14 +15,10 @@ export default function registerAddSection(
     'add-section',
     'Add a new section (test suite) to a project',
     {
-      projectId: z.number()
-        .int()
-        .positive()
-        .describe('Project ID'),
-      sectionName: z.string()
-        .min(1)
-        .describe('Section name'),
-      parentSectionId: z.number()
+      projectId: z.number().int().positive().describe('Project ID'),
+      sectionName: z.string().min(1).describe('Section name'),
+      parentSectionId: z
+        .number()
         .int()
         .positive()
         .optional()
@@ -40,25 +36,22 @@ export default function registerAddSection(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `add section "${sectionName}" to project ${projectId}`,
-          [
-            'projectId (number, required): Project ID',
-            'sectionName (string, required): Name of the section',
-            'parentSectionId (number, optional): Parent section ID for nesting',
-          ]
-        );
+        return handleApiResponse(data, `add section "${sectionName}" to project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'sectionName (string, required): Name of the section',
+          'parentSectionId (number, optional): Parent section ID for nesting',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error adding section: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-sections to view existing sections.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error adding section: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-sections to view existing sections.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
 }
-

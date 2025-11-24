@@ -13,17 +13,17 @@ export default function registerGetAutomationStatus(
     async ({ orgId }) => {
       try {
         const data = await makeRequest(`api/v1/automationStatus?orgId=${orgId}`);
-        return handleApiResponse(
-          data,
-          `retrieve automation statuses for organization ${orgId}`,
-          ['orgId (number, required): Organization ID']
-        );
+        return handleApiResponse(data, `retrieve automation statuses for organization ${orgId}`, [
+          'orgId (number, required): Organization ID',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving automation statuses: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving automation statuses: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-orgs-list to find valid organization IDs.`,
+            },
+          ],
           isError: true,
         };
       }

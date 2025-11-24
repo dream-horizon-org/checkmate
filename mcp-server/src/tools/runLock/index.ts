@@ -21,20 +21,18 @@ export default function registerRunLock(
           body: JSON.stringify(body),
         });
 
-        return handleApiResponse(
-          data,
-          `lock run ${runId}`,
-          [
-            'runId (number, required): Run ID to lock',
-            'projectId (number, required): Project ID',
-          ]
-        );
+        return handleApiResponse(data, `lock run ${runId}`, [
+          'runId (number, required): Run ID to lock',
+          'projectId (number, required): Project ID',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error locking run: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs. Note: Only Active runs can be locked.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error locking run: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-runs to find valid run IDs. Note: Only Active runs can be locked.`,
+            },
+          ],
           isError: true,
         };
       }

@@ -26,31 +26,26 @@ const startTime = Date.now();
 /**
  * Register server info resource
  */
-export function registerServerInfoResource(
-  server: McpServer,
-  apiBase: string,
-) {
-  server.resource(
-    'server-info',
-    'checkmate://server-info',
-    () => {
-      const info: ServerInfo = {
-        name: 'checkmate-mcp',
-        version: '1.0.0',
-        apiBase,
-        uptime: Date.now() - startTime,
-        timestamp: new Date().toISOString(),
-      };
+export function registerServerInfoResource(server: McpServer, apiBase: string) {
+  server.resource('server-info', 'checkmate://server-info', () => {
+    const info: ServerInfo = {
+      name: 'checkmate-mcp',
+      version: '1.0.0',
+      apiBase,
+      uptime: Date.now() - startTime,
+      timestamp: new Date().toISOString(),
+    };
 
-      return {
-        contents: [{
+    return {
+      contents: [
+        {
           uri: 'checkmate://server-info',
           mimeType: 'application/json',
           text: JSON.stringify(info, null, 2),
-        }],
-      };
-    },
-  );
+        },
+      ],
+    };
+  });
 }
 
 /**
@@ -61,49 +56,44 @@ export function registerHealthCheckResource(
   apiBase: string,
   makeRequest: <T>(path: string, init?: RequestInit) => Promise<T | null>,
 ) {
-  server.resource(
-    'health',
-    'checkmate://health',
-    async () => {
-      const health: HealthStatus = {
-        status: 'healthy',
-        apiReachable: false,
-        timestamp: new Date().toISOString(),
-        uptime: Date.now() - startTime,
-      };
+  server.resource('health', 'checkmate://health', async () => {
+    const health: HealthStatus = {
+      status: 'healthy',
+      apiReachable: false,
+      timestamp: new Date().toISOString(),
+      uptime: Date.now() - startTime,
+    };
 
-      try {
-        // Try to reach the Checkmate API
-        const response = await makeRequest('api/v1/orgs');
+    try {
+      // Try to reach the Checkmate API
+      const response = await makeRequest('api/v1/orgs');
 
-        health.apiReachable = response !== null;
-        health.status = health.apiReachable ? 'healthy' : 'unhealthy';
-      } catch (error) {
-        health.status = 'unhealthy';
-        health.apiReachable = false;
-        health.error = error instanceof Error ? error.message : 'Unknown error';
-      }
+      health.apiReachable = response !== null;
+      health.status = health.apiReachable ? 'healthy' : 'unhealthy';
+    } catch (error) {
+      health.status = 'unhealthy';
+      health.apiReachable = false;
+      health.error = error instanceof Error ? error.message : 'Unknown error';
+    }
 
-      return {
-        contents: [{
+    return {
+      contents: [
+        {
           uri: 'checkmate://health',
           mimeType: 'application/json',
           text: JSON.stringify(health, null, 2),
-        }],
-      };
-    },
-  );
+        },
+      ],
+    };
+  });
 }
 
 /**
  * Register API documentation resource
  */
 export function registerApiDocsResource(server: McpServer) {
-  server.resource(
-    'api-docs',
-    'checkmate://api-docs',
-    () => {
-      const docs = `# Checkmate API Documentation
+  server.resource('api-docs', 'checkmate://api-docs', () => {
+    const docs = `# Checkmate API Documentation
 
 ## Official Documentation
 
@@ -136,15 +126,16 @@ The Checkmate MCP server provides access to the following API endpoints:
 For more information, visit the official documentation links above.
 `;
 
-      return {
-        contents: [{
+    return {
+      contents: [
+        {
           uri: 'checkmate://api-docs',
           mimeType: 'text/markdown',
           text: docs,
-        }],
-      };
-    },
-  );
+        },
+      ],
+    };
+  });
 }
 
 /**
@@ -159,4 +150,3 @@ export function registerAllResources(
   registerHealthCheckResource(server, apiBase, makeRequest);
   registerApiDocsResource(server);
 }
-

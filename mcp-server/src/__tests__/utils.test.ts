@@ -1,10 +1,10 @@
-import { 
-  formatErrorResponse, 
-  formatSuccessResponse, 
-  buildQueryString, 
+import {
+  formatErrorResponse,
+  formatSuccessResponse,
+  buildQueryString,
   validateResponse,
   sanitizeInput,
-  handleApiResponse
+  handleApiResponse,
 } from '../tools/utils.js';
 
 describe('Tool Utilities', () => {
@@ -132,4 +132,3 @@ describe('Tool Utilities', () => {
     });
   });
 });
-

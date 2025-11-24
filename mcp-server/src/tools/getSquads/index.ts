@@ -16,20 +16,20 @@ export default function registerGetSquads(
       try {
         const qs = new URLSearchParams({ projectId: String(projectId) });
         const data = await makeRequest(`api/v1/project/squads?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve squads for project ${projectId}`,
-          ['projectId (number, required): Project ID']
-        );
+        return handleApiResponse(data, `retrieve squads for project ${projectId}`, [
+          'projectId (number, required): Project ID',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving squads: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving squads: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
-} 
+}

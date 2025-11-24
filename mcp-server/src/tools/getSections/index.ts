@@ -21,23 +21,21 @@ export default function registerGetSections(
         }
 
         const data = await makeRequest(`api/v1/project/sections?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve sections for project ${projectId}`,
-          [
-            'projectId (number, required): Project ID',
-            'runId (number, optional): Filter by run ID',
-          ]
-        );
+        return handleApiResponse(data, `retrieve sections for project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'runId (number, optional): Filter by run ID',
+        ]);
       } catch (error) {
         return {
-          content: [{
-            type: 'text',
-            text: `❌ Error retrieving sections: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
-          }],
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving sections: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
           isError: true,
         };
       }
     },
   );
-} 
+}

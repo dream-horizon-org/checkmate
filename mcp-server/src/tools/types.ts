@@ -1,6 +1,10 @@
-import type { ZodSchema } from "zod";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { TextContent, ImageContent, EmbeddedResource } from '@modelcontextprotocol/sdk/types.js';
+import type { ZodSchema } from 'zod';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type {
+  TextContent,
+  ImageContent,
+  EmbeddedResource,
+} from '@modelcontextprotocol/sdk/types.js';
 
 export type ToolContent = TextContent | ImageContent | EmbeddedResource;
 
@@ -17,10 +21,7 @@ export interface ToolDefinition<Args extends Record<string, unknown> = Record<st
   schema: ZodSchema<Args>;
   handler: (args: Args, ctx: unknown) => Promise<ToolResponse>;
   /** Optional additional metadata */
-  requiredRole?: "reader" | "user" | "admin";
+  requiredRole?: 'reader' | 'user' | 'admin';
 }
 
-export type RegisterTool = (
-  server: McpServer,
-  tool: ToolDefinition,
-) => void; 
+export type RegisterTool = (server: McpServer, tool: ToolDefinition) => void;
