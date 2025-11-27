@@ -162,9 +162,16 @@ docker-compose logs -f checkmate-mcp
 ```
 
 **Documentation:**
+<<<<<<< HEAD
 - [MCP Server API Reference](https://checkmate.dreamsportslabs.com/docs/guides/api/mcp-server) - Complete API reference
 - [MCP Tools Guide](https://checkmate.dreamsportslabs.com/docs/guides/api/mcp-tools) - Tool usage examples
 - [Docker Deployment](https://checkmate.dreamsportslabs.com/docs/project/mcp-docker) - Production deployment with Docker
+=======
+- [MCP Server README](./mcp-server/README.md) - Complete setup and usage
+- [Local Setup Guide](./mcp-server/LOCAL_SETUP.md) - Running MCP server locally
+- [MCP Tools Guide](./website/docs/guides/api/mcp-tools.mdx) - Tool usage examples
+- [Docker Deployment](./website/docs/project/mcp-docker.mdx) - Production deployment with Docker
+>>>>>>> 434eb4c308d9b22650798291d1ca34b70115bbbc
 
 ### ⚙️ TechStack Used:
 
