@@ -15,8 +15,9 @@ This Test Case Management Tool is designed to address the challenges faced by te
 ## 🔗 Quick Links
 
 - [Detailed Documentation](https://checkmate.dreamsportslabs.com/)
-- [Installation Guide](https://checkmate.dreamsportslabs.com/project/setup/)
-- [Product Guide](https://checkmate.dreamsportslabs.com/guides/projects/)
+- [Installation Guide](https://checkmate.dreamsportslabs.com/docs/project/setup)
+- [Product Guide](https://checkmate.dreamsportslabs.com/docs/guides/projects)
+- [API Documentation](https://checkmate.dreamsportslabs.com/docs/guides/api/)
 - [Connect with us on discord](https://discord.gg/wBQXeYAKNc)
 
 ## 📦 Installation
@@ -161,10 +162,9 @@ docker-compose logs -f checkmate-mcp
 ```
 
 **Documentation:**
-- [MCP Server README](./mcp-server/README.md) - Complete setup and usage
-- [Local Setup Guide](./mcp-server/LOCAL_SETUP.md) - Running MCP server locally
-- [MCP Tools Guide](./website/docs/guides/api/mcp-tools.mdx) - Tool usage examples
-- [Docker Deployment](./website/docs/project/mcp-docker.mdx) - Production deployment with Docker
+- [MCP Server API Reference](https://checkmate.dreamsportslabs.com/docs/guides/api/mcp-server) - Complete API reference
+- [MCP Tools Guide](https://checkmate.dreamsportslabs.com/docs/guides/api/mcp-tools) - Tool usage examples
+- [Docker Deployment](https://checkmate.dreamsportslabs.com/docs/project/mcp-docker) - Production deployment with Docker
 
 ### ⚙️ TechStack Used:
 
