@@ -15,6 +15,10 @@
     "db:studio": "drizzle-kit studio --port 4000",
     "dev:db:setup": "./scripts/docker-start.sh --db-init true && yarn db:init",
     "dev": "node server.mjs",
+    "dev:with-mcp": "concurrently -n \"APP,MCP\" -c \"blue,green\" \"yarn dev\" \"yarn mcp:dev\"",
+    "mcp:build": "cd mcp-server && npm install && npm run build",
+    "mcp:dev": "cd mcp-server && npm run build && node build/index.js",
+    "mcp:start": "cd mcp-server && node build/index.js",
     "docker:app:setup": "./scripts/docker-start.sh --app-docker true --seed-data true",
     "docker:db:setup": "./scripts/docker-start.sh --seed-data true --db-init true",
     "docker:setup": "./scripts/docker-start.sh --app-docker true --db-init true --seed-data true",
@@ -118,7 +122,8 @@
     "ts-node": "10.9.2",
     "typescript": "5.4.5",
     "vite": "5.2.13",
-    "vite-tsconfig-paths": "4.3.2"
+    "vite-tsconfig-paths": "4.3.2",
+    "concurrently": "^8.2.2"
   },
   "engines": {
     "node": ">=18.0.0"

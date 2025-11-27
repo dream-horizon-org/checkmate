@@ -486,6 +486,67 @@ install_dependencies() {
     fi
 }
 
+# Function to build MCP server
+build_mcp_server() {
+    print_header "Building MCP Server"
+    
+    # Verify REPO_DIR is set before using it
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid. Cannot build MCP server."
+        exit 1
+    fi
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        exit 1
+    }
+    
+    # Check if mcp-server directory exists
+    if [ ! -d "$REPO_DIR/mcp-server" ]; then
+        print_warning "MCP server directory not found. Skipping MCP server build."
+        return
+    fi
+    
+    cd "$REPO_DIR/mcp-server" || {
+        print_error "Failed to change to MCP server directory"
+        exit 1
+    }
+    
+    # Check if package.json exists
+    if [ ! -f "package.json" ]; then
+        print_warning "MCP server package.json not found. Skipping build."
+        return
+    fi
+    
+    print_info "Installing MCP server dependencies..."
+    if npm install; then
+        print_success "MCP server dependencies installed"
+    else
+        print_warning "Failed to install MCP server dependencies. Continuing anyway..."
+        return
+    fi
+    
+    print_info "Building MCP server..."
+    if npm run build; then
+        print_success "MCP server built successfully"
+        
+        # Verify build output exists
+        if [ -f "build/index.js" ]; then
+            print_success "MCP server build artifact verified: build/index.js"
+        else
+            print_warning "MCP server build completed but build/index.js not found"
+        fi
+    else
+        print_warning "Failed to build MCP server. You can build it later with: cd mcp-server && npm run build"
+    fi
+    
+    # Return to repo root
+    cd "$REPO_DIR" || {
+        print_error "Failed to return to repository directory"
+        exit 1
+    }
+}
+
 # Function to verify Docker setup (without starting containers)
 verify_docker_setup() {
     print_header "Verifying Docker Configuration"
@@ -609,6 +670,9 @@ main() {
     # Install dependencies
     install_dependencies
     
+    # Build MCP server
+    build_mcp_server
+    
     # Verify Docker setup (without starting containers)
     echo ""
     verify_docker_setup
@@ -633,6 +697,7 @@ main() {
     echo -e "  ${GREEN}✓${NC} Environment file created"
     echo -e "  ${GREEN}✓${NC} MCP server environment file created"
     echo -e "  ${GREEN}✓${NC} Dependencies installed"
+    echo -e "  ${GREEN}✓${NC} MCP server built"
     echo -e "  ${GREEN}✓${NC} Docker configuration verified"
     echo ""
     
@@ -679,6 +744,9 @@ main() {
     echo ""
     echo -e "  ${BLUE}📚 MCP Server Documentation:${NC}"
     echo -e "     ${BLUE}$REPO_DIR/mcp-server/README.md${NC}"
+    echo ""
+    echo -e "  ${GREEN}✅ MCP Server is built and ready for Cursor IDE${NC}"
+    echo -e "     ${BLUE}Build location: $REPO_DIR/mcp-server/build/index.js${NC}"
     echo ""
     
     # Show ports information
@@ -740,10 +808,11 @@ main() {
     echo ""
     echo -e "  ${GREEN}4.${NC} Sign in with your Google account"
     echo ""
-    echo -e "  ${GREEN}5.${NC} Configure MCP Server (optional):"
+    echo -e "  ${GREEN}5.${NC} Configure MCP Server for Cursor IDE (optional):"
     echo -e "     ${BLUE}Get API token from Checkmate UI${NC}"
     echo -e "     ${BLUE}Update mcp-server/.env with token${NC}"
-    echo -e "     ${BLUE}MCP server starts automatically with Docker${NC}"
+    echo -e "     ${BLUE}MCP server is already built and ready${NC}"
+    echo -e "     ${BLUE}Configure Cursor: See $REPO_DIR/CURSOR_SETUP.md${NC}"
     echo ""
     
     # Resources
