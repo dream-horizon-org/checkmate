@@ -108,6 +108,64 @@ cd checkmate
 
 [Postman](https://documenter.getpostman.com/view/23217307/2sAYXFgwRt) collection of APIs is currently available, comprehensive documentation is in progress.
 
+### 🤖 MCP Server
+
+Checkmate includes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that allows AI assistants like Claude to interact with your Checkmate instance programmatically.
+
+**Features:**
+- ✅ Full API access through AI assistants
+- ✅ Manage tests, projects, and runs via natural language
+- ✅ Update test statuses and track progress
+- ✅ Query test history and analytics
+- ✅ TypeScript-based with full type safety
+- ✅ Docker support for production deployment
+
+**Local Development Setup:**
+
+For local development, start both the app and MCP server together:
+
+```bash
+# Start Checkmate app and MCP server together
+yarn dev:with-mcp
+```
+
+Or run separately:
+
+```bash
+# Terminal 1: Start Checkmate app
+yarn dev
+
+# Terminal 2: Start MCP server
+yarn mcp:dev
+```
+
+**Prerequisites:**
+1. Get your API token from Checkmate UI (User Settings → API Tokens → Generate Token)
+2. Update `mcp-server/.env` with your token:
+   ```env
+   CHECKMATE_API_BASE=http://localhost:3000
+   CHECKMATE_API_TOKEN=your-api-token-here
+   ```
+
+**Docker Deployment:**
+
+```bash
+# Start all services including MCP server
+docker-compose up -d
+
+# Check MCP server status
+docker-compose ps checkmate-mcp
+
+# View MCP server logs
+docker-compose logs -f checkmate-mcp
+```
+
+**Documentation:**
+- [MCP Server README](./mcp-server/README.md) - Complete setup and usage
+- [Local Setup Guide](./mcp-server/LOCAL_SETUP.md) - Running MCP server locally
+- [MCP Tools Guide](./website/docs/guides/api/mcp-tools.mdx) - Tool usage examples
+- [Docker Deployment](./website/docs/project/mcp-docker.mdx) - Production deployment with Docker
+
 ### ⚙️ TechStack Used:
 
 - <span style="display: flex; align-items: center;">

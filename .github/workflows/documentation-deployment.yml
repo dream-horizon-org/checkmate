@@ -27,11 +27,11 @@ jobs:
       - name: Enable Corepack and Set up Yarn
         run: |
           corepack enable
-          corepack prepare yarn@4.10.3 --activate
+          corepack prepare yarn@1.22.19 --activate
 
       - name: Install Dependencies
         working-directory: ./website
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Build Docusaurus Website
         working-directory: ./website

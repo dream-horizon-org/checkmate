@@ -1,0 +1,59 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+# Note: package-lock.json is excluded, but yarn.lock is needed
+
+# Build output
+build/
+dist/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test files and coverage
+coverage/
+.nyc_output/
+**/__tests__/
+**/*.test.ts
+**/*.spec.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Development files
+.eslintrc.js
+.prettierrc
+.prettierignore
+.editorconfig
+jest.config.cjs
+# Note: tsconfig.json is needed for the build, so don't exclude it
+

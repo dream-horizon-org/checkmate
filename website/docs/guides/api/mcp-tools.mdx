@@ -1,0 +1,391 @@
+---
+sidebar_position: 6
+title: MCP Tools Usage Guide
+description: How to use MCP server tools with examples
+---
+
+# MCP Tools Usage Guide
+
+Learn how to use Checkmate MCP Server tools effectively with Cursor or other AI editors.
+
+## 🔧 Setup with Cursor IDE
+
+> **📖 Detailed Guide Available**: For comprehensive setup instructions with troubleshooting, see the [Complete Cursor Setup Guide](https://github.com/ds-horizon/checkmate/blob/master/mcp-server/CURSOR_SETUP.md).
+
+### Quick Setup
+
+1. **Open Cursor Settings**
+   - Press `Cmd/Ctrl + Shift + P`
+   - Type: `Preferences: Open User Settings (JSON)`
+   - Or: **Cursor** → **Settings** → **Features** → **MCP**
+
+2. **Add Configuration**
+
+```json
+{
+  "mcpServers": {
+    "checkmate": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/checkmate/mcp-server/build/index.js"
+      ],
+      "env": {
+        "CHECKMATE_API_BASE": "http://localhost:3000",
+        "CHECKMATE_API_TOKEN": "your-api-token-here"
+      },
+      "disabled": false,
+      "alwaysAllow": []
+    }
+  }
+}
+```
+
+3. **Get Your API Token**
+   - Login to Checkmate: http://localhost:3000
+   - Go to: **User Settings** → **API Tokens**
+   - Click **Generate Token**
+   - Copy and paste into the config above
+
+4. **Restart Cursor**
+   - Quit Cursor completely (Cmd+Q / Alt+F4)
+   - Reopen Cursor
+   - Check MCP icon shows "checkmate" as connected ✅
+
+### Configuration File Locations
+
+**macOS:**
+```
+~/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
+```
+
+**Windows:**
+```
+%APPDATA%\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json
+```
+
+**Linux:**
+```
+~/.config/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings\cline_mcp_settings.json
+```
+
+### Configuration Variations
+
+#### For Global NPM Installation
+```json
+{
+  "mcpServers": {
+    "checkmate": {
+      "command": "checkmate-mcp",
+      "args": [],
+      "env": {
+        "CHECKMATE_API_BASE": "http://localhost:3000",
+        "CHECKMATE_API_TOKEN": "your-token"
+      }
+    }
+  }
+}
+```
+
+#### For Production/Remote Checkmate
+```json
+{
+  "mcpServers": {
+    "checkmate": {
+      "command": "node",
+      "args": ["/path/to/mcp-server/build/index.js"],
+      "env": {
+        "CHECKMATE_API_BASE": "https://checkmate.yourcompany.com",
+        "CHECKMATE_API_TOKEN": "prod-token-here"
+      },
+      "alwaysAllow": [
+        "get-orgs-list",
+        "get-projects",
+        "get-tests"
+      ]
+    }
+  }
+}
+```
+
+### Using MCP in Cursor
+
+Once configured, interact with Checkmate through natural language:
+
+**Example Prompts:**
+```
+"Show me all projects in organization 1"
+"Create a test called 'Login validation' in project 3"
+"List all tests in the Authentication section"
+"Create a run named 'Sprint 10' with tests 100-110"
+"Update test 545 to passed status in run 2"
+"Get the latest run status for project 3"
+```
+
+### Troubleshooting Cursor Setup
+
+#### MCP Server Not Appearing
+- ✓ Check JSON syntax (no trailing commas)
+- ✓ Use absolute path for `index.js`
+- ✓ Restart Cursor completely
+- ✓ Check logs: `Help` → `Toggle Developer Tools` → `Console`
+
+#### Authentication Failed
+```bash
+# Test your token manually
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  http://localhost:3000/api/v1/orgs
+```
+- If 401: Regenerate token in Checkmate UI
+- If connection refused: Start Checkmate server (`yarn dev`)
+
+#### Connection Timeout
+- Verify Checkmate is running
+- Check `CHECKMATE_API_BASE` URL is correct
+- Test connection: `curl http://localhost:3000/api/v1/orgs`
+
+## Quick Reference
+
+### Common Issues
+
+#### Authentication Errors (401)
+**Symptom:** "Unauthorized" or "Authentication required"
+
+**Solution:**
+- Verify `CHECKMATE_API_TOKEN` in `.env` file
+- Check token hasn't expired
+- Regenerate token from Checkmate UI
+
+#### Permission Errors (403)
+**Symptom:** "You are not authorized to perform this action"
+
+**Solution:**
+- Contact admin for permissions
+- Check RBAC policies for your role
+
+#### Validation Errors (400)
+**Symptom:** "Data validation error" or "Required field missing"
+
+**Solution:**
+- Review required fields for the tool
+- Ensure data types match (numbers vs strings)
+- Verify IDs reference existing resources
+
+#### Resource Not Found (404)
+**Solution:**
+- Use list/get tools to find valid IDs first
+- Ensure you have access to the resource
+
+## Tool Usage Patterns
+
+### Creating a Project
+
+```
+Use: create-project
+Required:
+  - orgId: Get from "get-orgs-list"
+  - projectName: Unique name
+
+Example: "Create a project called 'Mobile Testing' in organization 1"
+```
+
+### Creating Tests
+
+#### Single Test
+```
+Use: create-test
+Required:
+  - projectId, testName, sectionId
+
+Steps:
+1. get-projects → Find projectId
+2. get-sections → Find sectionId  
+3. create-test with required fields
+
+Example: "Create test 'Login validation' in project 1, section 2"
+```
+
+#### Bulk Tests (Recommended)
+```
+Use: bulk-add-tests
+Required:
+  - projectId, orgId
+  - tests array with title, section (NAMES not IDs!)
+
+⚠️ IMPORTANT: Uses NAMES, not IDs!
+
+Example: "Create 5 login tests in project 1 under 'Authentication' section"
+```
+
+### Creating a Test Run
+
+```
+Use: create-run
+Required:
+  - projectId, runName, testIds[]
+
+Steps:
+1. get-tests → Get test IDs
+2. create-run with selected testIds
+
+Example: "Create run 'Sprint 10' in project 1 with tests 100-110"
+```
+
+### Updating Test Status
+
+```
+Use: run-update-test-status
+Required:
+  - runId, testIdStatusArray
+
+⚠️ Run must be unlocked!
+
+Steps:
+1. get-run-state-detail → Check if locked
+2. run-update-test-status with test statuses
+
+Example: "Mark tests 100, 101 as passed in run 5"
+```
+
+## Finding IDs
+
+### Organization ID
+```
+Tool: get-orgs-list
+Returns: orgId for each organization
+```
+
+### Project ID
+```
+Tool: get-projects
+Input: orgId
+Returns: projectId for each project
+```
+
+### Section ID
+```
+Tool: get-sections
+Input: projectId
+Returns: sectionId for each section
+```
+
+### Test IDs
+```
+Tool: get-tests
+Input: projectId
+Returns: Paginated test list with testId
+```
+
+### Metadata IDs
+```
+get-priority → priorityId
+get-type → typeId
+get-platforms → platformId
+get-squads → squadId
+get-labels → labelId
+```
+
+## Best Practices
+
+### 1. Start with Metadata
+
+Always get IDs before creating resources:
+
+```
+1. get-orgs-list → orgId
+2. get-projects → projectId
+3. get-sections → sectionId
+4. get-priority → priorityId
+5. Now create/update resources
+```
+
+### 2. Use Bulk Operations
+
+More efficient than individual operations:
+
+```
+Instead of: create-test 10 times
+Use: bulk-add-tests with 10 tests
+
+Instead of: update-test 50 times
+Use: bulk-update-tests with 50 tests
+```
+
+### 3. Check Status First
+
+Before updating:
+
+```
+For runs: get-run-state-detail (check if locked)
+For tests: get-tests (verify they exist)
+```
+
+### 4. Handle Errors
+
+```
+404 → Resource doesn't exist → Use list tools
+403 → No permission → Contact admin
+423 → Resource locked → Unlock first  
+400 → Validation error → Check required fields
+```
+
+## Common Workflows
+
+### Complete Test Suite Creation
+
+```
+Step 1: Get metadata
+  - get-orgs-list
+  - get-projects
+  - get-sections
+  - get-priority
+
+Step 2: Create tests
+  - bulk-add-tests with:
+    * projectId
+    * orgId
+    * tests array
+
+Step 3: Verify
+  - get-tests to confirm
+```
+
+### Test Execution Cycle
+
+```
+Step 1: Create run
+  - get-tests (get testIds)
+  - create-run
+
+Step 2: Execute
+  - get-run-tests-list
+  - run-update-test-status
+
+Step 3: Complete
+  - run-lock
+  - download-report
+```
+
+## FAQ
+
+**Q: Why "Failed to bulk add tests"?**
+
+A: Use section/priority NAMES (strings), not IDs (numbers). Also ensure orgId is provided.
+
+**Q: Can I update a locked run?**
+
+A: No. Unlock it first or create a new run.
+
+**Q: What's the difference between create-test and bulk-add-tests?**
+
+A: create-test uses IDs, bulk-add-tests uses NAMES.
+
+**Q: How do I get permission for an operation?**
+
+A: Try it. If 403 error, contact admin for RBAC permissions.
+
+## See Also
+
+- [MCP Server API Reference](/docs/guides/api/mcp-server) - Complete tool list
+- [API Authentication](/docs/guides/api/authentication) - Setup guide
+- [MCP Docker Setup](/docs/project/mcp-docker) - Deployment guide
+

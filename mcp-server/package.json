@@ -1,0 +1,71 @@
+{
+  "name": "@d11/checkmate-mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol server for Checkmate Test Case Management",
+  "main": "build/index.js",
+  "type": "module",
+  "bin": {
+    "checkmate-mcp": "./build/index.js"
+  },
+  "scripts": {
+    "build": "rm -rf build && tsc && chmod 755 build/index.js",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf build node_modules"
+  },
+  "files": [
+    "build",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "checkmate",
+    "test-management",
+    "qa",
+    "testing",
+    "ai-assistant",
+    "llm"
+  ],
+  "author": "DreamSportsLabs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ds-horizon/checkmate.git",
+    "directory": "mcp-server"
+  },
+  "bugs": {
+    "url": "https://github.com/ds-horizon/checkmate/issues"
+  },
+  "homepage": "https://checkmate.dreamsportslabs.com/",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "dotenv": "^16.4.5",
+    "fast-glob": "^3.3.2",
+    "zod": "^3.25.36"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.15.24",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.2.5",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,56 @@
+import { z } from 'zod';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { handleApiResponse } from '../utils.js';
+
+export default function registerGetRuns(
+  server: McpServer,
+  makeRequest: <T>(path: string, init?: RequestInit) => Promise<T | null>,
+) {
+  server.tool(
+    'get-runs',
+    'Get list of runs for a project',
+    {
+      projectId: z.number().int().positive().describe('Project ID'),
+      page: z.number().int().positive().optional(),
+      pageSize: z.number().int().positive().optional(),
+      search: z.string().optional(),
+      status: z.enum(['Active', 'Locked', 'Archived', 'Deleted']).optional(),
+    },
+    async ({ projectId, page, pageSize, search, status }) => {
+      try {
+        const qs = new URLSearchParams({ projectId: String(projectId) });
+        if (page) {
+          qs.set('page', String(page));
+        }
+        if (pageSize) {
+          qs.set('pageSize', String(pageSize));
+        }
+        if (search) {
+          qs.set('search', search);
+        }
+        if (status) {
+          qs.set('status', status);
+        }
+
+        const data = await makeRequest(`api/v1/runs?${qs.toString()}`);
+        return handleApiResponse(data, `retrieve runs for project ${projectId}`, [
+          'projectId (number, required): Project ID',
+          'page (number, optional): Page number',
+          'pageSize (number, optional): Items per page',
+          'search (string, optional): Search filter',
+          'status (enum, optional): Filter by status (Active, Locked, Archived, Deleted)',
+        ]);
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `❌ Error retrieving runs: ${error instanceof Error ? error.message : 'Unknown error'}\n\n💡 Tip: Use get-projects to find valid project IDs.`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    },
+  );
+}

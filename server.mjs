@@ -100,7 +100,29 @@ httpServer.listen(port, async () => {
         )
         console.log()
       } else {
-        import('./build/server/index.js')
+        // Check if build directory exists
+        const buildPath = './build/server/index.js'
+        if (!fs.existsSync(buildPath)) {
+          console.error(
+            chalk.red.bold('Error:'),
+            chalk.red('Build directory not found.'),
+          )
+          console.error(
+            '  ',
+            chalk.yellow('Please run'),
+            chalk.yellow.bold('yarn build'),
+            chalk.yellow('before starting the server in production mode.'),
+          )
+          console.error(
+            '  ',
+            chalk.dim('Or run'),
+            chalk.dim.bold('yarn dev'),
+            chalk.dim('for development mode.'),
+          )
+          process.exit(1)
+        }
+
+        import(buildPath)
           .then((build) => {
             app.all(
               '*',
@@ -117,6 +139,10 @@ httpServer.listen(port, async () => {
             console.log()
           })
           .catch((e) => {
+            console.error(
+              chalk.red.bold('Error loading build:'),
+              chalk.red(e.message),
+            )
             throw e
           })
       }

@@ -3,6 +3,7 @@ import {z} from 'zod'
 import ProjectsController from '~/dataController/projects.controller'
 import {API} from '~/routes/utilities/api'
 import {getUserAndCheckAccess} from '~/routes/utilities/checkForUserAndAccess'
+import {checkProjectOwnership} from '~/routes/utilities/projectOwnership'
 import {
   errorResponseHandler,
   responseHandler,
@@ -28,6 +29,20 @@ export const action = async ({request}: ActionFunctionArgs) => {
       request,
       EditProjectRequestSchema,
     )
+
+    // Check project ownership
+    const ownershipCheck = await checkProjectOwnership({
+      projectId: data.projectId,
+      userId: user?.userId ?? 0,
+      userRole: user?.role ?? '',
+    })
+
+    if (!ownershipCheck.hasAccess) {
+      return responseHandler({
+        error: ownershipCheck.message || 'Access denied',
+        status: 403,
+      })
+    }
 
     await ProjectsController.editProject({
       ...data,

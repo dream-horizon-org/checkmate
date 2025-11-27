@@ -78,18 +78,34 @@ check_install_git() {
     if command_exists git; then
         GIT_VERSION=$(git --version | cut -d' ' -f3)
         print_success "Git is installed (version $GIT_VERSION)"
+        return 0
     else
         print_warning "Git is not installed. Installing..."
         if [[ "$OS" == "macos" ]]; then
-            brew install git
+            if brew install git; then
+                print_success "Git installed successfully"
+                return 0
+            else
+                return 1
+            fi
         elif [[ "$OS" == "linux" ]]; then
             if [[ "$DISTRO" == "ubuntu" ]] || [[ "$DISTRO" == "debian" ]]; then
-                sudo apt-get update && sudo apt-get install -y git
+                if sudo apt-get update && sudo apt-get install -y git; then
+                    print_success "Git installed successfully"
+                    return 0
+                else
+                    return 1
+                fi
             elif [[ "$DISTRO" == "fedora" ]] || [[ "$DISTRO" == "rhel" ]] || [[ "$DISTRO" == "centos" ]]; then
-                sudo yum install -y git
+                if sudo yum install -y git; then
+                    print_success "Git installed successfully"
+                    return 0
+                else
+                    return 1
+                fi
             fi
         fi
-        print_success "Git installed successfully"
+        return 1
     fi
 }
 
@@ -112,7 +128,11 @@ check_install_nvm() {
         return 0
     else
         print_warning "nvm is not installed. Installing..."
-        install_nvm
+        if install_nvm; then
+            return 0
+        else
+            return 1
+        fi
     fi
 }
 
@@ -143,6 +163,16 @@ install_nvm() {
     print_success "nvm installed successfully"
 }
 
+# Function to read Node.js version from .nvmrc (if repository is available)
+read_nvmrc_version() {
+    local repo_dir=$1
+    if [ -n "$repo_dir" ] && [ -f "$repo_dir/.nvmrc" ]; then
+        cat "$repo_dir/.nvmrc" | tr -d 'v' | tr -d '\n' | xargs
+    else
+        echo "20"
+    fi
+}
+
 # Function to check and install Node.js using nvm
 check_install_node() {
     print_header "Checking Node.js"
@@ -151,12 +181,11 @@ check_install_node() {
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
     
-    # Default to Node 20 if .nvmrc doesn't exist (we'll check .nvmrc later after repo is cloned)
+    # Default to Node 20 if .nvmrc not available yet (will be checked after repo setup)
     REQUIRED_NODE_VERSION="20"
-    print_info "Installing Node.js 20.x (will use .nvmrc version after repository setup)"
+    print_info "Installing Node.js 20.x (will switch to .nvmrc version after repository setup)"
     
     # Check if Node 20 is installed via nvm
-    # nvm list outputs versions, so we check if version 20 appears in the output
     if nvm list | grep -E "v20\." >/dev/null 2>&1; then
         print_success "Node.js 20.x is installed via nvm"
         nvm use 20 >/dev/null 2>&1
@@ -166,9 +195,11 @@ check_install_node() {
         print_info "Installing Node.js 20.x via nvm..."
         install_nodejs "20"
     else
-        print_warning "Node.js is not installed. Installing via nvm..."
+        print_warning "Node.js is not installed. Installing Node.js 20.x via nvm..."
         install_nodejs "20"
     fi
+    
+    return 0
 }
 
 # Function to install Node.js using nvm
@@ -200,14 +231,25 @@ check_install_yarn() {
     if command_exists yarn; then
         YARN_VERSION=$(yarn --version)
         print_success "Yarn is installed (version $YARN_VERSION)"
+        return 0
     else
         print_warning "Yarn is not installed. Installing..."
         if [[ "$OS" == "macos" ]]; then
-            brew install yarn
+            if brew install yarn; then
+                print_success "Yarn installed successfully"
+                return 0
+            else
+                return 1
+            fi
         elif [[ "$OS" == "linux" ]]; then
-            npm install -g yarn
-        fi
+            if npm install -g yarn; then
         print_success "Yarn installed successfully"
+                return 0
+            else
+                return 1
+            fi
+        fi
+        return 1
     fi
 }
 
@@ -269,6 +311,7 @@ setup_repository() {
     if [ -f "package.json" ] && grep -q "checkmate" package.json 2>/dev/null; then
         print_success "Already in Checkmate repository directory"
         REPO_DIR=$(pwd)
+        return 0
     else
         print_info "Cloning Checkmate repository..."
         if [ -d "checkmate" ]; then
@@ -277,8 +320,9 @@ setup_repository() {
             if [ ! -f "$REPO_DIR/package.json" ]; then
                 print_error "Directory 'checkmate' exists but doesn't appear to be a valid repository."
                 print_info "Please remove it and run this script again."
-                exit 1
+                return 1
             fi
+            return 0
         else
             # Try SSH first, fallback to HTTPS if SSH fails
             print_info "Attempting to clone via SSH..."
@@ -292,22 +336,17 @@ setup_repository() {
                     print_success "Repository cloned successfully via HTTPS"
                 else
                     print_error "Failed to clone repository. Please check your internet connection and try again."
-                    exit 1
+                    return 1
                 fi
             fi
             
             # Verify the clone was successful
             if [ ! -d "$REPO_DIR" ] || [ ! -f "$REPO_DIR/package.json" ]; then
                 print_error "Repository clone appears to have failed. Directory structure is invalid."
-                exit 1
+                return 1
             fi
+            return 0
         fi
-    fi
-    
-    # Verify REPO_DIR is set and valid
-    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
-        print_error "Repository directory is not set or invalid."
-        exit 1
     fi
 }
 
@@ -354,6 +393,85 @@ show_oauth_instructions() {
     echo ""
 }
 
+# Function to collect Google OAuth credentials interactively
+collect_oauth_credentials() {
+    print_header "Google OAuth Configuration"
+    
+    show_oauth_instructions
+    
+    echo ""
+    read -p "Press Enter when you have your Google OAuth credentials ready, or Ctrl+C to exit..."
+    echo ""
+    
+    # Check if credentials are already set
+    if grep -q "^GOOGLE_CLIENT_ID=" .env 2>/dev/null && grep -q "^GOOGLE_CLIENT_SECRET=" .env 2>/dev/null; then
+        EXISTING_CLIENT_ID=$(grep "^GOOGLE_CLIENT_ID=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+        if [ -n "$EXISTING_CLIENT_ID" ] && [ "$EXISTING_CLIENT_ID" != "your_google_client_id_here" ]; then
+            print_info "Google OAuth credentials found in .env file"
+            read -p "Do you want to update them? (y/n) " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                print_success "Using existing Google OAuth credentials"
+                return 0
+            fi
+        fi
+    fi
+    
+    # Collect Client ID
+    while true; do
+        read -p "Enter your Google OAuth Client ID: " GOOGLE_CLIENT_ID
+        if [ -z "$GOOGLE_CLIENT_ID" ]; then
+            print_error "Client ID cannot be empty. Please try again."
+            continue
+        fi
+        break
+    done
+    
+    # Collect Client Secret
+    while true; do
+        read -p "Enter your Google OAuth Client Secret: " GOOGLE_CLIENT_SECRET
+        if [ -z "$GOOGLE_CLIENT_SECRET" ]; then
+            print_error "Client Secret cannot be empty. Please try again."
+            continue
+        fi
+        break
+    done
+    
+    # Update .env file
+    if [[ "$OS" == "macos" ]]; then
+        # Update or add GOOGLE_CLIENT_ID
+        if grep -q "^GOOGLE_CLIENT_ID=" .env 2>/dev/null; then
+            sed -i '' "s|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID|g" .env
+        else
+            echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env
+        fi
+        
+        # Update or add GOOGLE_CLIENT_SECRET
+        if grep -q "^GOOGLE_CLIENT_SECRET=" .env 2>/dev/null; then
+            sed -i '' "s|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET|g" .env
+        else
+            echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env
+        fi
+    else
+        # Update or add GOOGLE_CLIENT_ID
+        if grep -q "^GOOGLE_CLIENT_ID=" .env 2>/dev/null; then
+            sed -i "s|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID|g" .env
+        else
+            echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env
+        fi
+        
+        # Update or add GOOGLE_CLIENT_SECRET
+        if grep -q "^GOOGLE_CLIENT_SECRET=" .env 2>/dev/null; then
+            sed -i "s|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET|g" .env
+        else
+            echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env
+        fi
+    fi
+    
+    print_success "Google OAuth credentials configured successfully"
+    echo ""
+}
+
 # Function to setup environment file
 setup_env_file() {
     print_header "Setting up Environment File"
@@ -370,9 +488,17 @@ setup_env_file() {
     }
     
     if [ -f ".env" ]; then
-        print_warning ".env file already exists. Skipping creation."
-        print_info "If you need to reconfigure, edit .env manually or delete it and run this script again."
+        print_warning ".env file already exists."
+        read -p "Do you want to reconfigure? (y/n) " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Using existing .env file"
+            # Still collect OAuth if not set
+            if ! grep -q "^GOOGLE_CLIENT_ID=" .env 2>/dev/null || ! grep -q "^GOOGLE_CLIENT_SECRET=" .env 2>/dev/null; then
+                collect_oauth_credentials
+            fi
         return
+        fi
     fi
     
     if [ ! -f ".env.example" ]; then
@@ -408,8 +534,58 @@ setup_env_file() {
     print_success "Session secret generated and configured"
     echo ""
     
-    # Show OAuth instructions
-    show_oauth_instructions
+    # Collect OAuth credentials interactively
+    collect_oauth_credentials
+}
+
+# Function to setup MCP server environment file
+setup_mcp_env_file() {
+    print_header "Setting up MCP Server Environment File"
+    
+    # Verify REPO_DIR is set before using it
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid. Cannot setup MCP server environment file."
+        exit 1
+    fi
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        exit 1
+    }
+    
+    MCP_ENV_FILE="$REPO_DIR/mcp-server/.env"
+    
+    if [ -f "$MCP_ENV_FILE" ]; then
+        print_warning "MCP server .env file already exists. Skipping creation."
+        print_info "If you need to reconfigure, edit $MCP_ENV_FILE manually."
+        return
+    fi
+    
+    if [ ! -f "$REPO_DIR/mcp-server/.env.example" ]; then
+        print_warning ".env.example not found in mcp-server directory."
+        print_info "Creating basic .env file..."
+        
+        # Create basic .env file
+        cat > "$MCP_ENV_FILE" << EOF
+# Checkmate MCP Server Configuration
+CHECKMATE_API_BASE=http://localhost:3000
+CHECKMATE_API_TOKEN=your-api-token-here
+LOG_LEVEL=info
+REQUEST_TIMEOUT=30000
+ENABLE_RETRY=false
+MAX_RETRIES=3
+EOF
+        print_success "MCP server .env file created with default values"
+    else
+        # Copy .env.example to .env
+        cp "$REPO_DIR/mcp-server/.env.example" "$MCP_ENV_FILE"
+        print_success "MCP server .env file created from .env.example"
+    fi
+    
+    print_warning "⚠️  Action Required: Update CHECKMATE_API_TOKEN in $MCP_ENV_FILE"
+    print_info "   Get your API token from: http://localhost:3000 (after starting Checkmate)"
+    print_info "   Navigate to: User Settings → API Tokens → Generate Token"
+    echo ""
 }
 
 # Function to install dependencies
@@ -430,19 +606,20 @@ install_dependencies() {
     print_info "Installing Node.js dependencies..."
     if yarn install; then
         print_success "Dependencies installed successfully"
+        return 0
     else
         print_error "Failed to install dependencies. Please check the error messages above."
-        exit 1
+        return 1
     fi
 }
 
-# Function to verify Docker setup (without starting containers)
-verify_docker_setup() {
-    print_header "Verifying Docker Configuration"
+# Function to build MCP server
+build_mcp_server() {
+    print_header "Building MCP Server"
     
     # Verify REPO_DIR is set before using it
     if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
-        print_error "Repository directory is not set or invalid. Cannot verify Docker setup."
+        print_error "Repository directory is not set or invalid. Cannot build MCP server."
         exit 1
     fi
     
@@ -451,24 +628,272 @@ verify_docker_setup() {
         exit 1
     }
     
+    # Check if mcp-server directory exists
+    if [ ! -d "$REPO_DIR/mcp-server" ]; then
+        print_warning "MCP server directory not found. Skipping MCP server build."
+        return
+    fi
+    
+    cd "$REPO_DIR/mcp-server" || {
+        print_error "Failed to change to MCP server directory"
+        exit 1
+    }
+    
+    # Check if package.json exists
+    if [ ! -f "package.json" ]; then
+        print_warning "MCP server package.json not found. Skipping build."
+        return
+    fi
+    
+    print_info "Installing MCP server dependencies..."
+    if yarn install --frozen-lockfile; then
+        print_success "MCP server dependencies installed"
+    else
+        print_warning "Failed to install MCP server dependencies. Continuing anyway..."
+        return
+    fi
+    
+    print_info "Building MCP server..."
+    if yarn build; then
+        print_success "MCP server built successfully"
+        
+        # Verify build output exists
+        if [ -f "build/index.js" ]; then
+            print_success "MCP server build artifact verified: build/index.js"
+        else
+            print_warning "MCP server build completed but build/index.js not found"
+        fi
+    else
+        print_warning "Failed to build MCP server. You can build it later with: cd mcp-server && yarn build"
+    fi
+    
+    # Return to repo root
+    cd "$REPO_DIR" || {
+        print_error "Failed to return to repository directory"
+        exit 1
+    }
+}
+
+# Function to verify Docker setup
+verify_docker_setup() {
+    print_header "Verifying Docker Configuration"
+    
+    # Verify REPO_DIR is set before using it
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR" ]; then
+        print_error "Repository directory is not set or invalid. Cannot verify Docker setup."
+        return 1
+    fi
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        return 1
+    }
+    
     # Check if docker-compose.yml exists
     if [ ! -f "docker-compose.yml" ]; then
         print_error "docker-compose.yml not found"
-        exit 1
+        return 1
     fi
     
     # Check if Docker is running
     if ! docker info >/dev/null 2>&1; then
         print_error "Docker is not running. Please start Docker Desktop."
-        exit 1
+        return 1
     fi
     
     echo -e "  ${GREEN}✓${NC} Docker is running"
     echo -e "  ${GREEN}✓${NC} docker-compose.yml found"
     echo ""
     print_success "Docker configuration verified"
-    print_info "Containers are prepared but not started"
-    print_info "Start them manually when ready (see commands in final summary)"
+    return 0
+}
+
+# Function to start Docker containers
+start_docker_containers() {
+    print_header "Starting Docker Containers"
+    
+    cd "$REPO_DIR" || {
+        print_error "Failed to change to repository directory: $REPO_DIR"
+        return 1
+    }
+    
+    print_info "Starting Checkmate services with Docker..."
+    if yarn docker:setup; then
+        print_success "Docker containers started successfully"
+        
+        # Wait for services to be ready
+        print_info "Waiting for services to be ready..."
+        sleep 10
+        
+        # Check if app is accessible
+        local max_attempts=30
+        local attempt=0
+        while [ $attempt -lt $max_attempts ]; do
+            if curl -s http://localhost:3000/healthcheck >/dev/null 2>&1; then
+                print_success "Checkmate application is running at http://localhost:3000"
+                return 0
+            fi
+            attempt=$((attempt + 1))
+            sleep 2
+        done
+        
+        print_warning "Checkmate application may still be starting. Please check manually."
+        return 0
+    else
+        print_error "Failed to start Docker containers"
+        return 1
+    fi
+}
+
+# Function to collect Checkmate API token
+collect_checkmate_token() {
+    print_header "Checkmate API Token Configuration"
+    
+    echo ""
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}  📝 How to Get Your API Token${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "  ${GREEN}1.${NC} Open Checkmate in your browser:"
+    echo -e "     ${BLUE}http://localhost:3000${NC}"
+    echo ""
+    echo -e "  ${GREEN}2.${NC} Sign in with your Google account"
+    echo ""
+    echo -e "  ${GREEN}3.${NC} Navigate to: ${BLUE}User Settings → API Tokens${NC}"
+    echo ""
+    echo -e "  ${GREEN}4.${NC} Click: ${BLUE}Generate Token${NC}"
+    echo ""
+    echo -e "  ${GREEN}5.${NC} Copy the generated token"
+    echo ""
+    echo ""
+    read -p "Press Enter when you have your API token ready, or Ctrl+C to exit..."
+    echo ""
+    
+    # Collect token
+    while true; do
+        read -p "Enter your Checkmate API token: " CHECKMATE_API_TOKEN
+        if [ -z "$CHECKMATE_API_TOKEN" ]; then
+            print_error "API token cannot be empty. Please try again."
+            continue
+        fi
+        
+        # Validate token format (basic check)
+        if [ ${#CHECKMATE_API_TOKEN} -lt 8 ]; then
+            print_warning "Token seems too short. Are you sure this is correct?"
+            read -p "Continue anyway? (y/n) " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                continue
+            fi
+        fi
+        break
+    done
+    
+    # Update MCP server .env file
+    MCP_ENV_FILE="$REPO_DIR/mcp-server/.env"
+    if [ ! -f "$MCP_ENV_FILE" ]; then
+        print_warning "MCP server .env file not found. Creating it..."
+        setup_mcp_env_file
+    fi
+    
+    # Update token in .env file
+    if [[ "$OS" == "macos" ]]; then
+        if grep -q "^CHECKMATE_API_TOKEN=" "$MCP_ENV_FILE" 2>/dev/null; then
+            sed -i '' "s|^CHECKMATE_API_TOKEN=.*|CHECKMATE_API_TOKEN=$CHECKMATE_API_TOKEN|g" "$MCP_ENV_FILE"
+        else
+            echo "CHECKMATE_API_TOKEN=$CHECKMATE_API_TOKEN" >> "$MCP_ENV_FILE"
+        fi
+    else
+        if grep -q "^CHECKMATE_API_TOKEN=" "$MCP_ENV_FILE" 2>/dev/null; then
+            sed -i "s|^CHECKMATE_API_TOKEN=.*|CHECKMATE_API_TOKEN=$CHECKMATE_API_TOKEN|g" "$MCP_ENV_FILE"
+        else
+            echo "CHECKMATE_API_TOKEN=$CHECKMATE_API_TOKEN" >> "$MCP_ENV_FILE"
+        fi
+    fi
+    
+    print_success "API token configured in mcp-server/.env"
+    echo ""
+}
+
+# Function to handle errors and offer retry
+handle_error() {
+    local error_message=$1
+    local step_name=$2
+    
+    echo ""
+    print_error "Installation failed at: $step_name"
+    print_error "Error: $error_message"
+    echo ""
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}  💡 Potential Fixes${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    case "$step_name" in
+        "Git Installation")
+            echo -e "  ${BLUE}•${NC} Ensure you have internet connection"
+            echo -e "  ${BLUE}•${NC} Check if Git is already installed: ${BLUE}git --version${NC}"
+            echo -e "  ${BLUE}•${NC} Try installing Git manually and run script again"
+            ;;
+        "NVM Installation")
+            echo -e "  ${BLUE}•${NC} Check internet connection"
+            echo -e "  ${BLUE}•${NC} Try: ${BLUE}curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash${NC}"
+            echo -e "  ${BLUE}•${NC} Restart terminal and run script again"
+            ;;
+        "Node.js Installation")
+            echo -e "  ${BLUE}•${NC} Ensure nvm is installed and loaded"
+            echo -e "  ${BLUE}•${NC} Try: ${BLUE}nvm install 20${NC}"
+            echo -e "  ${BLUE}•${NC} Check Node.js version: ${BLUE}node --version${NC}"
+            ;;
+        "Yarn Installation")
+            echo -e "  ${BLUE}•${NC} Ensure Node.js is installed"
+            echo -e "  ${BLUE}•${NC} Try: ${BLUE}npm install -g yarn${NC}"
+            echo -e "  ${BLUE}•${NC} Check Yarn version: ${BLUE}yarn --version${NC}"
+            ;;
+        "Docker Installation")
+            echo -e "  ${BLUE}•${NC} Install Docker Desktop manually"
+            echo -e "  ${BLUE}•${NC} Start Docker Desktop"
+            echo -e "  ${BLUE}•${NC} Verify: ${BLUE}docker info${NC}"
+            ;;
+        "Repository Setup")
+            echo -e "  ${BLUE}•${NC} Check internet connection"
+            echo -e "  ${BLUE}•${NC} Verify Git is installed: ${BLUE}git --version${NC}"
+            echo -e "  ${BLUE}•${NC} Try cloning manually: ${BLUE}git clone https://github.com/ds-horizon/checkmate.git${NC}"
+            ;;
+        "Dependencies Installation")
+            echo -e "  ${BLUE}•${NC} Ensure Node.js and Yarn are installed"
+            echo -e "  ${BLUE}•${NC} Check internet connection"
+            echo -e "  ${BLUE}•${NC} Try: ${BLUE}cd $REPO_DIR && yarn install${NC}"
+            ;;
+        "MCP Server Build")
+            echo -e "  ${BLUE}•${NC} Ensure Node.js is installed"
+            echo -e "  ${BLUE}•${NC} Try: ${BLUE}cd $REPO_DIR/mcp-server && yarn install && yarn build${NC}"
+            ;;
+        "Docker Startup")
+            echo -e "  ${BLUE}•${NC} Ensure Docker is running"
+            echo -e "  ${BLUE}•${NC} Check port 3000 is not in use"
+            echo -e "  ${BLUE}•${NC} Try: ${BLUE}cd $REPO_DIR && yarn docker:setup${NC}"
+            ;;
+        *)
+            echo -e "  ${BLUE}•${NC} Check the error message above"
+            echo -e "  ${BLUE}•${NC} Review installation logs"
+            echo -e "  ${BLUE}•${NC} Check documentation: ${BLUE}https://checkmate.dreamsportslabs.com${NC}"
+            ;;
+    esac
+    
+    echo ""
+    read -p "Would you like to try again? (y/n) " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo ""
+        print_info "Please fix the issue and run the script again:"
+        echo -e "     ${BLUE}./install.sh${NC}"
+        echo ""
+        exit 1
+    else
+        print_info "Installation cancelled. You can run the script again later."
+        exit 1
+    fi
 }
 
 # Main installation flow
@@ -496,19 +921,32 @@ main() {
     fi
     
     # Check and install prerequisites
-    check_install_git
-    check_install_nvm
-    check_install_node
-    check_install_yarn
-    check_install_docker
+    if ! check_install_git; then
+        handle_error "Git installation failed" "Git Installation"
+    fi
+    
+    if ! check_install_nvm; then
+        handle_error "NVM installation failed" "NVM Installation"
+    fi
+    
+    if ! check_install_node; then
+        handle_error "Node.js installation failed" "Node.js Installation"
+    fi
+    
+    if ! check_install_yarn; then
+        handle_error "Yarn installation failed" "Yarn Installation"
+    fi
+    
+    if ! check_install_docker; then
+        handle_error "Docker installation/verification failed" "Docker Installation"
+    fi
     
     # Setup repository
-    setup_repository
+    if ! setup_repository; then
+        handle_error "Repository setup failed" "Repository Setup"
+    fi
     
-    # Setup environment file
-    setup_env_file
-    
-    # Ensure correct Node version from .nvmrc is installed and active
+    # Read .nvmrc and ensure correct Node version is installed (after repository is cloned)
     cd "$REPO_DIR" || {
         print_error "Failed to change to repository directory: $REPO_DIR"
         exit 1
@@ -526,39 +964,58 @@ main() {
         print_info "Found .nvmrc with Node.js version: $NVMRC_VERSION"
         
         # Check if this version is already installed
-        # nvm list outputs versions, so we check if the version appears in the output
-        # Use word boundary to match exact version (e.g., "20.19.5" not "20.19.50")
         if nvm list | grep -E "v?$NVMRC_VERSION\b" >/dev/null 2>&1; then
             print_success "Node.js $NVMRC_VERSION is already installed"
         else
             print_info "Installing Node.js $NVMRC_VERSION via nvm..."
-            nvm install "$NVMRC_VERSION"
-            if [ $? -ne 0 ]; then
-                print_error "Failed to install Node.js $NVMRC_VERSION"
-                exit 1
+            if ! nvm install "$NVMRC_VERSION"; then
+                handle_error "Failed to install Node.js $NVMRC_VERSION" "Node.js Installation"
             fi
         fi
         
         # Use the version from .nvmrc
         print_info "Switching to Node.js version from .nvmrc..."
-        nvm use
-        if [ $? -ne 0 ]; then
-            print_error "Failed to switch to Node.js version from .nvmrc"
-            exit 1
+        if ! nvm use; then
+            handle_error "Failed to switch to Node.js version from .nvmrc" "Node.js Installation"
         fi
         
         ACTUAL_VERSION=$(node --version)
         print_success "Using Node.js $ACTUAL_VERSION (from .nvmrc)"
     else
-        print_warning ".nvmrc file not found. Using default Node.js version."
+        print_warning ".nvmrc file not found. Using Node.js version from previous step."
     fi
     
-    # Install dependencies
-    install_dependencies
+    # Setup environment file (includes OAuth credential collection)
+    setup_env_file
     
-    # Verify Docker setup (without starting containers)
+    # Setup MCP server environment file
+    setup_mcp_env_file
+    
+    # Install dependencies
+    if ! install_dependencies; then
+        handle_error "Dependencies installation failed" "Dependencies Installation"
+    fi
+    
+    # Build MCP server
+    build_mcp_server  # Non-fatal, continues on failure
+    
+    # Verify Docker setup
     echo ""
-    verify_docker_setup
+    if ! verify_docker_setup; then
+        handle_error "Docker setup verification failed" "Docker Setup"
+    fi
+    
+    # Start Docker containers
+    echo ""
+    if start_docker_containers; then
+        # Collect API token after services are running
+        echo ""
+        collect_checkmate_token
+    else
+        print_warning "Docker containers failed to start. You can start them manually later."
+        print_info "To start manually: cd $REPO_DIR && yarn docker:setup"
+        print_info "You can configure the API token later in mcp-server/.env"
+    fi
     
     # Final success message
     echo ""
@@ -575,49 +1032,42 @@ main() {
     echo -e "${GREEN}  Installation Summary${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${GREEN}✓${NC} All prerequisites installed"
-    echo -e "  ${GREEN}✓${NC} Repository cloned"
-    echo -e "  ${GREEN}✓${NC} Environment file created"
-    echo -e "  ${GREEN}✓${NC} Dependencies installed"
-    echo -e "  ${GREEN}✓${NC} Docker configuration verified"
+    echo -e "  ${GREEN}✓${NC} Step 1: Prerequisites installed (Git, NVM, Node.js, Yarn, Docker)"
+    echo -e "  ${GREEN}✓${NC} Step 2: Repository cloned/setup"
+    echo -e "  ${GREEN}✓${NC} Step 3: Node.js version configured from .nvmrc"
+    echo -e "  ${GREEN}✓${NC} Step 4: Environment file created with session secret"
+    echo -e "  ${GREEN}✓${NC} Step 5: Google OAuth credentials configured"
+    echo -e "  ${GREEN}✓${NC} Step 6: MCP server environment file created"
+    echo -e "  ${GREEN}✓${NC} Step 7: Main dependencies installed"
+    echo -e "  ${GREEN}✓${NC} Step 8: MCP server built"
+    echo -e "  ${GREEN}✓${NC} Step 9: Docker containers started"
+    echo -e "  ${GREEN}✓${NC} Step 10: Checkmate API token configured"
     echo ""
     
-    # Show configuration status
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}  ⚠️  Configuration Required${NC}"
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    # Resources
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}  📚 Resources${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "${YELLOW}  Action Required: Configure Google OAuth${NC}"
+    echo -e "  ${BLUE}📖${NC} Documentation:"
+    echo -e "     ${BLUE}https://checkmate.dreamsportslabs.com${NC}"
     echo ""
-    echo -e "  ${BLUE}📝 Edit the .env file:${NC}"
-    echo -e "     ${BLUE}$REPO_DIR/.env${NC}"
+    echo -e "  ${BLUE}💬${NC} Discord Community:"
+    echo -e "     ${BLUE}https://discord.gg/wBQXeYAKNc${NC}"
     echo ""
-    echo -e "  ${BLUE}➕ Add these variables:${NC}"
-    echo ""
-    echo -e "     ${GREEN}GOOGLE_CLIENT_ID${NC}=your_google_client_id"
-    echo -e "     ${GREEN}GOOGLE_CLIENT_SECRET${NC}=your_google_client_secret"
-    echo ""
-    echo -e "  ${BLUE}📖 Setup Guide:${NC}"
-    echo -e "     ${BLUE}https://checkmate.dreamsportslabs.com/docs/project/setup#google-oauth-setup${NC}"
-    echo ""
-    echo -e "  ${BLUE}🔗 Google Cloud Console:${NC}"
-    echo -e "     ${BLUE}https://console.cloud.google.com/apis/credentials${NC}"
+    echo -e "  ${BLUE}🐙${NC} GitHub:"
+    echo -e "     ${BLUE}https://github.com/ds-horizon/checkmate${NC}"
     echo ""
     
-    # Show ports information
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}  🌐 Service Ports${NC}"
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    # Show configuration status (already configured during installation)
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}  ✅ Configuration Status${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${GREEN}✓${NC} ${BLUE}Checkmate Application${NC}"
-    echo -e "     ${BLUE}http://localhost:3000${NC}"
-    echo ""
-    echo -e "  ${GREEN}✓${NC} ${BLUE}MySQL Database${NC}"
-    echo -e "     ${BLUE}localhost:3306${NC}"
-    echo ""
-    echo -e "  ${GREEN}✓${NC} ${BLUE}Drizzle Studio${NC}"
-    echo -e "     ${BLUE}http://localhost:4000${NC}"
-    echo -e "     ${YELLOW}(run: yarn db:studio)${NC}"
+    echo -e "  ${GREEN}✓${NC} Google OAuth credentials configured in .env"
+    echo -e "  ${GREEN}✓${NC} Checkmate API token configured in mcp-server/.env"
+    echo -e "  ${GREEN}✓${NC} MCP Server built and ready"
+    echo -e "     ${BLUE}Build location: $REPO_DIR/mcp-server/build/index.js${NC}"
     echo ""
     
     # Show Docker commands
@@ -652,31 +1102,66 @@ main() {
     echo -e "${GREEN}  🚀 Next Steps${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${GREEN}1.${NC} Configure Google OAuth in .env file (see above)"
+    echo -e "  ${GREEN}1.${NC} Access Checkmate:"
+    echo -e "     ${BLUE}Open http://localhost:3000 in your browser${NC}"
     echo ""
-    echo -e "  ${GREEN}2.${NC} Start Docker containers when ready:"
-    echo -e "     ${BLUE}cd $REPO_DIR${NC}"
-    echo -e "     ${BLUE}yarn docker:setup${NC}"
+    echo -e "  ${GREEN}2.${NC} Sign in with your Google account"
     echo ""
-    echo -e "  ${GREEN}3.${NC} Access Checkmate at:"
-    echo -e "     ${BLUE}http://localhost:3000${NC}"
+    echo -e "  ${GREEN}3.${NC} Configure Cursor IDE (optional):"
+    if [ -f "$REPO_DIR/CURSOR_SETUP.md" ]; then
+        echo -e "     ${BLUE}See: $REPO_DIR/CURSOR_SETUP.md${NC}"
+    else
+        echo -e "     ${BLUE}See: $REPO_DIR/mcp-server/README.md${NC}"
+    fi
+    echo -e "     ${BLUE}MCP server build: $REPO_DIR/mcp-server/build/index.js${NC}"
     echo ""
-    echo -e "  ${GREEN}4.${NC} Sign in with your Google account"
+    echo -e "  ${GREEN}4.${NC} Start using Checkmate!"
     echo ""
     
-    # Resources
+    # Show ports information
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BLUE}  📚 Resources${NC}"
+    echo -e "${BLUE}  🌐 Service Ports${NC}"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${BLUE}📖${NC} Documentation:"
-    echo -e "     ${BLUE}https://checkmate.dreamsportslabs.com${NC}"
+    echo -e "  ${GREEN}✓${NC} ${BLUE}Checkmate Application${NC}"
+    echo -e "     ${BLUE}http://localhost:3000${NC}"
     echo ""
-    echo -e "  ${BLUE}💬${NC} Discord Community:"
-    echo -e "     ${BLUE}https://discord.gg/wBQXeYAKNc${NC}"
+    echo -e "  ${GREEN}✓${NC} ${BLUE}MySQL Database${NC}"
+    echo -e "     ${BLUE}localhost:3306${NC}"
     echo ""
-    echo -e "  ${BLUE}🐙${NC} GitHub:"
-    echo -e "     ${BLUE}https://github.com/ds-horizon/checkmate${NC}"
+    echo -e "  ${GREEN}✓${NC} ${BLUE}Drizzle Studio${NC}"
+    echo -e "     ${BLUE}http://localhost:4000${NC}"
+    echo -e "     ${YELLOW}(run: yarn db:studio)${NC}"
+    echo ""
+    
+    # Final refined steps
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}  📋 Refined Installation Steps Summary${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${BLUE}The installation script completed the following steps:${NC}"
+    echo ""
+    echo -e "  ${GREEN}1.${NC} ${BLUE}Prerequisites Installation${NC}"
+    echo -e "     • Git, NVM, Node.js, Yarn, Docker"
+    echo ""
+    echo -e "  ${GREEN}2.${NC} ${BLUE}Repository Setup${NC}"
+    echo -e "     • Cloned Checkmate repository"
+    echo -e "     • Configured Node.js version from .nvmrc"
+    echo ""
+    echo -e "  ${GREEN}3.${NC} ${BLUE}Configuration${NC}"
+    echo -e "     • Created .env file with session secret"
+    echo -e "     • Collected Google OAuth credentials"
+    echo -e "     • Created mcp-server/.env file"
+    echo ""
+    echo -e "  ${GREEN}4.${NC} ${BLUE}Dependencies & Build${NC}"
+    echo -e "     • Installed main application dependencies"
+    echo -e "     • Built MCP server"
+    echo ""
+    echo -e "  ${GREEN}5.${NC} ${BLUE}Services Startup${NC}"
+    echo -e "     • Started Docker containers"
+    echo -e "     • Collected and configured API token"
+    echo ""
+    echo -e "${BLUE}Everything is ready to use!${NC}"
     echo ""
     
     # Security tip

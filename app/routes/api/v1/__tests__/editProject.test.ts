@@ -9,12 +9,14 @@ import {
   responseHandler,
 } from '~/routes/utilities/responseHandler'
 import {getRequestParams} from '../../../utilities/utils'
+import {checkProjectOwnership} from '~/routes/utilities/projectOwnership'
 import {action} from '../editProject'
 
 jest.mock('../../../utilities/utils')
 jest.mock('@controllers/projects.controller')
 jest.mock('~/routes/utilities/responseHandler')
 jest.mock('~/routes/utilities/checkForUserAndAccess')
+jest.mock('~/routes/utilities/projectOwnership')
 
 describe('editProject action', () => {
   const mockRequest = {
@@ -45,6 +47,7 @@ describe('editProject action', () => {
   it('should update a project and return a successful response', async () => {
     ;(getUserAndCheckAccess as jest.Mock).mockResolvedValue(mockUser)
     ;(getRequestParams as jest.Mock).mockResolvedValue(mockData)
+    ;(checkProjectOwnership as jest.Mock).mockResolvedValue({hasAccess: true})
     ;(ProjectsController.editProject as jest.Mock).mockResolvedValue(
       mockUpdatedProjectResponse,
     )
@@ -118,6 +121,7 @@ describe('editProject action', () => {
 
     ;(getUserAndCheckAccess as jest.Mock).mockResolvedValue(mockUser)
     ;(getRequestParams as jest.Mock).mockResolvedValue(mockData)
+    ;(checkProjectOwnership as jest.Mock).mockResolvedValue({hasAccess: true})
     ;(ProjectsController.editProject as jest.Mock).mockRejectedValue(sqlError)
     ;(errorResponseHandler as jest.Mock).mockImplementation(
       (response) => response,
@@ -146,6 +150,7 @@ describe('editProject action', () => {
 
     ;(getUserAndCheckAccess as jest.Mock).mockResolvedValue(mockUser)
     ;(getRequestParams as jest.Mock).mockResolvedValue(mockData)
+    ;(checkProjectOwnership as jest.Mock).mockResolvedValue({hasAccess: true})
     ;(ProjectsController.editProject as jest.Mock).mockRejectedValue(
       unexpectedError,
     )

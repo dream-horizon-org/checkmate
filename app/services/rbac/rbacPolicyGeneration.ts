@@ -15,23 +15,27 @@ export function generateRbacPolicy(): IRbacPolicy[] {
     let action: ApiTypes | null = null
 
     switch (endpoint) {
-      case API.AddProjects:
-        role = AccessType.ADMIN
-        action = ApiTypes.POST
-        break
-
       case API.DeleteRun:
         role = AccessType.ADMIN
         action = ApiTypes.DELETE
         break
 
-      case API.EditProject:
-      case API.EditProjectStatus:
       case API.RunLock:
       case API.RunReset:
       case API.UpdateUserRole:
       case API.RunRemoveTest:
         role = AccessType.ADMIN
+        action = ApiTypes.PUT
+        break
+
+      case API.AddProjects:
+        role = AccessType.USER
+        action = ApiTypes.POST
+        break
+
+      case API.EditProject:
+      case API.EditProjectStatus:
+        role = AccessType.USER
         action = ApiTypes.PUT
         break
 

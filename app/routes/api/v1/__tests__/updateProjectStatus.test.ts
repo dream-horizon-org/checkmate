@@ -1,6 +1,7 @@
 import {action} from '~/routes/api/v1/updateProjectStatus'
 import ProjectsController from '@controllers/projects.controller'
 import {getUserAndCheckAccess} from '~/routes/utilities/checkForUserAndAccess'
+import {checkProjectOwnership} from '~/routes/utilities/projectOwnership'
 import {responseHandler} from '~/routes/utilities/responseHandler'
 import {
   getRequestParams,
@@ -15,6 +16,7 @@ jest.mock('@controllers/projects.controller')
 jest.mock('~/routes/utilities/responseHandler')
 jest.mock('~/routes/utilities/checkForUserAndAccess')
 jest.mock('~/routes/utilities/utils')
+jest.mock('~/routes/utilities/projectOwnership')
 
 describe('Update Project Status - Action Function', () => {
   beforeEach(() => {
@@ -36,6 +38,7 @@ describe('Update Project Status - Action Function', () => {
 
     ;(getUserAndCheckAccess as jest.Mock).mockResolvedValue(mockUser)
     ;(getRequestParams as jest.Mock).mockResolvedValue(requestData)
+    ;(checkProjectOwnership as jest.Mock).mockResolvedValue({hasAccess: true})
     ;(ProjectsController.updateProjectStatus as jest.Mock).mockResolvedValue(
       mockResponse,
     )
@@ -106,6 +109,7 @@ describe('Update Project Status - Action Function', () => {
 
     ;(getUserAndCheckAccess as jest.Mock).mockResolvedValue({userId: 456})
     ;(getRequestParams as jest.Mock).mockResolvedValue(requestData)
+    ;(checkProjectOwnership as jest.Mock).mockResolvedValue({hasAccess: true})
     ;(ProjectsController.updateProjectStatus as jest.Mock).mockRejectedValue(
       mockSqlError,
     )
@@ -144,6 +148,7 @@ describe('Update Project Status - Action Function', () => {
 
     ;(getUserAndCheckAccess as jest.Mock).mockResolvedValue(mockUser)
     ;(getRequestParams as jest.Mock).mockResolvedValue(requestData)
+    ;(checkProjectOwnership as jest.Mock).mockResolvedValue({hasAccess: true})
     ;(ProjectsController.updateProjectStatus as jest.Mock).mockResolvedValue(
       mockResponse,
     )
@@ -177,6 +182,7 @@ describe('Update Project Status - Action Function', () => {
 
     ;(getUserAndCheckAccess as jest.Mock).mockResolvedValue(undefined)
     ;(getRequestParams as jest.Mock).mockResolvedValue(requestData)
+    ;(checkProjectOwnership as jest.Mock).mockResolvedValue({hasAccess: true})
     ;(ProjectsController.updateProjectStatus as jest.Mock).mockResolvedValue(
       mockResponse,
     )

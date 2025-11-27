@@ -14,6 +14,7 @@ export default {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
+  testPathIgnorePatterns: ['/node_modules/', '/mcp-server/'],
   setupFilesAfterEnv: ['<rootDir>/jest/mock.js'],
   transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)'],
   coverageReporters: [

@@ -3,6 +3,7 @@ import type {ActionFunctionArgs} from '@remix-run/node'
 import {z} from 'zod'
 import {API} from '~/routes/utilities/api'
 import {getUserAndCheckAccess} from '~/routes/utilities/checkForUserAndAccess'
+import {checkProjectOwnership} from '~/routes/utilities/projectOwnership'
 import {responseHandler} from '~/routes/utilities/responseHandler'
 import {
   getRequestParams,
@@ -29,6 +30,20 @@ export async function action({request}: ActionFunctionArgs) {
       request,
       updateProjectStatusSchema,
     )
+
+    // Check project ownership
+    const ownershipCheck = await checkProjectOwnership({
+      projectId: data.projectId,
+      userId: user?.userId ?? 0,
+      userRole: user?.role ?? '',
+    })
+
+    if (!ownershipCheck.hasAccess) {
+      return responseHandler({
+        error: ownershipCheck.message || 'Access denied',
+        status: 403,
+      })
+    }
 
     const resp = await ProjectsController.updateProjectStatus({
       ...data,

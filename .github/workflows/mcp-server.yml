@@ -1,0 +1,99 @@
+name: MCP Server CI
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'mcp-server/**'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'mcp-server/**'
+
+defaults:
+  run:
+    working-directory: mcp-server
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x]  # Only test on Node 20
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+          cache-dependency-path: mcp-server/yarn.lock
+      
+      - name: Set up Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.19 --activate
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Run type check
+        run: yarn typecheck
+      
+      - name: Run linter
+        run: yarn lint
+      
+      - name: Check formatting
+        run: yarn format:check
+      
+      - name: Run tests
+        run: yarn test
+      
+      - name: Run tests with coverage
+        run: yarn test:coverage
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./mcp-server/coverage/lcov.info
+          flags: mcp-server
+          name: mcp-server-coverage
+  
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'yarn'
+          cache-dependency-path: mcp-server/yarn.lock
+      
+      - name: Set up Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.19 --activate
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Build
+        run: yarn build
+      
+      - name: Test built artifact
+        run: |
+          if [ ! -f build/index.js ]; then
+            echo "Build artifact not found!"
+            exit 1
+          fi
+          echo "Build successful!"
+

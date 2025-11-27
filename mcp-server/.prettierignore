@@ -1,0 +1,16 @@
+# Build output
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Test coverage
+coverage/
+
+# Configuration
+*.config.js
+*.config.cjs
+jest.config.cjs
+jest.config.js
+
