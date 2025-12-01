@@ -31,7 +31,7 @@ FROM node:20.17.0-alpine
 RUN corepack enable && corepack prepare yarn@1.22.19 --activate
 
 # Add labels for better container management
-LABEL maintainer="DreamSportsLabs"
+LABEL maintainer="Dream Horizon"
 LABEL description="Checkmate MCP Server - Model Context Protocol server for Checkmate API"
 LABEL version="1.0.0"
 

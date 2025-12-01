@@ -5,11 +5,11 @@ export const UploadTestsInfoBox = () => {
   return (
     <HoverCard>
       <HoverCardTrigger>
-        <Info size={20} className="self-center align-middle ml-2" />
+        <Info size={20} className="self-center ml-2 align-middle" />
       </HoverCardTrigger>
-      <HoverCardContent className="min-w-80 text-sm">
+      <HoverCardContent className="text-sm min-w-80">
         <div className="flex flex-row">
-          <h6 className="scroll-m-20 font-semibold tracking-tight">
+          <h6 className="font-semibold tracking-tight scroll-m-20">
             Must Have Columns in CSV
           </h6>
         </div>
@@ -17,8 +17,8 @@ export const UploadTestsInfoBox = () => {
           <li>Title, character length must be greater then 5</li>
           <li>{"Section, add '>' if nested"}</li>
         </ul>
-        <div className="flex flex-row mt-4 ">
-          <h6 className="scroll-m-20 font-semibold tracking-tight">
+        <div className="flex flex-row mt-4">
+          <h6 className="font-semibold tracking-tight scroll-m-20">
             Columns data considered while storing
           </h6>
         </div>
@@ -37,7 +37,7 @@ export const UploadTestsInfoBox = () => {
           <li>Section Description</li>
           <li>Automation Status</li>
         </ul>
-        <div className="text-xs flex flex-col mt-2 text-red-600">
+        <div className="flex flex-col mt-2 text-xs text-red-600">
           <span>*Make sure either all contain ID or none contains it</span>
           <span>*Section, Squad not present will be added.</span>
           <span>
@@ -48,7 +48,7 @@ export const UploadTestsInfoBox = () => {
         <a
           style={{color: 'rgb(37 99 235)', marginTop: '10px'}}
           href={
-            'https://checkmate.dreamsportslabs.com/guides/tests/bulk-addition'
+            'https://checkmate.dreamhorizon.org/guides/tests/bulk-addition'
           }
           target="_blank"
           rel="noopener noreferrer">

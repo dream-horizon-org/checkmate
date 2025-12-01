@@ -72,7 +72,7 @@ function HeroSection() {
                     <span className={styles.codeComment}># Install Checkmate with one command</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>curl</span> -fsSL https://raw.githubusercontent.com/ds-horizon/checkmate/master/bootstrap.sh | <span className={styles.codeKeyword}>bash</span>
+                    <span className={styles.codeKeyword}>curl</span> -fsSL https://raw.githubusercontent.com/dream-horizon-org/checkmate/master/bootstrap.sh | <span className={styles.codeKeyword}>bash</span>
                   </div>
                   <div className={styles.codeLine}></div>
                   <div className={styles.codeLine}>
@@ -283,7 +283,7 @@ function CTASection() {
             </Link>
             <Link
               className={clsx('button button--outline button--lg', styles.ctaButtonSecondary)}
-              to="https://github.com/ds-horizon/checkmate">
+              to="https://github.com/dream-horizon-org/checkmate">
               View on GitHub
             </Link>
           </div>

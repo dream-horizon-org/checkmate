@@ -578,9 +578,9 @@ logger.warn('Performance degradation', metrics);
 
 ## Resources
 
-- **Documentation:** https://checkmate.dreamsportslabs.com
-- **API Docs:** https://checkmate.dreamsportslabs.com/guides/api
-- **GitHub:** https://github.com/dream-sports-labs/checkmate
+- **Documentation:** https://checkmate.dreamhorizon.org
+- **API Docs:** https://checkmate.dreamhorizon.org/guides/api
+- **GitHub:** https://github.com/dream-horizon-org/checkmate
 - **Discord:** https://discord.gg/wBQXeYAKNc
 - **Postman:** https://documenter.getpostman.com/view/23217307/2sAYXFgwRt
 

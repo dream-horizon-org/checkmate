@@ -264,7 +264,7 @@ By contributing, you agree that your contributions will be licensed under the MI
 ## ❓ Questions?
 
 - Join our [Discord](https://discord.gg/wBQXeYAKNc)
-- Open a [GitHub Discussion](https://github.com/ds-horizon/checkmate/discussions)
+- Open a [GitHub Discussion](https://github.com/dream-horizon-org/checkmate/discussions)
 - Check the [main README](../README.md)
 
 Thank you for contributing! 🎉

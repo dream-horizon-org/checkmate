@@ -24,26 +24,26 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
     <>
       <header
         className={cn(
-          'flex items-center justify-between px-8 sticky top-0 z-50',
-          'bg-slate-900 border-b border-slate-800',
+          'flex sticky top-0 z-50 justify-between items-center px-8',
+          'border-b bg-slate-900 border-slate-800',
           'shadow-sm',
           'h-16',
         )}>
         {/* Left Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex gap-4 items-center">
           {/* App Logo - Clickable to go to projects */}
           <button
             onClick={(e) => {
               e.preventDefault()
               navigate(`/projects?orgId=${ORG_ID}&page=1&pageSize=${SMALL_PAGE_SIZE}`, {})
             }}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
+            className="flex gap-3 items-center transition-opacity cursor-pointer hover:opacity-80">
             <img 
               src="/logo.svg" 
               alt={APP_NAME}
-              className="h-10 w-auto"
+              className="w-auto h-10"
             />
-            <span className="text-xl font-semibold text-white tracking-tight">
+            <span className="text-xl font-semibold tracking-tight text-white">
               {APP_NAME}
             </span>
           </button>
@@ -52,7 +52,7 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
           {projectId && (
             <>
               {/* Separator */}
-              <div className="h-6 w-px bg-slate-700"></div>
+              <div className="w-px h-6 bg-slate-700"></div>
 
               {/* Project Switcher */}
               <ProjectSwitcher />
@@ -61,14 +61,14 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex gap-4 items-center">
           {/* Documentation */}
           <a
-            href="https://checkmate.dreamsportslabs.com"
+            href="https://checkmate.dreamhorizon.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors">
-            <FileText className="h-4 w-4" />
+            className="flex gap-2 items-center px-3 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white hover:bg-slate-800">
+            <FileText className="w-4 h-4" />
             <span>Docs</span>
           </a>
 
@@ -77,23 +77,23 @@ export const AppHeader = ({user}: {user: User | undefined}) => {
             href="https://discord.gg/wBQXeYAKNc"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors">
-            <MessageCircle className="h-4 w-4" />
+            className="flex gap-2 items-center px-3 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white hover:bg-slate-800">
+            <MessageCircle className="w-4 h-4" />
             <span>Discord</span>
           </a>
 
           {/* Report Issue */}
           <a
-            href="https://github.com/dream-sports-labs/checkmate/issues"
+            href="https://github.com/dream-horizon-org/checkmate/issues"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors">
-            <AlertCircle className="h-4 w-4" />
+            className="flex gap-2 items-center px-3 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white hover:bg-slate-800">
+            <AlertCircle className="w-4 h-4" />
             <span>Issues</span>
           </a>
 
           {/* Separator */}
-          <div className="h-6 w-px bg-slate-700"></div>
+          <div className="w-px h-6 bg-slate-700"></div>
 
           {/* User Component */}
           {user?.userId && UserComponent(user)}

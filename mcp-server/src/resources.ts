@@ -98,8 +98,8 @@ export function registerApiDocsResource(server: McpServer) {
 ## Official Documentation
 
 - [Postman Collection](https://documenter.getpostman.com/view/23217307/2sAYXFgwRt)
-- [Checkmate Documentation](https://checkmate.dreamsportslabs.com/)
-- [GitHub Repository](https://github.com/ds-horizon/checkmate)
+- [Checkmate Documentation](https://checkmate.dreamhorizon.org/)
+- [GitHub Repository](https://github.com/dream-horizon-org/checkmate)
 
 ## Available Endpoints
 
