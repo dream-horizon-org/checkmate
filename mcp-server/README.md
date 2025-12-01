@@ -43,7 +43,7 @@ npm install -g @d11/mcp-server
 
 ```bash
 # Clone the repository
-git clone https://github.com/ds-horizon/checkmate.git
+git clone https://github.com/dream-horizon-org/checkmate.git
 cd checkmate/mcp-server
 
 # Install dependencies
@@ -390,13 +390,13 @@ If you encounter issues:
 1. Check the [Troubleshooting](#troubleshooting) section above
 2. Review server logs (stderr output)
 3. Verify your Checkmate API is working correctly
-4. Open an issue on [GitHub](https://github.com/ds-horizon/checkmate/issues)
+4. Open an issue on [GitHub](https://github.com/dream-horizon-org/checkmate/issues)
 5. Join our [Discord](https://discord.gg/wBQXeYAKNc) community
 
 ## 📚 Resources
 
 - [MCP Documentation](https://modelcontextprotocol.io/)
-- [Checkmate Documentation](https://checkmate.dreamsportslabs.com/)
+- [Checkmate Documentation](https://checkmate.dreamhorizon.org/)
 - [Checkmate API Documentation](https://documenter.getpostman.com/view/23217307/2sAYXFgwRt)
 
 ## 🤝 Contributing
@@ -420,9 +420,9 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE) f
 ## 🙏 Acknowledgments
 
 - Built with the [Model Context Protocol SDK](https://github.com/modelcontextprotocol/typescript-sdk)
-- Part of the [Checkmate](https://github.com/ds-horizon/checkmate) project
-- Created by [DreamSportsLabs](https://www.dreamsportslabs.com/)
+- Part of the [Checkmate](https://github.com/dream-horizon-org/checkmate) project
+- Created by [DreamHorizon](https://www.dreamhorizon.org/)
 
 ---
 
-**Need help?** Join our [Discord community](https://discord.gg/wBQXeYAKNc) or [open an issue](https://github.com/ds-horizon/checkmate/issues).
+**Need help?** Join our [Discord community](https://discord.gg/wBQXeYAKNc) or [open an issue](https://github.com/dream-horizon-org/checkmate/issues).

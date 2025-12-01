@@ -51,9 +51,9 @@ website/
 
 ### Docusaurus Config (`docusaurus.config.ts`)
 
-- **URL**: `https://checkmate.dreamsportslabs.com`
+- **URL**: `https://checkmate.dreamhorizon.org`
 - **Base URL**: `/`
-- **Organization**: `ds-horizon`
+- **Organization**: `dream-horizon-org`
 - **Project**: `checkmate`
 
 ### Features
@@ -171,7 +171,7 @@ This documentation was migrated from Astro Starlight with the following conversi
 
 ## 🔗 Links
 
-- [Checkmate Repository](https://github.com/ds-horizon/checkmate)
+- [Checkmate Repository](https://github.com/dream-horizon-org/checkmate)
 - [Docusaurus Documentation](https://docusaurus.io)
 - [Discord Community](https://discord.gg/wBQXeYAKNc)
 

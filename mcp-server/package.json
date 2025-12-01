@@ -37,17 +37,17 @@
     "ai-assistant",
     "llm"
   ],
-  "author": "DreamSportsLabs",
+  "author": "Dream Horizon",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ds-horizon/checkmate.git",
+    "url": "https://github.com/dream-horizon-org/checkmate.git",
     "directory": "mcp-server"
   },
   "bugs": {
-    "url": "https://github.com/ds-horizon/checkmate/issues"
+    "url": "https://github.com/dream-horizon-org/checkmate/issues"
   },
-  "homepage": "https://checkmate.dreamsportslabs.com/",
+  "homepage": "https://checkmate.dreamhorizon.org/",
   "engines": {
     "node": ">=18.0.0"
   },

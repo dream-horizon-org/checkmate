@@ -15,14 +15,14 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://checkmate.dreamsportslabs.com',
+  url: 'https://checkmate.dreamhorizon.org',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'ds-horizon', // Usually your GitHub org/user name.
+  organizationName: 'dream-horizon-org', // Usually your GitHub org/user name.
   projectName: 'checkmate', // Usually your repo name.
 
   onBrokenLinks: 'warn',
@@ -41,7 +41,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/ds-horizon/checkmate/tree/master/website/',
+          editUrl: 'https://github.com/dream-horizon-org/checkmate/tree/master/website/',
         },
         blog: false,
         theme: {
@@ -98,7 +98,7 @@ const config: Config = {
           label: 'Docs',
         },
         {
-          href: 'https://github.com/ds-horizon/checkmate',
+          href: 'https://github.com/dream-horizon-org/checkmate',
           label: 'GitHub',
           position: 'right',
         },
@@ -138,7 +138,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/ds-horizon/checkmate',
+              href: 'https://github.com/dream-horizon-org/checkmate',
             },
           ],
         },
@@ -147,11 +147,11 @@ const config: Config = {
           items: [
             {
               label: 'GitHub Issues',
-              href: 'https://github.com/ds-horizon/checkmate/issues',
+              href: 'https://github.com/dream-horizon-org/checkmate/issues',
             },
             {
               label: 'Contributing',
-              href: 'https://github.com/ds-horizon/checkmate/blob/master/CONTRIBUTING.md',
+              href: 'https://github.com/dream-horizon-org/checkmate/blob/master/CONTRIBUTING.md',
             },
           ],
         },

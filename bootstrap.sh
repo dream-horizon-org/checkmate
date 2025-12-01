@@ -22,7 +22,7 @@ echo -e "${NC}\n"
 echo -e "${BLUE}ℹ️  Downloading installation script...${NC}\n"
 
 # Download the install script
-INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/ds-horizon/checkmate/master/install.sh"
+INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dream-horizon-org/checkmate/master/install.sh"
 
 if command -v curl &> /dev/null; then
     curl -fsSL "$INSTALL_SCRIPT_URL" -o /tmp/checkmate-install.sh

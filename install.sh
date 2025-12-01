@@ -326,12 +326,12 @@ setup_repository() {
         else
             # Try SSH first, fallback to HTTPS if SSH fails
             print_info "Attempting to clone via SSH..."
-            if git clone git@github.com:ds-horizon/checkmate.git 2>/dev/null; then
+            if git clone git@github.com:dream-horizon-org/checkmate.git 2>/dev/null; then
                 REPO_DIR="$(pwd)/checkmate"
                 print_success "Repository cloned successfully via SSH"
             else
                 print_warning "SSH clone failed, trying HTTPS..."
-                if git clone https://github.com/ds-horizon/checkmate.git 2>/dev/null; then
+                if git clone https://github.com/dream-horizon-org/checkmate.git 2>/dev/null; then
                     REPO_DIR="$(pwd)/checkmate"
                     print_success "Repository cloned successfully via HTTPS"
                 else
@@ -379,7 +379,7 @@ show_oauth_instructions() {
     echo -e "     ${GREEN}GOOGLE_CLIENT_SECRET${NC}=your_google_client_secret_here"
     echo ""
     echo -e "  ${BLUE}📖 Setup Guide:${NC}"
-    echo -e "     ${BLUE}https://checkmate.dreamsportslabs.com/docs/project/setup#google-oauth-setup${NC}"
+    echo -e "     ${BLUE}https://checkmate.dreamhorizon.org/docs/project/setup#google-oauth-setup${NC}"
     echo ""
     echo -e "  ${BLUE}🔗 Google Cloud Console:${NC}"
     echo -e "     ${BLUE}https://console.cloud.google.com/apis/credentials${NC}"
@@ -858,7 +858,7 @@ handle_error() {
         "Repository Setup")
             echo -e "  ${BLUE}•${NC} Check internet connection"
             echo -e "  ${BLUE}•${NC} Verify Git is installed: ${BLUE}git --version${NC}"
-            echo -e "  ${BLUE}•${NC} Try cloning manually: ${BLUE}git clone https://github.com/ds-horizon/checkmate.git${NC}"
+            echo -e "  ${BLUE}•${NC} Try cloning manually: ${BLUE}git clone https://github.com/dream-horizon-org/checkmate.git${NC}"
             ;;
         "Dependencies Installation")
             echo -e "  ${BLUE}•${NC} Ensure Node.js and Yarn are installed"
@@ -877,7 +877,7 @@ handle_error() {
         *)
             echo -e "  ${BLUE}•${NC} Check the error message above"
             echo -e "  ${BLUE}•${NC} Review installation logs"
-            echo -e "  ${BLUE}•${NC} Check documentation: ${BLUE}https://checkmate.dreamsportslabs.com${NC}"
+            echo -e "  ${BLUE}•${NC} Check documentation: ${BLUE}https://checkmate.dreamhorizon.org${NC}"
             ;;
     esac
     
@@ -1050,13 +1050,13 @@ main() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     echo -e "  ${BLUE}📖${NC} Documentation:"
-    echo -e "     ${BLUE}https://checkmate.dreamsportslabs.com${NC}"
+    echo -e "     ${BLUE}https://checkmate.dreamhorizon.org${NC}"
     echo ""
     echo -e "  ${BLUE}💬${NC} Discord Community:"
     echo -e "     ${BLUE}https://discord.gg/wBQXeYAKNc${NC}"
     echo ""
     echo -e "  ${BLUE}🐙${NC} GitHub:"
-    echo -e "     ${BLUE}https://github.com/ds-horizon/checkmate${NC}"
+    echo -e "     ${BLUE}https://github.com/dream-horizon-org/checkmate${NC}"
     echo ""
     
     # Show configuration status (already configured during installation)

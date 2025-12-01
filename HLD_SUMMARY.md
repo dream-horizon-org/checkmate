@@ -8,7 +8,7 @@ I've created a comprehensive High-Level Design (HLD) document for the Checkmate 
 
 ### 1. **Main Documentation Site** (docs/src/content/docs/tech/hld.mdx)
 - **Location:** `/Users/mayank.kush/Documents/workspace/checkmate/docs/src/content/docs/tech/hld.mdx`
-- **Access:** https://checkmate.dreamsportslabs.com/tech/hld
+- **Access:** https://checkmate.dreamhorizon.org/tech/hld
 - **Format:** MDX with interactive components (Astro Starlight)
 - **Status:** ✅ Complete (WIP badge removed)
 
@@ -172,7 +172,7 @@ The MDX version includes:
 
 ### Online (Recommended)
 ```
-https://checkmate.dreamsportslabs.com/tech/hld
+https://checkmate.dreamhorizon.org/tech/hld
 ```
 
 ### Local Development
@@ -239,12 +239,12 @@ Consider versioning the HLD document:
 
 The HLD complements other documentation:
 
-- **[Application Structure](https://checkmate.dreamsportslabs.com/project/application-structure)** - Code organization
-- **[Database Schema](https://checkmate.dreamsportslabs.com/tech/db-schema)** - Detailed schema
-- **[Tech Stack](https://checkmate.dreamsportslabs.com/tech/techstack)** - Technology details
-- **[API Documentation](https://checkmate.dreamsportslabs.com/guides/api)** - API reference
-- **[RBAC Guide](https://checkmate.dreamsportslabs.com/project/rbac)** - Authorization details
-- **[Setup Guide](https://checkmate.dreamsportslabs.com/project/setup)** - Installation instructions
+- **[Application Structure](https://checkmate.dreamhorizon.org/project/application-structure)** - Code organization
+- **[Database Schema](https://checkmate.dreamhorizon.org/tech/db-schema)** - Detailed schema
+- **[Tech Stack](https://checkmate.dreamhorizon.org/tech/techstack)** - Technology details
+- **[API Documentation](https://checkmate.dreamhorizon.org/guides/api)** - API reference
+- **[RBAC Guide](https://checkmate.dreamhorizon.org/project/rbac)** - Authorization details
+- **[Setup Guide](https://checkmate.dreamhorizon.org/project/setup)** - Installation instructions
 
 ## ✨ Key Features of the HLD
 

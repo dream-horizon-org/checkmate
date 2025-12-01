@@ -14,10 +14,10 @@ This Test Case Management Tool is designed to address the challenges faced by te
 
 ## 🔗 Quick Links
 
-- [Detailed Documentation](https://checkmate.dreamsportslabs.com/)
-- [Installation Guide](https://checkmate.dreamsportslabs.com/docs/project/setup)
-- [Product Guide](https://checkmate.dreamsportslabs.com/docs/guides/projects)
-- [API Documentation](https://checkmate.dreamsportslabs.com/docs/guides/api/)
+- [Detailed Documentation](https://checkmate.dreamhorizon.org/)
+- [Installation Guide](https://checkmate.dreamhorizon.org/docs/project/setup)
+- [Product Guide](https://checkmate.dreamhorizon.org/docs/guides/projects)
+- [API Documentation](https://checkmate.dreamhorizon.org/docs/guides/api/)
 - [Connect with us on discord](https://discord.gg/wBQXeYAKNc)
 
 ## 📦 Installation
@@ -27,13 +27,13 @@ This Test Case Management Tool is designed to address the challenges faced by te
 Install Checkmate with a single command:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/ds-horizon/checkmate/master/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/dream-horizon-org/checkmate/master/bootstrap.sh | bash
 ```
 
 Or using wget:
 
 ```sh
-wget -qO- https://raw.githubusercontent.com/ds-horizon/checkmate/master/bootstrap.sh | bash
+wget -qO- https://raw.githubusercontent.com/dream-horizon-org/checkmate/master/bootstrap.sh | bash
 ```
 
 This will download and run the interactive installer that walks you through everything.
@@ -44,7 +44,7 @@ If you prefer to download the script first:
 
 ```sh
 # Download
-curl -fsSL https://raw.githubusercontent.com/ds-horizon/checkmate/master/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/dream-horizon-org/checkmate/master/install.sh -o install.sh
 chmod +x install.sh
 
 # Run
@@ -54,7 +54,7 @@ chmod +x install.sh
 Or clone the repository first:
 
 ```sh
-git clone git@github.com:ds-horizon/checkmate.git
+git clone git@github.com:dream-horizon-org/checkmate.git
 cd checkmate
 ./install.sh
 ```
@@ -85,7 +85,7 @@ cd checkmate
 
 1. Clone the repository:
    ```sh
-   git clone git@github.com:ds-horizon/checkmate.git
+   git clone git@github.com:dream-horizon-org/checkmate.git
    cd checkmate
    ```
 2. Create an .env file at root level, based on .env.example.
@@ -162,9 +162,9 @@ docker-compose logs -f checkmate-mcp
 ```
 
 **Documentation:**
-- [MCP Server API Reference](https://checkmate.dreamsportslabs.com/docs/guides/api/mcp-server) - Complete API reference
-- [MCP Tools Guide](https://checkmate.dreamsportslabs.com/docs/guides/api/mcp-tools) - Tool usage examples
-- [Docker Deployment](https://checkmate.dreamsportslabs.com/docs/project/mcp-docker) - Production deployment with Docker
+- [MCP Server API Reference](https://checkmate.dreamhorizon.org/docs/guides/api/mcp-server) - Complete API reference
+- [MCP Tools Guide](https://checkmate.dreamhorizon.org/docs/guides/api/mcp-tools) - Tool usage examples
+- [Docker Deployment](https://checkmate.dreamhorizon.org/docs/project/mcp-docker) - Production deployment with Docker
 
 ### ⚙️ TechStack Used:
 
@@ -193,9 +193,9 @@ docker-compose logs -f checkmate-mcp
   <a href="https://casbin.org/" target="_blank">Casbin (RBAC)</a>
   </span>
 
-## <img src="app/assets/d11-logo.png" style="width:24px; height:auto; padding-top:8px;" /> Created by DreamSportsLabs
+## <img src="app/assets/d11-logo.png" style="width:24px; height:auto; padding-top:8px;" /> Created by Dream Horizon
 
-DreamSportsLabs is committed to building open-source tools that empower developers and businesses. Learn more about us at our website.
+Dream Horizon is committed to building open-source tools that empower developers and businesses. Learn more about us at our website.
 
 ## 🚀 Contribute to Checkmate
 
@@ -207,4 +207,4 @@ This project is published under the [MIT License](/LICENSE).
 
 ## ✉️ Contact
 
-If you need feedback or support, reach out via the [Issue Tracker](https://github.com/ds-horizon/checkmate/issues) or [Discord](https://discord.gg/wBQXeYAKNc).
+If you need feedback or support, reach out via the [Issue Tracker](https://github.com/dream-horizon-org/checkmate/issues) or [Discord](https://discord.gg/wBQXeYAKNc).
