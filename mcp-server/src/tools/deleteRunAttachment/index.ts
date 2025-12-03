@@ -23,14 +23,10 @@ export default function registerDeleteRunAttachment(
           }),
         });
 
-        return handleApiResponse(
-          data,
-          `delete run attachment ${attachmentId}`,
-          [
-            'projectId (number, required): Project ID',
-            'attachmentId (number, required): Attachment ID to delete',
-          ],
-        );
+        return handleApiResponse(data, `delete run attachment ${attachmentId}`, [
+          'projectId (number, required): Project ID',
+          'attachmentId (number, required): Attachment ID to delete',
+        ]);
       } catch (error) {
         return {
           content: [
@@ -45,4 +41,3 @@ export default function registerDeleteRunAttachment(
     },
   );
 }
-

@@ -23,15 +23,11 @@ export default function registerGetRunAttachments(
         });
 
         const data = await makeRequest(`api/v1/run/attachments?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve attachments for test ${testId} in run ${runId}`,
-          [
-            'projectId (number, required): Project ID',
-            'runId (number, required): Run ID',
-            'testId (number, required): Test ID',
-          ],
-        );
+        return handleApiResponse(data, `retrieve attachments for test ${testId} in run ${runId}`, [
+          'projectId (number, required): Project ID',
+          'runId (number, required): Run ID',
+          'testId (number, required): Test ID',
+        ]);
       } catch (error) {
         return {
           content: [
@@ -46,4 +42,3 @@ export default function registerGetRunAttachments(
     },
   );
 }
-

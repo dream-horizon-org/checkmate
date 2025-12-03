@@ -21,14 +21,10 @@ export default function registerGetTestAttachments(
         });
 
         const data = await makeRequest(`api/v1/test/attachments?${qs.toString()}`);
-        return handleApiResponse(
-          data,
-          `retrieve attachments for test ${testId}`,
-          [
-            'projectId (number, required): Project ID',
-            'testId (number, required): Test ID',
-          ],
-        );
+        return handleApiResponse(data, `retrieve attachments for test ${testId}`, [
+          'projectId (number, required): Project ID',
+          'testId (number, required): Test ID',
+        ]);
       } catch (error) {
         return {
           content: [
@@ -43,4 +39,3 @@ export default function registerGetTestAttachments(
     },
   );
 }
-
