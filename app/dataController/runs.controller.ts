@@ -22,6 +22,7 @@ export interface ICreateRuns {
   createdBy: number
   filterType?: 'and' | 'or'
   platformIds?: number[]
+  priorityIds?: number[]
 }
 
 export interface IUpdateRun {
